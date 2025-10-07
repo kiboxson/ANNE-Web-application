@@ -1,0 +1,74 @@
+[
+  {
+    "id": "Samsung Galaxy S23-1758977142774",
+    "title": "Samsung Galaxy S23",
+    "price": 400,
+    "stock": 10,
+    "category": "Smart Phone",
+    "image": "https://res.cloudinary.com/dgpocgkx3/image/upload/v1758977144/products/Samsung%20Galaxy%20S23-1758977142774_1758977142774.jpg"
+  },
+  {
+    "id": "Primum Watch-1758978062614",
+    "title": "Primum Watch",
+    "price": 50,
+    "stock": 50,
+    "category": "Watch",
+    "image": "https://res.cloudinary.com/dgpocgkx3/image/upload/v1758978066/products/Primum%20Watch-1758978062614_1758978062614.jpg"
+  },
+  {
+    "id": "Canon-1758978261178",
+    "title": "Canon",
+    "price": 500,
+    "stock": 20,
+    "category": "Camera",
+    "image": "https://res.cloudinary.com/dgpocgkx3/image/upload/v1758978262/products/Canon-1758978261178_1758978261178.jpg"
+  },
+  {
+    "id": "JBL-1758979888271",
+    "title": "JBL",
+    "price": 30,
+    "stock": 10,
+    "category": "Speaker",
+    "image": "https://res.cloudinary.com/dgpocgkx3/image/upload/v1758979889/products/JBL-1758979888271_1758979888271.jpg"
+  },
+  {
+    "id": "qwer-1759745599627",
+    "title": "qwer",
+    "price": 123,
+    "stock": 12,
+    "category": "asd",
+    "image": "https://res.cloudinary.com/dgpocgkx3/image/upload/v1759745602/products/qwer-1759745599627_1759745599627.png"
+  },
+  {
+    "id": "qwer-1759745964596",
+    "title": "qwer",
+    "price": 1234,
+    "stock": 12,
+    "category": "qwert",
+    "image": "https://res.cloudinary.com/dgpocgkx3/image/upload/v1759745965/products/qwer-1759745964596_1759745964596.png"
+  },
+  {
+    "id": "qwert-1759746088988",
+    "title": "qwert",
+    "price": 1234,
+    "stock": 12,
+    "category": "qwert",
+    "image": "https://res.cloudinary.com/dgpocgkx3/image/upload/v1759746089/products/qwert-1759746088988_1759746088988.png"
+  },
+  {
+    "id": "qwer-1759747591138",
+    "title": "qwer",
+    "price": 1234,
+    "stock": 12,
+    "category": "qwer",
+    "image": "https://res.cloudinary.com/dgpocgkx3/image/upload/v1759747593/products/qwer-1759747591138_1759747591139.png"
+  },
+  {
+    "id": "asd-1759747711514",
+    "title": "asd",
+    "price": 1234,
+    "stock": 12,
+    "category": "asd",
+    "image": "https://res.cloudinary.com/dgpocgkx3/image/upload/v1759747712/products/asd-1759747711514_1759747711514.png"
+  }
+]

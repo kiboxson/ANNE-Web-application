@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>Product API Test</h1>
+    <button onclick="testAPI()">Test API</button>
+    <button onclick="migrateData()">Migrate Data</button>
+    <div id="results"></div>
+
+    <script>
+        async function testAPI() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Testing API...</p>';
+            
+            try {
+                const response = await fetch('/api/products');
+                const data = await response.json();
+                results.innerHTML = `
+                    <h3>API Response:</h3>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                results.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        async function migrateData() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Migrating data...</p>';
+            
+            try {
+                const response = await fetch('/api/migrate-products', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                results.innerHTML = `
+                    <h3>Migration Results:</h3>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                results.innerHTML = `<p style="color: red;">Migration Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+[
+  {
+    "id": "JBL-1758980552440",
+    "title": "JBL",
+    "price": 30,
+    "stock": 10,
+    "category": "Speaker",
+    "image": "https://res.cloudinary.com/dgpocgkx3/image/upload/v1758980554/flashsale/JBL-1758980552440_1758980552441.jpg",
+    "startsAt": "2025-09-27T19:12",
+    "endsAt": "2025-09-28T19:12",
+    "discount": 33
+  },
+  {
+    "id": "Samsung TV-1758980996078",
+    "title": "Samsung TV",
+    "price": 100,
+    "stock": 5,
+    "category": "TV",
+    "image": "https://res.cloudinary.com/dgpocgkx3/image/upload/v1758981002/flashsale/Samsung%20TV-1758980996078_1758980996078.jpg",
+    "startsAt": "2025-09-27T19:19",
+    "endsAt": "2025-09-28T19:19",
+    "discount": 20
+  },
+  {
+    "id": "Bag-1758981498572",
+    "title": "Bag",
+    "price": 20,
+    "stock": 5,
+    "category": "bag",
+    "image": "https://res.cloudinary.com/dgpocgkx3/image/upload/v1758981500/flashsale/Bag-1758981498572_1758981498572.jpg",
+    "startsAt": "2025-09-27T19:20",
+    "endsAt": "2025-09-28T19:21",
+    "discount": 20
+  },
+  {
+    "id": "Console-1758981775512",
+    "title": "Console",
+    "price": 40,
+    "stock": 5,
+    "category": "Console",
+    "image": "https://res.cloudinary.com/dgpocgkx3/image/upload/v1758981777/flashsale/Console-1758981775512_1758981775513.jpg",
+    "startsAt": "2025-09-27T19:32",
+    "endsAt": "2025-09-28T19:32",
+    "discount": 20
+  }
+]
