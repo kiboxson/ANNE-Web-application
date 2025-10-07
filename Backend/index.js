@@ -14,6 +14,25 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname)); // Serve static files for testing
 
+// Root route handler
+app.get("/", (req, res) => {
+  res.json({
+    message: "🚀 ANNE Web Application Backend API",
+    status: "✅ Server is running successfully",
+    version: "1.0.0",
+    endpoints: {
+      health: "/api/health/db",
+      products: "/api/products",
+      flashProducts: "/api/flash-products",
+      orders: "/api/orders",
+      chat: "/api/chat",
+      users: "/api/users",
+      email: "/api/test-email"
+    },
+    documentation: "Visit the API endpoints above for functionality"
+  });
+});
+
 // --- MongoDB Atlas connection ---
 const MONGODB_URI = "mongodb+srv://kiboxsonleena:20040620Kiyu@cluster0.cr1byep.mongodb.net/passkey?retryWrites=true&w=majority&appName=Cluster0";
 
