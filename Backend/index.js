@@ -10,7 +10,20 @@ const mongoose = require("mongoose");
 
 const app = express();
 
-app.use(cors());
+// CORS configuration for production
+const corsOptions = {
+  origin: [
+    'http://localhost:3000', // Local development
+    'https://localhost:3000', // Local development HTTPS
+    /\.vercel\.app$/, // All Vercel domains
+    /\.netlify\.app$/, // All Netlify domains (if needed)
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-requested-with']
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 // Removed static file serving to prevent API route conflicts
 // app.use(express.static(__dirname)); // Serve static files for testing
