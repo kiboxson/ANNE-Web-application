@@ -14,7 +14,7 @@ export default function EmailTest({ onBack }) {
   const testEmailCredentials = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('/api/test-email');
+      const response = await axios.get('http://localhost:5000/api/test-email');
       setTestResult(response.data);
     } catch (error) {
       setTestResult({
@@ -34,7 +34,7 @@ export default function EmailTest({ onBack }) {
 
     setLoading(true);
     try {
-      const response = await axios.post('/api/setup-email', credentials);
+      const response = await axios.post('http://localhost:5000/api/setup-email', credentials);
       setTestResult(response.data);
       if (response.data.success) {
         alert('Email credentials saved successfully!');

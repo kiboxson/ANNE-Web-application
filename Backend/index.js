@@ -12,7 +12,8 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(__dirname)); // Serve static files for testing
+// Removed static file serving to prevent API route conflicts
+// app.use(express.static(__dirname)); // Serve static files for testing
 
 // Root route handler
 app.get("/", (req, res) => {

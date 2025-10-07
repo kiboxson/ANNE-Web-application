@@ -144,7 +144,7 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
 
   async function loadChatSessions() {
     try {
-      const response = await axios.get('/api/chat-sessions');
+      const response = await axios.get('http://localhost:5000/api/chat-sessions');
       setChatSessions(response.data);
     } catch (error) {
       console.error('Failed to load chat sessions:', error);
@@ -153,10 +153,10 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
 
   async function loadChatMessages(sessionId) {
     try {
-      const response = await axios.get(`/api/chat/${sessionId}`);
+      const response = await axios.get(`http://localhost:5000/api/chat/${sessionId}`);
       setChatMessages(response.data);
       // Mark messages as read
-      await axios.put(`/api/chat/${sessionId}/read`);
+      await axios.put(`http://localhost:5000/api/chat/${sessionId}/read`);
     } catch (error) {
       console.error('Failed to load chat messages:', error);
     }
@@ -166,7 +166,7 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
     if (!adminMessage.trim() || !selectedSession) return;
     
     try {
-      await axios.post('/api/chat', {
+      await axios.post('http://localhost:5000/api/chat', {
         message: adminMessage.trim(),
         sender: 'admin',
         senderName: 'Admin Support',
@@ -183,7 +183,7 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
   // User management functions
   async function loadUsers() {
     try {
-      const response = await axios.get('/api/users');
+      const response = await axios.get('http://localhost:5000/api/users');
       setUsers(response.data);
     } catch (error) {
       console.error('Failed to load users:', error);
@@ -197,7 +197,7 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
       
       const newRole = user.role === 'admin' ? 'user' : 'admin';
       
-      await axios.put(`/api/users/${userId}/role`, { role: newRole });
+      await axios.put(`http://localhost:5000/api/users/${userId}/role`, { role: newRole });
       
       // Update local state
       setUsers(prev => 
@@ -211,7 +211,7 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
   // Order management functions
   async function loadOrders() {
     try {
-      const response = await axios.get('/api/orders');
+      const response = await axios.get('http://localhost:5000/api/orders');
       setOrders(response.data);
     } catch (error) {
       console.error('Failed to load orders:', error);
@@ -220,14 +220,14 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
 
   async function updateOrderStatus(orderId, newStatus) {
     try {
-      await axios.put(`/api/orders/${orderId}/status`, { status: newStatus });
+      await axios.put(`http://localhost:5000/api/orders/${orderId}/status`, { status: newStatus });
       
       // If order is being cancelled, send cancellation email
       if (newStatus === 'cancelled') {
         const order = orders.find(o => o.orderId === orderId);
         if (order) {
           try {
-            await axios.post('/api/send-cancellation-email', {
+            await axios.post('http://localhost:5000/api/send-cancellation-email', {
               orderId: order.orderId,
               customerName: order.customerName,
               customerEmail: order.customerEmail,

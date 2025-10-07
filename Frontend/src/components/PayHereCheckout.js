@@ -80,7 +80,7 @@ export default function PayHereCheckout({ cartItems, totalAmount, onSuccess, onC
         phone: shippingInfo.phone
       };
 
-      const orderResponse = await axios.post('/api/orders', orderData);
+      const orderResponse = await axios.post('http://localhost:5000/api/orders', orderData);
       const order = orderResponse.data;
 
       // Initiate PayHere payment
@@ -138,7 +138,7 @@ export default function PayHereCheckout({ cartItems, totalAmount, onSuccess, onC
         paymentMethod: 'Cash on Delivery'
       };
 
-      const orderResponse = await axios.post('/api/orders', orderData);
+      const orderResponse = await axios.post('http://localhost:5000/api/orders', orderData);
       const order = orderResponse.data;
       
       onSuccess && onSuccess(order);

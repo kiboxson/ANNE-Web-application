@@ -11,7 +11,7 @@ import axios from "axios";
 
 async function registerUserInBackend(user) {
   try {
-    await axios.post('/api/users', {
+    await axios.post('http://localhost:5000/api/users', {
       userId: user.userId,
       username: user.username,
       email: user.email

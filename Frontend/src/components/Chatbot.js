@@ -69,7 +69,7 @@ export default function Chatbot() {
 
   async function loadMessages() {
     try {
-      const response = await axios.get(`/api/chat/${sessionId}`);
+      const response = await axios.get(`http://localhost:5000/api/chat/${sessionId}`);
       const chatMessages = response.data.map(msg => ({
         role: msg.sender === 'user' ? 'user' : 'admin',
         text: msg.message,
@@ -117,7 +117,7 @@ export default function Chatbot() {
     
     // Send initial welcome message to backend
     try {
-      await axios.post('/api/chat', {
+      await axios.post('http://localhost:5000/api/chat', {
         message: welcomeMessage,
         sender: 'admin',
         senderName: 'Support Team',
@@ -145,7 +145,7 @@ export default function Chatbot() {
     setInput("");
     
     try {
-      await axios.post('/api/chat', {
+      await axios.post('http://localhost:5000/api/chat', {
         message: trimmed,
         sender: 'user',
         senderName: customerName || 'Customer',

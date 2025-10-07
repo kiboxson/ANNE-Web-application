@@ -13,7 +13,7 @@ export function FlashProductsProvider({ children }) {
     (async () => {
       try {
         console.log('🔄 Loading flash products from backend...');
-        const res = await fetch('/api/flash-products');
+        const res = await fetch('http://localhost:5000/api/flash-products');
         console.log('⚡ Flash products API response status:', res.status);
         if (!res.ok) throw new Error(`Failed to load flash products: ${res.status}`);
         const data = await res.json();
@@ -33,7 +33,7 @@ export function FlashProductsProvider({ children }) {
   // Function to refresh flash products from backend
   const refreshFlashProducts = useCallback(async () => {
     try {
-      const res = await fetch('/api/flash-products');
+      const res = await fetch('http://localhost:5000/api/flash-products');
       if (!res.ok) throw new Error(`Failed to load flash products: ${res.status}`);
       const data = await res.json();
       setFlashProducts(Array.isArray(data) ? data : []);
@@ -64,7 +64,7 @@ export function FlashProductsProvider({ children }) {
       console.log('⚡ Adding flash product via context:', p);
 
       // Persist to backend
-      const res = await fetch('/api/flash-products', {
+      const res = await fetch('http://localhost:5000/api/flash-products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(p),
@@ -95,7 +95,7 @@ export function FlashProductsProvider({ children }) {
 
   const removeFlashProduct = useCallback(async (id) => {
     try {
-      const res = await fetch(`/api/flash-products/${encodeURIComponent(id)}`, { method: 'DELETE' });
+      const res = await fetch(`http://localhost:5000/api/flash-products/${encodeURIComponent(id)}`, { method: 'DELETE' });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.error || `Failed to delete flash product: ${res.status}`);

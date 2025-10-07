@@ -23,7 +23,7 @@ export default function Orders({ onBack }) {
   async function loadUserOrders(userId) {
     try {
       setLoading(true);
-      const response = await axios.get(`/api/orders/user/${userId}`);
+      const response = await axios.get(`http://localhost:5000/api/orders/user/${userId}`);
       setOrders(response.data);
     } catch (error) {
       console.error('Failed to load orders:', error);
