@@ -3,6 +3,7 @@ import img1 from "../assets/img1.jpg";
 import img2 from "../assets/img2.jpg";
 import img3 from "../assets/img3.jpg";
 import "./ImageSlider.css";
+import "../styles/shared-responsive.css";
 
 const images = [img1, img2, img3];
 
@@ -35,7 +36,7 @@ function ImageSlider() {
   };
 
   return (
-    <div className="image-slider-container">
+    <div className="slider-responsive-container">
       <div className="image-slider-wrapper">
         {/* Slides (sliding track) */}
         <div className="absolute inset-0 overflow-hidden z-0">

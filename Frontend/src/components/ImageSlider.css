@@ -1,23 +1,14 @@
 /* ImageSlider Media Queries - Mobile First Approach */
 
-.image-slider-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  padding: 0 8px;
-  margin-top: 12px;
-}
-
 .image-slider-wrapper {
   position: relative;
   width: 100%;
-  max-width: 1280px;
   height: 200px;
-  margin: 0 auto;
-  border-radius: 16px;
+  border-radius: 12px;
   overflow: hidden;
   background-color: white;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  margin-top: 12px;
 }
 
 .slider-content {
@@ -150,6 +141,7 @@
 @media (min-width: 320px) {
   .image-slider-wrapper {
     height: 220px;
+    border-radius: 14px;
   }
   
   .mega-sale-title {
@@ -163,12 +155,9 @@
 
 /* Small Devices (landscape phones, 480px and up) */
 @media (min-width: 480px) {
-  .image-slider-container {
-    padding: 0 16px;
-  }
-  
   .image-slider-wrapper {
     height: 240px;
+    border-radius: 16px;
   }
   
   .hot-deals-badge {
@@ -269,10 +258,6 @@
 
 /* Large Devices (desktops, 1024px and up) */
 @media (min-width: 1024px) {
-  .image-slider-container {
-    padding: 0 24px;
-  }
-  
   .image-slider-wrapper {
     height: 420px;
   }

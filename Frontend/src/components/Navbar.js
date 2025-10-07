@@ -2,6 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import img from "../assets/kiyu.png";
 import { useCart } from "../context/CartContext";
+import "../styles/shared-responsive.css";
 
 function Navbar({ user, onLoginClick, onSignupClick, onLogoutClick, searchValue, onSearchChange, onCartClick }) {
   const { count } = useCart();
@@ -17,7 +18,8 @@ function Navbar({ user, onLoginClick, onSignupClick, onLogoutClick, searchValue,
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
       >
         {/* Top section - login/logout buttons */}
-        <div className="flex flex-wrap px-2 sm:px-4 py-2 gap-2 sm:gap-4 items-center justify-center text-[#EBEBEB] text-xs sm:text-sm">
+        <div className="navbar-responsive-container">
+          <div className="flex flex-wrap py-2 gap-2 sm:gap-4 items-center justify-center text-[#EBEBEB] text-xs sm:text-sm">
           {user ? (
             <div className="flex items-center gap-4">
               <span className="font-semibold">Hi, {user.username || user.email}</span>
@@ -56,6 +58,7 @@ function Navbar({ user, onLoginClick, onSignupClick, onLogoutClick, searchValue,
           <motion.button className="px-3 py-1 rounded-lg hover:bg-white/10 transition" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             Contact Us 
           </motion.button>
+          </div>
         </div>
 
       </motion.div>
@@ -67,7 +70,8 @@ function Navbar({ user, onLoginClick, onSignupClick, onLogoutClick, searchValue,
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.1 }}
       >
-        <div className="flex items-center justify-center gap-4 px-3 sm:px-4 lg:px-6 py-3">
+        <div className="navbar-responsive-container">
+          <div className="flex items-center justify-center gap-4 py-3">
           {/* Logo - now sticky */}
           <div className="flex items-center">
             <img src={img} alt="Logo" className="w-14 h-14 sm:w-16 sm:h-16" />
@@ -139,6 +143,7 @@ function Navbar({ user, onLoginClick, onSignupClick, onLogoutClick, searchValue,
               )}
             </motion.div>
           </div>
+          </div>
         </div>
       </motion.div>
 
@@ -150,7 +155,8 @@ function Navbar({ user, onLoginClick, onSignupClick, onLogoutClick, searchValue,
           exit={{ opacity: 0, height: 0 }}
           className="sticky top-[73px] z-40 lg:hidden bg-[#1A1E21] border-t border-white/20"
         >
-          <div className="px-4 py-3 space-y-3">
+          <div className="navbar-responsive-container">
+            <div className="py-3 space-y-3">
             {/* Mobile search */}
             <div className="md:hidden relative">
               <input
@@ -186,6 +192,7 @@ function Navbar({ user, onLoginClick, onSignupClick, onLogoutClick, searchValue,
               )}
               <button className="text-left py-2 hover:bg-white/10 rounded">Help & Support</button>
               <button className="text-left py-2 hover:bg-white/10 rounded">Contact Us</button>
+            </div>
             </div>
           </div>
         </motion.div>
