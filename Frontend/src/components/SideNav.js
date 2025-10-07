@@ -32,13 +32,13 @@ export default function SideNav({ onHomeClick, onCartClick, onFiltersClick, onDe
       </motion.button>
 
       {/* Mobile overlay sidebar */}
-      {collapsed && (
+      {!collapsed && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="md:hidden fixed inset-0 z-[55] bg-black/50"
-          onClick={() => setCollapsed(false)}
+          onClick={() => setCollapsed(true)}
         >
           <motion.div
             initial={{ x: -300 }}
@@ -50,7 +50,7 @@ export default function SideNav({ onHomeClick, onCartClick, onFiltersClick, onDe
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-lg font-semibold">Menu</h2>
               <button
-                onClick={() => setCollapsed(false)}
+                onClick={() => setCollapsed(true)}
                 className="text-white hover:text-gray-300"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -59,26 +59,26 @@ export default function SideNav({ onHomeClick, onCartClick, onFiltersClick, onDe
               </button>
             </div>
             <div className="space-y-3">
-              <Item label="Home" onClick={() => { onHomeClick(); setCollapsed(false); }}>
+              <Item label="Home" onClick={() => { onHomeClick(); setCollapsed(true); }}>
                 🏠
               </Item>
-              <Item label="Cart" onClick={() => { onCartClick(); setCollapsed(false); }}>
+              <Item label="Cart" onClick={() => { onCartClick(); setCollapsed(true); }}>
                 🛒
               </Item>
-              <Item label="Filters" onClick={() => { onFiltersClick(); setCollapsed(false); }}>
+              <Item label="Filters" onClick={() => { onFiltersClick(); setCollapsed(true); }}>
                 🔍
               </Item>
-              <Item label="Flash Deals" onClick={() => { onDealsClick(); setCollapsed(false); }}>
+              <Item label="Flash Deals" onClick={() => { onDealsClick(); setCollapsed(true); }}>
                 ⚡
               </Item>
-              <Item label="Profile" onClick={() => { onProfileClick(); setCollapsed(false); }}>
+              <Item label="Profile" onClick={() => { onProfileClick(); setCollapsed(true); }}>
                 👤
               </Item>
-              <Item label="Orders" onClick={() => { onOrdersClick(); setCollapsed(false); }}>
+              <Item label="Orders" onClick={() => { onOrdersClick(); setCollapsed(true); }}>
                 📦
               </Item>
               {isAdmin && (
-                <Item label="Admin" onClick={() => { onAdminClick(); setCollapsed(false); }}>
+                <Item label="Admin" onClick={() => { onAdminClick(); setCollapsed(true); }}>
                   ⚙️
                 </Item>
               )}
