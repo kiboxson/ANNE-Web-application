@@ -19,45 +19,59 @@ function Navbar({ user, onLoginClick, onSignupClick, onLogoutClick, searchValue,
       >
         {/* Top section - login/logout buttons */}
         <div className="navbar-responsive-container">
-          <div className="flex flex-wrap py-2 gap-2 sm:gap-4 items-center justify-center text-[#EBEBEB] text-xs sm:text-sm">
-          {user ? (
-            <div className="flex items-center gap-4">
-              <span className="font-semibold">Hi, {user.username || user.email}</span>
-              <motion.button
-                onClick={onLogoutClick}
-                className="px-3 py-1 rounded-lg hover:bg-white/10 transition"
-                whileHover={{ scale: 1.05 }}
+          <div className="flex items-center justify-center py-2 text-[#EBEBEB] text-xs sm:text-sm overflow-x-auto scrollbar-hide">
+            <div className="flex items-center gap-1 sm:gap-4 whitespace-nowrap min-w-max px-2">
+              {user ? (
+                <div className="flex items-center gap-2 sm:gap-4">
+                  <span className="font-semibold text-xs sm:text-sm truncate max-w-[100px] sm:max-w-none">
+                    Hi, {user.username || user.email}
+                  </span>
+                  <motion.button
+                    onClick={onLogoutClick}
+                    className="px-2 sm:px-3 py-1 rounded-lg hover:bg-white/10 transition text-xs sm:text-sm"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Logout
+                  </motion.button>
+                </div>
+              ) : (
+                <>
+                  <motion.button
+                    onClick={onLoginClick}
+                    className="px-2 sm:px-3 py-1 rounded-lg hover:bg-white/10 transition text-xs sm:text-sm"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Login
+                  </motion.button>
+                  <motion.button
+                    onClick={onSignupClick}
+                    className="px-2 sm:px-3 py-1 rounded-lg hover:bg-white/10 transition text-xs sm:text-sm"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Sign up
+                  </motion.button>
+                </>
+              )}
+              <motion.button 
+                className="px-2 sm:px-3 py-1 rounded-lg hover:bg-white/10 transition text-xs sm:text-sm" 
+                whileHover={{ scale: 1.05 }} 
                 whileTap={{ scale: 0.95 }}
               >
-                Logout
+                <span className="hidden sm:inline">Help & Support</span>
+                <span className="sm:hidden">Help</span>
+              </motion.button>
+              <motion.button 
+                className="px-2 sm:px-3 py-1 rounded-lg hover:bg-white/10 transition text-xs sm:text-sm" 
+                whileHover={{ scale: 1.05 }} 
+                whileTap={{ scale: 0.95 }}
+              >
+                <span className="hidden sm:inline">Contact Us</span>
+                <span className="sm:hidden">Contact</span>
               </motion.button>
             </div>
-          ) : (
-            <>
-              <motion.button
-                onClick={onLoginClick}
-                className="px-3 py-1 rounded-lg hover:bg-white/10 transition"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Login
-              </motion.button>
-              <motion.button
-                onClick={onSignupClick}
-                className="px-3 py-1 rounded-lg hover:bg-white/10 transition"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Sign up
-              </motion.button>
-            </>
-          )}
-          <motion.button className="px-3 py-1 rounded-lg hover:bg-white/10 transition" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            Help & Support
-          </motion.button>
-          <motion.button className="px-3 py-1 rounded-lg hover:bg-white/10 transition" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            Contact Us 
-          </motion.button>
           </div>
         </div>
 
