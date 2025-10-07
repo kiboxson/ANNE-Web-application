@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useMemo, useState, useCallback } from "react";
 import storageService from "../services/storage";
+import { getApiUrl, API_CONFIG } from "../config/api";
 
 const ProductsContext = createContext(null);
 
@@ -14,7 +15,7 @@ export function ProductsProvider({ children }) {
     (async () => {
       try {
         console.log('🔄 Loading products from backend...');
-        const res = await fetch('http://localhost:5000/api/products');
+        const res = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.PRODUCTS));
         if (!res.ok) throw new Error(`Failed to load products: ${res.status}`);
         const data = await res.json();
         console.log('📦 Products loaded from backend:', data.length, 'products');
@@ -30,7 +31,7 @@ export function ProductsProvider({ children }) {
   // Function to refresh products from backend
   const refreshProducts = useCallback(async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/products');
+      const res = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.PRODUCTS));
       if (!res.ok) throw new Error(`Failed to load products: ${res.status}`);
       const data = await res.json();
       setProducts(Array.isArray(data) ? data : []);
@@ -89,7 +90,7 @@ export function ProductsProvider({ children }) {
       };
 
       // Persist to backend
-      const res = await fetch('http://localhost:5000/api/products', {
+      const res = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.PRODUCTS), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(p),
@@ -120,7 +121,7 @@ export function ProductsProvider({ children }) {
   const removeProduct = useCallback(async (id) => {
     // Optimistically remove from UI after backend confirms
     try {
-      const res = await fetch(`http://localhost:5000/api/products/${encodeURIComponent(id)}`, { method: 'DELETE' });
+      const res = await fetch(`${getApiUrl(API_CONFIG.ENDPOINTS.PRODUCTS)}/${encodeURIComponent(id)}`, { method: 'DELETE' });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.error || `Failed to delete product: ${res.status}`);

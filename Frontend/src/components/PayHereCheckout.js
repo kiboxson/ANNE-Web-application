@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { initiatePayHerePayment, getExchangeInfo } from '../services/payhere';
 import { getCurrentUser } from '../services/auth';
 import axios from 'axios';
+import { API_BASE_URL_EXPORT } from '../config/api';
 
 export default function PayHereCheckout({ cartItems, totalAmount, onSuccess, onCancel }) {
   const [loading, setLoading] = useState(false);
@@ -80,7 +81,7 @@ export default function PayHereCheckout({ cartItems, totalAmount, onSuccess, onC
         phone: shippingInfo.phone
       };
 
-      const orderResponse = await axios.post('http://localhost:5000/api/orders', orderData);
+      const orderResponse = await axios.post(`${API_BASE_URL_EXPORT}/api/orders`, orderData);
       const order = orderResponse.data;
 
       // Initiate PayHere payment
@@ -138,7 +139,7 @@ export default function PayHereCheckout({ cartItems, totalAmount, onSuccess, onC
         paymentMethod: 'Cash on Delivery'
       };
 
-      const orderResponse = await axios.post('http://localhost:5000/api/orders', orderData);
+      const orderResponse = await axios.post(`${API_BASE_URL_EXPORT}/api/orders`, orderData);
       const order = orderResponse.data;
       
       onSuccess && onSuccess(order);

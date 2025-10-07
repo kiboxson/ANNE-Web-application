@@ -8,10 +8,11 @@ import {
   updateProfile,
 } from "firebase/auth";
 import axios from "axios";
+import { API_BASE_URL_EXPORT } from "../config/api";
 
 async function registerUserInBackend(user) {
   try {
-    await axios.post('http://localhost:5000/api/users', {
+    await axios.post(`${API_BASE_URL_EXPORT}/api/users`, {
       userId: user.userId,
       username: user.username,
       email: user.email

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { API_BASE_URL_EXPORT } from '../config/api';
 
 export default function EmailTest({ onBack }) {
   const [credentials, setCredentials] = useState({ user: '', pass: '' });
@@ -14,7 +15,7 @@ export default function EmailTest({ onBack }) {
   const testEmailCredentials = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/test-email');
+      const response = await axios.get(`${API_BASE_URL_EXPORT}/api/test-email`);
       setTestResult(response.data);
     } catch (error) {
       setTestResult({
@@ -34,7 +35,7 @@ export default function EmailTest({ onBack }) {
 
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/setup-email', credentials);
+      const response = await axios.post(`${API_BASE_URL_EXPORT}/api/setup-email`, credentials);
       setTestResult(response.data);
       if (response.data.success) {
         alert('Email credentials saved successfully!');

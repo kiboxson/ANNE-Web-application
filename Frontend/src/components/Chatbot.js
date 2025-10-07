@@ -1,5 +1,6 @@
 import React, { useMemo, useRef, useState, useEffect } from "react";
-import axios from "axios";
+import axios from 'axios';
+import { API_BASE_URL_EXPORT } from '../config/api';
 import { motion, AnimatePresence } from "framer-motion";
 import { getCurrentUser } from "../services/auth";
 
@@ -69,7 +70,7 @@ export default function Chatbot() {
 
   async function loadMessages() {
     try {
-      const response = await axios.get(`http://localhost:5000/api/chat/${sessionId}`);
+      const response = await axios.get(`${API_BASE_URL_EXPORT}/api/chat/${sessionId}`);
       const chatMessages = response.data.map(msg => ({
         role: msg.sender === 'user' ? 'user' : 'admin',
         text: msg.message,
@@ -117,7 +118,7 @@ export default function Chatbot() {
     
     // Send initial welcome message to backend
     try {
-      await axios.post('http://localhost:5000/api/chat', {
+      await axios.post(`${API_BASE_URL_EXPORT}/api/chat`, {
         message: welcomeMessage,
         sender: 'admin',
         senderName: 'Support Team',
@@ -145,7 +146,7 @@ export default function Chatbot() {
     setInput("");
     
     try {
-      await axios.post('http://localhost:5000/api/chat', {
+      await axios.post(`${API_BASE_URL_EXPORT}/api/chat`, {
         message: trimmed,
         sender: 'user',
         senderName: customerName || 'Customer',
