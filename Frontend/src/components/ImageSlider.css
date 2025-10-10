@@ -6,7 +6,7 @@
   height: 200px;
   border-radius: 12px;
   overflow: hidden;
-  background-color: white;
+  background-color: #f3f4f6;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   margin-top: 12px;
 }
@@ -162,38 +162,10 @@
   
   .hot-deals-badge {
     font-size: 11px;
-    padding: 6px 14px;
   }
   
-  .mega-sale-title {
-    font-size: 32px;
-    margin-top: 14px;
-  }
-  
-  .sale-subtitle {
-    font-size: 16px;
-    margin-top: 6px;
-  }
-  
-  .action-buttons {
-    margin-top: 18px;
-  }
-  
-  .shop-now-btn {
-    padding: 10px 24px;
-  }
-  
-  .nav-button {
-    height: 36px;
-    width: 36px;
-  }
-  
-  .nav-button.prev {
-    left: 16px;
-  }
-  
-  .nav-button.next {
-    right: 16px;
+  .slider-track {
+    transition: transform 0.7s ease-in-out;
   }
   
   .dots-container {

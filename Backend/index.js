@@ -41,6 +41,7 @@ app.get("/", (req, res) => {
       orders: "/api/orders",
       chat: "/api/chat",
       users: "/api/users",
+      cart: "/api/cart/:userId",
       email: "/api/test-email"
     },
     documentation: "Visit the API endpoints above for functionality"
@@ -174,6 +175,21 @@ const flashProductSchema = new mongoose.Schema({
 });
 
 const FlashProduct = mongoose.model('FlashProduct', flashProductSchema);
+
+// Cart Schema for user-specific cart storage
+const cartSchema = new mongoose.Schema({
+  userId: { type: String, required: true, unique: true }, // Firebase UID
+  items: [{
+    id: { type: String, required: true },
+    title: { type: String, required: true },
+    price: { type: Number, required: true },
+    quantity: { type: Number, required: true, min: 1 },
+    image: { type: String, default: null }
+  }],
+  updatedAt: { type: Date, default: Date.now }
+});
+
+const Cart = mongoose.model('Cart', cartSchema);
 
 // Persistent JSON storage for products
 const DATA_DIR = path.join(__dirname, "data");
@@ -1296,6 +1312,146 @@ app.post("/api/whatsapp/send", async (req, res) => {
   } catch (err) {
     const status = err.response?.status || 500;
     res.status(status).json({ error: err.response?.data || err.message });
+  }
+});
+
+// Cart API endpoints
+// Get user's cart
+app.get("/api/cart/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    let cart = await Cart.findOne({ userId });
+    
+    if (!cart) {
+      // Create empty cart if it doesn't exist
+      cart = new Cart({ userId, items: [] });
+      await cart.save();
+    }
+    
+    res.json(cart);
+  } catch (err) {
+    console.error("❌ Error fetching cart:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Add item to cart
+app.post("/api/cart/:userId/add", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { product, quantity = 1 } = req.body;
+    
+    if (!product || !product.id) {
+      return res.status(400).json({ error: "Product data is required" });
+    }
+    
+    let cart = await Cart.findOne({ userId });
+    
+    if (!cart) {
+      cart = new Cart({ userId, items: [] });
+    }
+    
+    // Check if item already exists in cart
+    const existingItemIndex = cart.items.findIndex(item => item.id === product.id);
+    
+    if (existingItemIndex !== -1) {
+      // Update quantity if item exists
+      cart.items[existingItemIndex].quantity += quantity;
+    } else {
+      // Add new item to cart
+      cart.items.push({
+        id: product.id,
+        title: product.title,
+        price: Number(product.price) || 0,
+        quantity: quantity,
+        image: product.image || null
+      });
+    }
+    
+    cart.updatedAt = new Date();
+    await cart.save();
+    
+    res.json(cart);
+  } catch (err) {
+    console.error("❌ Error adding to cart:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Update item quantity in cart
+app.put("/api/cart/:userId/item/:itemId", async (req, res) => {
+  try {
+    const { userId, itemId } = req.params;
+    const { quantity } = req.body;
+    
+    if (!quantity || quantity < 1) {
+      return res.status(400).json({ error: "Valid quantity is required" });
+    }
+    
+    const cart = await Cart.findOne({ userId });
+    
+    if (!cart) {
+      return res.status(404).json({ error: "Cart not found" });
+    }
+    
+    const itemIndex = cart.items.findIndex(item => item.id === itemId);
+    
+    if (itemIndex === -1) {
+      return res.status(404).json({ error: "Item not found in cart" });
+    }
+    
+    cart.items[itemIndex].quantity = quantity;
+    cart.updatedAt = new Date();
+    await cart.save();
+    
+    res.json(cart);
+  } catch (err) {
+    console.error("❌ Error updating cart item:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Remove item from cart
+app.delete("/api/cart/:userId/item/:itemId", async (req, res) => {
+  try {
+    const { userId, itemId } = req.params;
+    
+    const cart = await Cart.findOne({ userId });
+    
+    if (!cart) {
+      return res.status(404).json({ error: "Cart not found" });
+    }
+    
+    cart.items = cart.items.filter(item => item.id !== itemId);
+    cart.updatedAt = new Date();
+    await cart.save();
+    
+    res.json(cart);
+  } catch (err) {
+    console.error("❌ Error removing cart item:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Clear entire cart
+app.delete("/api/cart/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    let cart = await Cart.findOne({ userId });
+    
+    if (!cart) {
+      cart = new Cart({ userId, items: [] });
+    } else {
+      cart.items = [];
+      cart.updatedAt = new Date();
+    }
+    
+    await cart.save();
+    res.json(cart);
+  } catch (err) {
+    console.error("❌ Error clearing cart:", err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 

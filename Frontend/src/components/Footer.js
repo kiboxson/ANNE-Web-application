@@ -1,7 +1,7 @@
 import React from "react";
 import { Facebook, Twitter, Instagram, Github } from "lucide-react";
 
-function Footer() {
+function Footer({ onCommunityClick }) {
   return (
     <footer className="bg-gray-900 text-gray-300 py-10 mt-10">
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -21,6 +21,14 @@ function Footer() {
             <li><a href="/" className="hover:text-white">Home</a></li>
             <li><a href="/products" className="hover:text-white">Products</a></li>
             <li><a href="/flashsale" className="hover:text-white">Flash Sale</a></li>
+            <li>
+              <button 
+                onClick={onCommunityClick}
+                className="hover:text-white text-left"
+              >
+                Community
+              </button>
+            </li>
             <li><a href="/contact" className="hover:text-white">Contact</a></li>
           </ul>
         </div>

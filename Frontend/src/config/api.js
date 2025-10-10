@@ -33,6 +33,13 @@ export const API_CONFIG = {
     USERS: '/api/users',
     USER_ROLE: (userId) => `/api/users/${userId}/role`,
     
+    // Cart
+    CART: (userId) => `/api/cart/${userId}`,
+    CART_ADD: (userId) => `/api/cart/${userId}/add`,
+    CART_UPDATE: (userId, itemId) => `/api/cart/${userId}/item/${itemId}`,
+    CART_REMOVE: (userId, itemId) => `/api/cart/${userId}/item/${itemId}`,
+    CART_CLEAR: (userId) => `/api/cart/${userId}`,
+    
     // Email
     TEST_EMAIL: '/api/test-email',
     SETUP_EMAIL: '/api/setup-email',

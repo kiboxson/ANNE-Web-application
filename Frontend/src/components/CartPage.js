@@ -4,7 +4,7 @@ import { useCart } from "../context/CartContext";
 import PayHereCheckout from "./PayHereCheckout";
 
 export default function CartPage({ onBack }) {
-  const { items, setQuantity, removeItem, clearCart, total } = useCart();
+  const { items, setQuantity, removeItem, clearCart, total, loading, error, isLoggedIn } = useCart();
   const [showCheckout, setShowCheckout] = useState(false);
 
   const hasItems = items && items.length > 0;
@@ -57,11 +57,24 @@ export default function CartPage({ onBack }) {
         </div>
       </div>
 
-      {!hasItems ? (
-        <div className="text-center text-gray-600 py-16 bg-[#F3F4F6] rounded-xl">
-          Your cart is empty.
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {error}
         </div>
-      ) : (
+      )}
+
+      {loading && (
+        <div className="text-center text-gray-600 py-8">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+          <p className="mt-2">Loading cart...</p>
+        </div>
+      )}
+
+      {!loading && !hasItems ? (
+        <div className="text-center text-gray-600 py-16 bg-[#F3F4F6] rounded-xl">
+          {isLoggedIn ? "Your cart is empty." : "Your cart is empty. Log in to save items to your cart."}
+        </div>
+      ) : !loading && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
           <div className="lg:col-span-2 flex flex-col gap-3 sm:gap-4">
             {items.map((it) => (

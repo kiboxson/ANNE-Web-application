@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 
-export default function SideNav({ onHomeClick, onCartClick, onFiltersClick, onDealsClick, onProfileClick, onOrdersClick, onAdminClick, isAdmin = false }) {
+export default function SideNav({ onHomeClick, onCartClick, onFiltersClick, onDealsClick, onProfileClick, onOrdersClick, onAdminClick, onCommunityClick, isAdmin = false }) {
   const [collapsed, setCollapsed] = useState(true);
 
   const Item = ({ label, onClick, children }) => (
@@ -77,6 +77,9 @@ export default function SideNav({ onHomeClick, onCartClick, onFiltersClick, onDe
               <Item label="Orders" onClick={() => { onOrdersClick(); setCollapsed(true); }}>
                 📦
               </Item>
+              <Item label="Community" onClick={() => { onCommunityClick(); setCollapsed(true); }}>
+                👥
+              </Item>
               {isAdmin && (
                 <Item label="Admin" onClick={() => { onAdminClick(); setCollapsed(true); }}>
                   ⚙️
@@ -110,6 +113,7 @@ export default function SideNav({ onHomeClick, onCartClick, onFiltersClick, onDe
           <Item label="Flash Deals" onClick={onDealsClick}>⚡</Item>
           <Item label="Profile" onClick={onProfileClick}>👤</Item>
           <Item label="Orders" onClick={onOrdersClick}>📦</Item>
+          <Item label="Community" onClick={onCommunityClick}>👥</Item>
           {isAdmin && <Item label="Admin" onClick={onAdminClick}>⚙️</Item>}
         </div>
       </aside>

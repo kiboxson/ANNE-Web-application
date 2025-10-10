@@ -45,18 +45,18 @@ function ImageSlider() {
             style={{ transform: `translateX(-${currentIndex * 100}%)` }}
           >
             {images.map((img, index) => (
-              <img
-                key={index}
-                src={img}
-                alt="slider"
-                className="w-full h-full object-cover flex-shrink-0"
-              />
+              <div key={index} className="w-full h-full flex-shrink-0 relative">
+                <img
+                  src={img}
+                  alt="slider"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+              </div>
             ))}
           </div>
         </div>
 
-        {/* Readability gradient */}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent z-10" />
 
         {/* Overlay content */}
         <div className="slider-content">
@@ -64,9 +64,6 @@ function ImageSlider() {
             <div className="hot-deals-badge">
               <span>HOT DEALS</span>
               <span className="emoji-icon">🔥</span>
-            </div>
-            <div className="mega-sale-title">
-              MEGA SALE
             </div>
             <div className="sale-subtitle">
               Up to <span className="sale-percentage">70% OFF</span>
