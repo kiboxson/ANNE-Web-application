@@ -93,7 +93,7 @@ function ClassicHomePage({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7, duration: 0.8 }}
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl xl:text-7xl font-serif font-bold mb-4 sm:mb-6 leading-tight"
+              className="text-sm sm:text-3xl md:text-4xl lg:text-6xl xl:text-7xl font-serif font-bold mb-4 sm:mb-6 leading-tight"
               style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}
             >
               Timeless Elegance
@@ -109,7 +109,7 @@ function ClassicHomePage({
                   dealsRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
                 }
               }}
-              className="hero-button bg-white text-gray-900 px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 rounded-none font-semibold text-sm sm:text-base md:text-lg tracking-wider uppercase hover:bg-gray-100 transition-all duration-300 shadow-lg"
+              className="hero-button bg-white text-gray-900 px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 rounded-none font-semibold text-xs sm:text-base md:text-lg tracking-wider uppercase hover:bg-gray-100 transition-all duration-300 shadow-lg"
             >
               Explore Collection
             </motion.button>
