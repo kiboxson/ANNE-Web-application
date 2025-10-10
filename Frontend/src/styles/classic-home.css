@@ -3,6 +3,26 @@
   font-family: 'Georgia', 'Times New Roman', serif;
 }
 
+/* Responsive Typography */
+@media (max-width: 640px) {
+  .classic-home-page h1 {
+    line-height: 1.2;
+    letter-spacing: 0.5px;
+  }
+  
+  .classic-home-page .hero-button {
+    letter-spacing: 1px;
+    font-weight: 600;
+  }
+}
+
+@media (max-width: 480px) {
+  .classic-home-page h1 {
+    line-height: 1.1;
+    letter-spacing: 0.25px;
+  }
+}
+
 /* Classic Typography */
 .classic-home-page h1,
 .classic-home-page h2,

@@ -8,7 +8,7 @@ function Footer({ onCommunityClick }) {
         
         {/* Brand Section */}
         <div>
-          <h2 className="text-2xl font-bold text-white">ShopEase</h2>
+          <h2 className="text-2xl font-bold text-white">ANNE</h2>
           <p className="mt-3 text-sm">
             Your one-stop shop for everything you love. Quality products, fast delivery.
           </p>
