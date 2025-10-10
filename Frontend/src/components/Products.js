@@ -165,11 +165,13 @@ export default function ProductsSection({ searchQuery = "", selectedCategories =
                   price={item.price}
                   rating={4}
                   discount={null}
-                  onAdd={() => {
+                  onAdd={async () => {
                     try {
-                      console.log('Adding item to cart:', item);
-                      addItem({ id: item.id || item.key, title: item.title, price: item.price, image: item.image }, 1);
+                      console.log('🛒 Adding item to cart:', item);
+                      await addItem({ id: item.id || item.key, title: item.title, price: item.price, image: item.image }, 1);
                       console.log('✅ Item added to cart successfully');
+                      // Show success message
+                      alert('✅ Item added to cart!');
                     } catch (error) {
                       console.error('❌ Error adding item to cart:', error);
                       alert('Failed to add item to cart: ' + error.message);
@@ -204,11 +206,13 @@ export default function ProductsSection({ searchQuery = "", selectedCategories =
               price={item.price}
               rating={4}
               discount={null}
-              onAdd={() => {
+              onAdd={async () => {
                 try {
-                  console.log('Adding item to cart:', item);
-                  addItem({ id: item.id || item.key, title: item.title, price: item.price, image: item.image }, 1);
+                  console.log('🛒 Adding item to cart:', item);
+                  await addItem({ id: item.id || item.key, title: item.title, price: item.price, image: item.image }, 1);
                   console.log('✅ Item added to cart successfully');
+                  // Show success message
+                  alert('✅ Item added to cart!');
                 } catch (error) {
                   console.error('❌ Error adding item to cart:', error);
                   alert('Failed to add item to cart: ' + error.message);

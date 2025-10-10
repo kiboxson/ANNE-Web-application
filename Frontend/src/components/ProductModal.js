@@ -47,11 +47,12 @@ export default function ProductModal({ open, product, onClose, onBuyNow }) {
                       className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.97 }}
-                      onClick={() => {
+                      onClick={async () => {
                         try {
-                          console.log('Adding item to cart from modal:', { id, title, price, image });
-                          addItem({ id, title, price, image }, 1);
+                          console.log('🛒 Adding item to cart from modal:', { id, title, price, image });
+                          await addItem({ id, title, price, image }, 1);
                           console.log('✅ Item added to cart from modal successfully');
+                          alert('✅ Item added to cart!');
                           onClose && onClose();
                         } catch (error) {
                           console.error('❌ Error adding item to cart from modal:', error);
@@ -65,10 +66,10 @@ export default function ProductModal({ open, product, onClose, onBuyNow }) {
                       className="px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.97 }}
-                      onClick={() => {
+                      onClick={async () => {
                         try {
-                          console.log('Buy Now clicked from modal:', { id, title, price, image });
-                          addItem({ id, title, price, image }, 1);
+                          console.log('🛒 Buy Now clicked from modal:', { id, title, price, image });
+                          await addItem({ id, title, price, image }, 1);
                           console.log('✅ Item added to cart, redirecting to cart');
                           onClose && onClose();
                           onBuyNow && onBuyNow();
