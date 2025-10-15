@@ -1502,4 +1502,12 @@ app.post("/api/whatsapp/webhook", (req, res) => {
   res.sendStatus(200);
 });
 
-app.listen(5000, () => console.log("✅ Backend running on http://localhost:5000"));
+// For Vercel deployment, export the app instead of listening on a port
+const PORT = process.env.PORT || 5000;
+
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => console.log(`✅ Backend running on http://localhost:${PORT}`));
+}
+
+// Export for Vercel
+module.exports = app;
