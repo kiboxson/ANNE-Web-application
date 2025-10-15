@@ -50,10 +50,21 @@ export default function ProductModal({ open, product, onClose, onBuyNow }) {
                       onClick={async () => {
                         try {
                           console.log('🛒 Adding item to cart from modal:', { id, title, price, image });
-                          await addItem({ id, title, price, image }, 1);
-                          console.log('✅ Item added to cart from modal successfully');
-                          alert('✅ Item added to cart!');
-                          onClose && onClose();
+                          const success = await addItem({ 
+                            id, 
+                            title, 
+                            price: Number(price), 
+                            image 
+                          }, 1);
+                          
+                          if (success) {
+                            console.log('✅ Item added to cart from modal successfully');
+                            alert('✅ Item added to cart!');
+                            onClose && onClose();
+                          } else {
+                            console.log('❌ Failed to add item to cart from modal');
+                            alert('❌ Failed to add item to cart. Please try again.');
+                          }
                         } catch (error) {
                           console.error('❌ Error adding item to cart from modal:', error);
                           alert('Failed to add item to cart: ' + error.message);
@@ -69,10 +80,21 @@ export default function ProductModal({ open, product, onClose, onBuyNow }) {
                       onClick={async () => {
                         try {
                           console.log('🛒 Buy Now clicked from modal:', { id, title, price, image });
-                          await addItem({ id, title, price, image }, 1);
-                          console.log('✅ Item added to cart, redirecting to cart');
-                          onClose && onClose();
-                          onBuyNow && onBuyNow();
+                          const success = await addItem({ 
+                            id, 
+                            title, 
+                            price: Number(price), 
+                            image 
+                          }, 1);
+                          
+                          if (success) {
+                            console.log('✅ Item added to cart, redirecting to cart');
+                            onClose && onClose();
+                            onBuyNow && onBuyNow();
+                          } else {
+                            console.log('❌ Failed to add item for Buy Now');
+                            alert('❌ Failed to add item to cart. Please try again.');
+                          }
                         } catch (error) {
                           console.error('❌ Error with Buy Now from modal:', error);
                           alert('Failed to process Buy Now: ' + error.message);

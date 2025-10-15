@@ -15,12 +15,14 @@ const corsOptions = {
   origin: [
     'http://localhost:3000', // Local development
     'https://localhost:3000', // Local development HTTPS
+    'http://127.0.0.1:3000', // Alternative localhost
+    'http://127.0.0.1:49326', // Browser preview proxy
     /\.vercel\.app$/, // All Vercel domains
     /\.netlify\.app$/, // All Netlify domains (if needed)
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-requested-with']
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-requested-with', 'Access-Control-Allow-Origin']
 };
 
 app.use(cors(corsOptions));
@@ -1341,13 +1343,28 @@ app.post("/api/cart/:userId/add", async (req, res) => {
     const { userId } = req.params;
     const { product, quantity = 1 } = req.body;
     
+    console.log(`🛒 Add to cart request - User: ${userId}, Product:`, product, `Quantity: ${quantity}`);
+    
+    if (!userId) {
+      console.log("❌ Missing userId parameter");
+      return res.status(400).json({ error: "User ID is required" });
+    }
+    
     if (!product || !product.id) {
-      return res.status(400).json({ error: "Product data is required" });
+      console.log("❌ Invalid product data:", product);
+      return res.status(400).json({ error: "Product data with valid ID is required" });
+    }
+    
+    if (!product.title || typeof product.price !== 'number') {
+      console.log("❌ Missing required product fields:", { title: product.title, price: product.price });
+      return res.status(400).json({ error: "Product must have title and valid price" });
     }
     
     let cart = await Cart.findOne({ userId });
+    console.log(`📦 Existing cart found: ${!!cart}`);
     
     if (!cart) {
+      console.log("🆕 Creating new cart for user:", userId);
       cart = new Cart({ userId, items: [] });
     }
     
@@ -1356,25 +1373,34 @@ app.post("/api/cart/:userId/add", async (req, res) => {
     
     if (existingItemIndex !== -1) {
       // Update quantity if item exists
+      const oldQuantity = cart.items[existingItemIndex].quantity;
       cart.items[existingItemIndex].quantity += quantity;
+      console.log(`🔄 Updated existing item quantity: ${oldQuantity} -> ${cart.items[existingItemIndex].quantity}`);
     } else {
       // Add new item to cart
-      cart.items.push({
+      const newItem = {
         id: product.id,
         title: product.title,
         price: Number(product.price) || 0,
         quantity: quantity,
         image: product.image || null
-      });
+      };
+      cart.items.push(newItem);
+      console.log("➕ Added new item to cart:", newItem);
     }
     
     cart.updatedAt = new Date();
-    await cart.save();
+    const savedCart = await cart.save();
+    console.log(`✅ Cart saved successfully. Total items: ${savedCart.items.length}`);
     
-    res.json(cart);
+    res.json(savedCart);
   } catch (err) {
-    console.error("❌ Error adding to cart:", err.message);
-    res.status(500).json({ error: err.message });
+    console.error("❌ Error adding to cart:", err);
+    console.error("❌ Stack trace:", err.stack);
+    res.status(500).json({ 
+      error: err.message,
+      details: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
   }
 });
 

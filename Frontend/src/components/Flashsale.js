@@ -198,10 +198,28 @@ export default function FlashSalePage({ searchQuery = "", selectedCategories = [
               title={p.title}
               price={p.price}
               stock={p.stock}
-              onGrabDeal={() => {
-                const id = p.id || p.title;
-                addItem({ id, title: p.title, price: p.price, image: p.image }, 1);
-                onGrabDeal();
+              onGrabDeal={async () => {
+                try {
+                  const id = p.id || p.title;
+                  console.log('🛒 Adding flash sale item to cart:', p);
+                  const success = await addItem({ 
+                    id, 
+                    title: p.title, 
+                    price: Number(p.price), 
+                    image: p.image 
+                  }, 1);
+                  
+                  if (success) {
+                    console.log('✅ Flash sale item added to cart successfully');
+                    onGrabDeal();
+                  } else {
+                    console.log('❌ Failed to add flash sale item to cart');
+                    alert('❌ Failed to add item to cart. Please try again.');
+                  }
+                } catch (error) {
+                  console.error('❌ Error adding flash sale item to cart:', error);
+                  alert('Failed to add item to cart: ' + error.message);
+                }
               }}
             />
           ))

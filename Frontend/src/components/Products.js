@@ -168,10 +168,20 @@ export default function ProductsSection({ searchQuery = "", selectedCategories =
                   onAdd={async () => {
                     try {
                       console.log('🛒 Adding item to cart:', item);
-                      await addItem({ id: item.id || item.key, title: item.title, price: item.price, image: item.image }, 1);
-                      console.log('✅ Item added to cart successfully');
-                      // Show success message
-                      alert('✅ Item added to cart!');
+                      const success = await addItem({ 
+                        id: item.id || item.key, 
+                        title: item.title, 
+                        price: Number(item.price), 
+                        image: item.image 
+                      }, 1);
+                      
+                      if (success) {
+                        console.log('✅ Item added to cart successfully');
+                        alert('✅ Item added to cart!');
+                      } else {
+                        console.log('❌ Failed to add item to cart');
+                        alert('❌ Failed to add item to cart. Please try again.');
+                      }
                     } catch (error) {
                       console.error('❌ Error adding item to cart:', error);
                       alert('Failed to add item to cart: ' + error.message);
@@ -209,10 +219,20 @@ export default function ProductsSection({ searchQuery = "", selectedCategories =
               onAdd={async () => {
                 try {
                   console.log('🛒 Adding item to cart:', item);
-                  await addItem({ id: item.id || item.key, title: item.title, price: item.price, image: item.image }, 1);
-                  console.log('✅ Item added to cart successfully');
-                  // Show success message
-                  alert('✅ Item added to cart!');
+                  const success = await addItem({ 
+                    id: item.id || item.key, 
+                    title: item.title, 
+                    price: Number(item.price), 
+                    image: item.image 
+                  }, 1);
+                  
+                  if (success) {
+                    console.log('✅ Item added to cart successfully');
+                    alert('✅ Item added to cart!');
+                  } else {
+                    console.log('❌ Failed to add item to cart');
+                    alert('❌ Failed to add item to cart. Please try again.');
+                  }
                 } catch (error) {
                   console.error('❌ Error adding item to cart:', error);
                   alert('Failed to add item to cart: ' + error.message);
