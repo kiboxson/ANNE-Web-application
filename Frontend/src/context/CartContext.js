@@ -2,6 +2,16 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from "
 import axios from "axios";
 import { API_CONFIG, API_BASE_URL_EXPORT } from "../config/api";
 
+// Force localhost for development to fix cart 404 errors
+const FORCE_LOCAL_API = process.env.NODE_ENV !== 'production' ? 'http://localhost:5000' : API_BASE_URL_EXPORT;
+
+console.log('🛒 CartContext API Configuration:', {
+  environment: process.env.NODE_ENV,
+  isProduction: process.env.NODE_ENV === 'production',
+  originalApiUrl: API_BASE_URL_EXPORT,
+  forcedApiUrl: FORCE_LOCAL_API
+});
+
 const CartContext = createContext(null);
 
 export function CartProvider({ children, user }) {
@@ -48,7 +58,7 @@ export function CartProvider({ children, user }) {
       setLoading(true);
       setError(null);
       console.log('🔄 Loading cart from API for user:', userId);
-      const response = await axios.get(`${API_BASE_URL_EXPORT}${API_CONFIG.ENDPOINTS.CART(userId)}`);
+      const response = await axios.get(`${FORCE_LOCAL_API}${API_CONFIG.ENDPOINTS.CART(userId)}`);
       console.log('📦 Cart API response:', response.data);
       setItems(response.data.items || []);
       console.log('✅ Cart loaded successfully');
@@ -88,7 +98,7 @@ export function CartProvider({ children, user }) {
         setLoading(true);
         setError(null);
         
-        const apiUrl = `${API_BASE_URL_EXPORT}${API_CONFIG.ENDPOINTS.CART_ADD(user.userId)}`;
+        const apiUrl = `${FORCE_LOCAL_API}${API_CONFIG.ENDPOINTS.CART_ADD(user.userId)}`;
         console.log('📡 Making API request to:', apiUrl);
         console.log('📡 Request payload:', { product, quantity: qty });
         
@@ -159,7 +169,7 @@ export function CartProvider({ children, user }) {
         setError(null);
         console.log('🗑️ Removing item from cart:', id);
         const response = await axios.delete(
-          `${API_BASE_URL_EXPORT}${API_CONFIG.ENDPOINTS.CART_REMOVE(user.userId, id)}`
+          `${FORCE_LOCAL_API}${API_CONFIG.ENDPOINTS.CART_REMOVE(user.userId, id)}`
         );
         console.log('📦 Remove item API response:', response.data);
         setItems(response.data.items || []);
@@ -195,7 +205,7 @@ export function CartProvider({ children, user }) {
         setError(null);
         console.log('🔄 Updating item quantity:', id, 'to', qty);
         const response = await axios.put(
-          `${API_BASE_URL_EXPORT}${API_CONFIG.ENDPOINTS.CART_UPDATE(user.userId, id)}`,
+          `${FORCE_LOCAL_API}${API_CONFIG.ENDPOINTS.CART_UPDATE(user.userId, id)}`,
           { quantity: Math.max(1, qty) }
         );
         console.log('📦 Update quantity API response:', response.data);
@@ -232,7 +242,7 @@ export function CartProvider({ children, user }) {
         setError(null);
         console.log('🧹 Clearing cart for user:', user.userId);
         const response = await axios.delete(
-          `${API_BASE_URL_EXPORT}${API_CONFIG.ENDPOINTS.CART_CLEAR(user.userId)}`
+          `${FORCE_LOCAL_API}${API_CONFIG.ENDPOINTS.CART_CLEAR(user.userId)}`
         );
         console.log('📦 Clear cart API response:', response.data);
         setItems(response.data.items || []);
@@ -264,7 +274,7 @@ export function CartProvider({ children, user }) {
         // Add each guest cart item to user's cart
         for (const item of items) {
           await axios.post(
-            `${API_BASE_URL_EXPORT}${API_CONFIG.ENDPOINTS.CART_ADD(userId)}`,
+            `${FORCE_LOCAL_API}${API_CONFIG.ENDPOINTS.CART_ADD(userId)}`,
             { 
               product: {
                 id: item.id,
