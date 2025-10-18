@@ -298,21 +298,21 @@ function Community({ onBack, onContactClick }) {
                   <MapPin className="w-6 h-6 text-blue-600" />
                   <div>
                     <p className="font-medium text-gray-900">Headquarters</p>
-                    <p className="text-gray-600">123 Innovation Drive, Tech Valley, CA 94025</p>
+                    <p className="text-gray-600">No-06 ,Vankalai, Mannar</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <Phone className="w-6 h-6 text-blue-600" />
                   <div>
                     <p className="font-medium text-gray-900">Phone</p>
-                    <p className="text-gray-600">+1 (555) 123-4567</p>
+                    <p className="text-gray-600">+94701269689</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <Mail className="w-6 h-6 text-blue-600" />
                   <div>
                     <p className="font-medium text-gray-900">Email</p>
-                    <p className="text-gray-600">contact@shopease.com</p>
+                    <p className="text-gray-600">kiboxsonleena51@gmail.com</p>
                   </div>
                 </div>
               </div>
