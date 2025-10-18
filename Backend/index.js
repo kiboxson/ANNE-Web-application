@@ -1505,8 +1505,15 @@ app.post("/api/whatsapp/webhook", (req, res) => {
 // For Vercel deployment, export the app instead of listening on a port
 const PORT = process.env.PORT || 5000;
 
+// Always listen in development, or when NODE_ENV is not explicitly set to 'production'
 if (process.env.NODE_ENV !== 'production') {
-  app.listen(PORT, () => console.log(`✅ Backend running on http://localhost:${PORT}`));
+  app.listen(PORT, () => {
+    console.log(`✅ Backend running on http://localhost:${PORT}`);
+    console.log(`🛒 Cart API available at: http://localhost:${PORT}/api/cart`);
+    console.log(`🌐 CORS enabled for frontend: http://localhost:3000`);
+  });
+} else {
+  console.log('🚀 Running in production mode (Vercel)');
 }
 
 // Export for Vercel

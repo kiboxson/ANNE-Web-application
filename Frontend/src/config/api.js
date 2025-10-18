@@ -2,8 +2,10 @@
 // This file centralizes all API endpoint configurations
 
 // Get the API base URL from environment variables
-// Fallback to localhost for development if not set
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+// Force localhost for development when NODE_ENV is not production
+const API_BASE_URL = process.env.NODE_ENV === 'production' 
+  ? (process.env.REACT_APP_API_URL || 'https://anne-web-application.vercel.app')
+  : 'http://localhost:5000';
 
 // API Configuration object
 export const API_CONFIG = {
@@ -80,5 +82,13 @@ export const API_BASE_URL_EXPORT = API_BASE_URL;
 console.log('🔗 API Configuration loaded:', {
   baseUrl: API_BASE_URL,
   environment: process.env.NODE_ENV,
-  isProduction: process.env.NODE_ENV === 'production'
+  isProduction: process.env.NODE_ENV === 'production',
+  envApiUrl: process.env.REACT_APP_API_URL
 });
+
+// Alert if still using wrong URL
+if (API_BASE_URL.includes('vercel.app') && process.env.NODE_ENV !== 'production') {
+  console.warn('⚠️ WARNING: Using Vercel URL in development mode!');
+  console.warn('Expected: http://localhost:5000');
+  console.warn('Actual:', API_BASE_URL);
+}
