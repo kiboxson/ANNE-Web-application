@@ -15,6 +15,7 @@
   },
   "scripts": {
     "start": "node index.js",
-    "start:index": "node index.js"
+    "start:index": "node index.js",
+    "dev": "node start-dev.js"
   }
 }
