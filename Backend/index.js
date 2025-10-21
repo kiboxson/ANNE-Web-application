@@ -17,6 +17,8 @@ const corsOptions = {
     'https://localhost:3000', // Local development HTTPS
     'http://127.0.0.1:3000', // Alternative localhost
     'http://127.0.0.1:49326', // Browser preview proxy
+    'http://127.0.0.1:63293', // Current browser preview proxy
+    /^http:\/\/127\.0\.0\.1:\d+$/, // Any localhost port
     /\.vercel\.app$/, // All Vercel domains
     /\.netlify\.app$/, // All Netlify domains (if needed)
   ],
@@ -51,12 +53,12 @@ app.get("/", (req, res) => {
 });
 
 // --- MongoDB Atlas connection ---
-const MONGODB_URI = "mongodb+srv://kiboxsonleena:20040620Kiyu@cluster0.cr1byep.mongodb.net/passkey?retryWrites=true&w=majority&appName=Cluster0";
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://kiboxsonleena:20040620Kiyu@cluster0.cr1byep.mongodb.net/passkey?retryWrites=true&w=majority&appName=Cluster0";
 
 mongoose
   .connect(MONGODB_URI, {
-    // options recommended for Mongoose 8+
-    dbName: "passkey",
+    serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+    socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
   })
   .then(async () => {
     console.log("✅ Connected to MongoDB Atlas");
@@ -66,7 +68,21 @@ mongoose
   })
   .catch((err) => {
     console.error("❌ MongoDB connection error:", err.message);
+    console.error("❌ Full error:", err);
   });
+
+// Handle MongoDB connection events
+mongoose.connection.on('connected', () => {
+  console.log('✅ Mongoose connected to MongoDB');
+});
+
+mongoose.connection.on('error', (err) => {
+  console.error('❌ Mongoose connection error:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('⚠️ Mongoose disconnected from MongoDB');
+});
 
 // Chat Message Schema
 const chatMessageSchema = new mongoose.Schema({
@@ -913,12 +929,19 @@ app.get("/api/payhere/return", (req, res) => {
 // Get all products from MongoDB
 app.get("/api/products", async (req, res) => {
   try {
+    // Check MongoDB connection
+    if (mongoose.connection.readyState !== 1) {
+      console.log("⚠️ MongoDB not connected, returning empty products array");
+      return res.json([]);
+    }
+    
     const products = await Product.find({ isActive: true }).sort({ createdAt: -1 });
     console.log(`📦 API: Returning ${products.length} products`);
     res.json(products);
   } catch (err) {
     console.error('❌ API Error:', err);
-    res.status(500).json({ error: err.message });
+    // Return empty array as fallback
+    res.json([]);
   }
 });
 
@@ -1007,12 +1030,19 @@ app.delete("/api/products/:id", async (req, res) => {
 // Flash products API - Get all flash products from MongoDB
 app.get("/api/flash-products", async (req, res) => {
   try {
+    // Check MongoDB connection
+    if (mongoose.connection.readyState !== 1) {
+      console.log("⚠️ MongoDB not connected, returning empty flash products array");
+      return res.json([]);
+    }
+    
     const flashProducts = await FlashProduct.find({ isActive: true }).sort({ createdAt: -1 });
     console.log(`⚡ API: Returning ${flashProducts.length} flash products`);
     res.json(flashProducts);
   } catch (err) {
     console.error('❌ Flash Products API Error:', err);
-    res.status(500).json({ error: err.message });
+    // Return empty array as fallback
+    res.json([]);
   }
 });
 
@@ -1322,6 +1352,13 @@ app.post("/api/whatsapp/send", async (req, res) => {
 app.get("/api/cart/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
+    
+    // Check MongoDB connection
+    if (mongoose.connection.readyState !== 1) {
+      console.log("⚠️ MongoDB not connected, returning empty cart");
+      return res.json({ userId, items: [], updatedAt: new Date() });
+    }
+    
     let cart = await Cart.findOne({ userId });
     
     if (!cart) {
@@ -1333,7 +1370,8 @@ app.get("/api/cart/:userId", async (req, res) => {
     res.json(cart);
   } catch (err) {
     console.error("❌ Error fetching cart:", err.message);
-    res.status(500).json({ error: err.message });
+    // Return empty cart as fallback
+    res.json({ userId: req.params.userId, items: [], updatedAt: new Date() });
   }
 });
 

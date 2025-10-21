@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Connection Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>API Connection Test</h1>
+    <div id="results"></div>
+    
+    <button onclick="testLocalhost()">Test Localhost:5000</button>
+    <button onclick="testCurrentOrigin()">Test Current Origin</button>
+    <button onclick="testCORS()">Test CORS</button>
+    
+    <script>
+        const resultsDiv = document.getElementById('results');
+        
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong>: ${message}`;
+            resultsDiv.appendChild(div);
+            console.log(message);
+        }
+        
+        async function testLocalhost() {
+            addResult('Testing connection to http://localhost:5000...', 'info');
+            
+            try {
+                const response = await axios.get('http://localhost:5000/api/health/db');
+                addResult(`✅ Localhost connection successful: ${JSON.stringify(response.data)}`, 'success');
+            } catch (error) {
+                addResult(`❌ Localhost connection failed: ${error.message}`, 'error');
+                if (error.response) {
+                    addResult(`Response status: ${error.response.status}`, 'error');
+                }
+            }
+        }
+        
+        async function testCurrentOrigin() {
+            const currentOrigin = window.location.origin;
+            addResult(`Testing connection to current origin: ${currentOrigin}...`, 'info');
+            
+            try {
+                const response = await axios.get(`${currentOrigin}/api/health/db`);
+                addResult(`✅ Current origin connection successful: ${JSON.stringify(response.data)}`, 'success');
+            } catch (error) {
+                addResult(`❌ Current origin connection failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testCORS() {
+            addResult('Testing CORS configuration...', 'info');
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/health/db', {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(`✅ CORS test successful: ${JSON.stringify(data)}`, 'success');
+                } else {
+                    addResult(`❌ CORS test failed with status: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ CORS test failed: ${error.message}`, 'error');
+            }
+        }
+        
+        // Auto-run tests when page loads
+        window.onload = function() {
+            addResult('🧪 Starting API connection tests...', 'info');
+            addResult(`Current page URL: ${window.location.href}`, 'info');
+            addResult(`Current origin: ${window.location.origin}`, 'info');
+            
+            setTimeout(testLocalhost, 1000);
+            setTimeout(testCORS, 2000);
+        };
+    </script>
+</body>
+</html>

@@ -4,7 +4,7 @@ import { useCart } from "../context/CartContext";
 import PayHereCheckout from "./PayHereCheckout";
 
 export default function CartPage({ onBack }) {
-  const { items, setQuantity, removeItem, clearCart, total, loading, error, isLoggedIn } = useCart();
+  const { items, setQuantity, removeItem, clearCart, total, loading, error, isLoggedIn, refreshCart } = useCart();
   const [showCheckout, setShowCheckout] = useState(false);
 
   const hasItems = items && items.length > 0;
@@ -59,7 +59,20 @@ export default function CartPage({ onBack }) {
 
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          {error}
+          <div className="flex items-center justify-between">
+            <span>{error}</span>
+            {refreshCart && (
+              <motion.button
+                className="ml-4 px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={refreshCart}
+                disabled={loading}
+              >
+                {loading ? "Retrying..." : "Retry"}
+              </motion.button>
+            )}
+          </div>
         </div>
       )}
 

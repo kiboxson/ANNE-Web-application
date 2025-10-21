@@ -21,6 +21,9 @@ export function CartProvider({ children, user }) {
 
   // Load cart from API when user changes
   useEffect(() => {
+    // Clear any previous errors when user changes
+    setError(null);
+    
     if (user?.userId) {
       loadCartFromAPI(user.userId);
     } else {
@@ -65,7 +68,19 @@ export function CartProvider({ children, user }) {
     } catch (err) {
       console.error("❌ Error loading cart:", err);
       console.error("❌ Error details:", err.response?.data || err.message);
-      setError("Failed to load cart");
+      console.error("❌ Request URL:", err.config?.url);
+      
+      // More specific error messages
+      let errorMessage = "Failed to load cart";
+      if (err.code === 'ERR_NETWORK') {
+        errorMessage = "Network error - please check your connection";
+      } else if (err.response?.status === 404) {
+        errorMessage = "Cart service not found";
+      } else if (err.response?.status >= 500) {
+        errorMessage = "Server error - please try again later";
+      }
+      
+      setError(errorMessage);
       // Fallback to empty cart
       setItems([]);
     } finally {
@@ -299,6 +314,13 @@ export function CartProvider({ children, user }) {
     }
   }
 
+  // Manual refresh function for cart
+  async function refreshCart() {
+    if (user?.userId) {
+      await loadCartFromAPI(user.userId);
+    }
+  }
+
   const count = useMemo(() => items.reduce((acc, it) => acc + (it.quantity || 1), 0), [items]);
   const total = useMemo(() => items.reduce((acc, it) => acc + (it.price || 0) * (it.quantity || 1), 0), [items]);
 
@@ -310,6 +332,7 @@ export function CartProvider({ children, user }) {
       setQuantity, 
       clearCart, 
       transferGuestCart,
+      refreshCart,
       count, 
       total, 
       loading, 

@@ -8,17 +8,24 @@ import {
   updateProfile,
 } from "firebase/auth";
 import axios from "axios";
-import { API_BASE_URL_EXPORT } from "../config/api";
+import { API_CONFIG, API_BASE_URL_EXPORT } from "../config/api";
 
 async function registerUserInBackend(user) {
   try {
-    await axios.post(`${API_BASE_URL_EXPORT}/api/users`, {
+    console.log('🔐 Registering user in backend:', user);
+    console.log('🔗 Using API URL:', API_BASE_URL_EXPORT);
+    
+    const response = await axios.post(`${API_BASE_URL_EXPORT}${API_CONFIG.ENDPOINTS.USERS}`, {
       userId: user.userId,
       username: user.username,
       email: user.email
     });
+    
+    console.log('✅ User registered successfully in backend:', response.data);
   } catch (error) {
-    console.error('Failed to register user in backend:', error);
+    console.error('❌ Failed to register user in backend:', error);
+    console.error('❌ Request URL:', error.config?.url);
+    console.error('❌ Error details:', error.response?.data || error.message);
   }
 }
 
