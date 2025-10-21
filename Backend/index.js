@@ -1503,10 +1503,10 @@ app.post("/api/whatsapp/webhook", (req, res) => {
 });
 
 // For Vercel deployment, export the app instead of listening on a port
-const PORT = process.env.PORT || 5000;
+const PORT = 5000; // Force port 5000 for development
 
 // Force development mode for local development
-const isDevelopment = !process.env.VERCEL && process.env.NODE_ENV !== 'production';
+const isDevelopment = !process.env.VERCEL;
 
 if (isDevelopment) {
   app.listen(PORT, () => {
