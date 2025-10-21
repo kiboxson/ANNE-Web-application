@@ -91,7 +91,7 @@ export default function SideNav({ onHomeClick, onCartClick, onFiltersClick, onDe
       )}
 
       {/* Desktop sidebar */}
-      <aside className={`hidden md:flex md:flex-col ${collapsed ? "md:w-12" : "md:w-44"} shrink-0 bg-[black]/95 text-white max-h-[50vh] sticky top-52 pt-2 rounded-md overflow-y-auto`}>
+      <aside className={`hidden md:flex md:flex-col ${collapsed ? "md:w-12" : "md:w-44"} shrink-0 bg-[black]/95 text-white max-h-[55vh] sticky top-52 pt-2 rounded-md overflow-y-auto`}>
         <div className="px-1.5 sticky top-0 bg-[black]/95 z-10">
           <motion.button
             className={`w-full ${collapsed ? "justify-center" : "justify-between"} flex items-center gap-2 px-1.5 py-1.5 rounded-md hover:bg-[white] hover:text-black text-white/90 cursor-pointer`}
