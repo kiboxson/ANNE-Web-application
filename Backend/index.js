@@ -55,21 +55,49 @@ app.get("/", (req, res) => {
 // --- MongoDB Atlas connection ---
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://kiboxsonleena:20040620Kiyu@cluster0.cr1byep.mongodb.net/passkey?retryWrites=true&w=majority&appName=Cluster0";
 
-mongoose
-  .connect(MONGODB_URI, {
-    serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
-    socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
-  })
-  .then(async () => {
+console.log('🔗 MongoDB Configuration:', {
+  hasMongoUri: !!process.env.MONGODB_URI,
+  environment: process.env.NODE_ENV,
+  uriLength: MONGODB_URI.length,
+  uriStart: MONGODB_URI.substring(0, 20) + '...'
+});
+
+// Enhanced MongoDB connection for production
+async function connectToMongoDB() {
+  try {
+    await mongoose.connect(MONGODB_URI, {
+      serverSelectionTimeoutMS: 10000, // 10 seconds for production
+      socketTimeoutMS: 45000,
+      maxPoolSize: 10, // Maintain up to 10 socket connections
+      serverSelectionRetryDelayMS: 5000, // Retry every 5 seconds
+      heartbeatFrequencyMS: 10000, // Check connection every 10 seconds
+    });
+    
     console.log("✅ Connected to MongoDB Atlas");
+    
     // Test the connection with a ping
     await mongoose.connection.db.admin().ping();
     console.log("✅ Pinged your deployment. You successfully connected to MongoDB!");
-  })
-  .catch((err) => {
+    
+    // Test database access
+    const collections = await mongoose.connection.db.listCollections().toArray();
+    console.log("✅ Database collections accessible:", collections.length, "collections found");
+    
+  } catch (err) {
     console.error("❌ MongoDB connection error:", err.message);
-    console.error("❌ Full error:", err);
-  });
+    console.error("❌ Connection details:", {
+      name: err.name,
+      code: err.code,
+      codeName: err.codeName
+    });
+    
+    // Don't exit the process, let the app run with fallback mechanisms
+    console.log("⚠️ App will continue with fallback mechanisms for database operations");
+  }
+}
+
+// Connect to MongoDB
+connectToMongoDB();
 
 // Handle MongoDB connection events
 mongoose.connection.on('connected', () => {
@@ -344,6 +372,44 @@ app.get("/api/health/db", (req, res) => {
     mongoConnected: state === 1,
     state,
   });
+});
+
+// Cart collection health check
+app.get("/api/health/cart", async (req, res) => {
+  try {
+    const isConnected = mongoose.connection.readyState === 1;
+    
+    if (!isConnected) {
+      return res.json({
+        cartCollectionAccessible: false,
+        mongoConnected: false,
+        message: "MongoDB not connected"
+      });
+    }
+
+    // Test cart collection access
+    const collections = await mongoose.connection.db.listCollections({ name: 'carts' }).toArray();
+    const cartCollectionExists = collections.length > 0;
+    
+    // Try to perform a basic cart operation
+    const testResult = await Cart.findOne().limit(1);
+    
+    res.json({
+      cartCollectionAccessible: true,
+      cartCollectionExists,
+      mongoConnected: true,
+      testQuerySuccessful: true,
+      message: "Cart collection is accessible"
+    });
+    
+  } catch (err) {
+    res.json({
+      cartCollectionAccessible: false,
+      mongoConnected: mongoose.connection.readyState === 1,
+      error: err.message,
+      message: "Cart collection test failed"
+    });
+  }
 });
 
 // Test email credentials endpoint
