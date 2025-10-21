@@ -1414,15 +1414,20 @@ app.post("/api/whatsapp/send", async (req, res) => {
 });
 
 // Cart API endpoints
+// In-memory cart storage for when MongoDB is not available
+const memoryCartStorage = new Map();
+
 // Get user's cart
 app.get("/api/cart/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
+    console.log(`📦 Getting cart for user: ${userId}`);
     
     // Check MongoDB connection
     if (mongoose.connection.readyState !== 1) {
-      console.log("⚠️ MongoDB not connected, returning empty cart");
-      return res.json({ userId, items: [], updatedAt: new Date() });
+      console.log("⚠️ MongoDB not connected, using memory storage");
+      const memoryCart = memoryCartStorage.get(userId) || { userId, items: [], updatedAt: new Date() };
+      return res.json(memoryCart);
     }
     
     let cart = await Cart.findOne({ userId });
@@ -1431,13 +1436,21 @@ app.get("/api/cart/:userId", async (req, res) => {
       // Create empty cart if it doesn't exist
       cart = new Cart({ userId, items: [] });
       await cart.save();
+      console.log(`✅ Created new cart for user: ${userId}`);
+    } else {
+      console.log(`✅ Found existing cart for user: ${userId} with ${cart.items.length} items`);
     }
     
     res.json(cart);
   } catch (err) {
     console.error("❌ Error fetching cart:", err.message);
-    // Return empty cart as fallback
-    res.json({ userId: req.params.userId, items: [], updatedAt: new Date() });
+    // Fallback to memory storage
+    const memoryCart = memoryCartStorage.get(req.params.userId) || { 
+      userId: req.params.userId, 
+      items: [], 
+      updatedAt: new Date() 
+    };
+    res.json(memoryCart);
   }
 });
 
@@ -1464,6 +1477,42 @@ app.post("/api/cart/:userId/add", async (req, res) => {
       return res.status(400).json({ error: "Product must have title and valid price" });
     }
     
+    // Check MongoDB connection
+    if (mongoose.connection.readyState !== 1) {
+      console.log("⚠️ MongoDB not connected, using memory storage for add to cart");
+      
+      // Use memory storage
+      let memoryCart = memoryCartStorage.get(userId) || { userId, items: [], updatedAt: new Date() };
+      
+      // Check if item already exists in cart
+      const existingItemIndex = memoryCart.items.findIndex(item => item.id === product.id);
+      
+      if (existingItemIndex !== -1) {
+        // Update quantity if item exists
+        const oldQuantity = memoryCart.items[existingItemIndex].quantity;
+        memoryCart.items[existingItemIndex].quantity += quantity;
+        console.log(`🔄 Updated existing item quantity in memory: ${oldQuantity} -> ${memoryCart.items[existingItemIndex].quantity}`);
+      } else {
+        // Add new item to cart
+        const newItem = {
+          id: product.id,
+          title: product.title,
+          price: Number(product.price) || 0,
+          quantity: quantity,
+          image: product.image || null
+        };
+        memoryCart.items.push(newItem);
+        console.log("➕ Added new item to memory cart:", newItem);
+      }
+      
+      memoryCart.updatedAt = new Date();
+      memoryCartStorage.set(userId, memoryCart);
+      console.log(`✅ Cart saved to memory successfully. Total items: ${memoryCart.items.length}`);
+      
+      return res.json(memoryCart);
+    }
+    
+    // Use MongoDB if connected
     let cart = await Cart.findOne({ userId });
     console.log(`📦 Existing cart found: ${!!cart}`);
     
@@ -1516,6 +1565,27 @@ app.put("/api/cart/:userId/item/:itemId", async (req, res) => {
     
     if (!quantity || quantity < 1) {
       return res.status(400).json({ error: "Valid quantity is required" });
+    }
+    
+    // Check MongoDB connection
+    if (mongoose.connection.readyState !== 1) {
+      console.log("⚠️ MongoDB not connected, using memory storage for update quantity");
+      
+      let memoryCart = memoryCartStorage.get(userId);
+      if (!memoryCart) {
+        return res.status(404).json({ error: "Cart not found" });
+      }
+      
+      const itemIndex = memoryCart.items.findIndex(item => item.id === itemId);
+      if (itemIndex === -1) {
+        return res.status(404).json({ error: "Item not found in cart" });
+      }
+      
+      memoryCart.items[itemIndex].quantity = quantity;
+      memoryCart.updatedAt = new Date();
+      memoryCartStorage.set(userId, memoryCart);
+      
+      return res.json(memoryCart);
     }
     
     const cart = await Cart.findOne({ userId });
