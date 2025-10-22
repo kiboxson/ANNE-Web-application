@@ -67,37 +67,66 @@ if (!process.env.MONGODB_URI) {
   console.warn('⚠️ WARNING: Using fallback MongoDB URI. Set MONGODB_URI environment variable in Vercel dashboard.');
 }
 
-// Enhanced MongoDB connection for production
+// Enhanced MongoDB connection for production - FORCE CONNECTION
 async function connectToMongoDB() {
-  try {
-    await mongoose.connect(MONGODB_URI, {
-      serverSelectionTimeoutMS: 10000, // 10 seconds for production
-      socketTimeoutMS: 45000,
-      maxPoolSize: 10, // Maintain up to 10 socket connections
-      serverSelectionRetryDelayMS: 5000, // Retry every 5 seconds
-      heartbeatFrequencyMS: 10000, // Check connection every 10 seconds
-    });
-    
-    console.log("✅ Connected to MongoDB Atlas");
-    
-    // Test the connection with a ping
-    await mongoose.connection.db.admin().ping();
-    console.log("✅ Pinged your deployment. You successfully connected to MongoDB!");
-    
-    // Test database access
-    const collections = await mongoose.connection.db.listCollections().toArray();
-    console.log("✅ Database collections accessible:", collections.length, "collections found");
-    
-  } catch (err) {
-    console.error("❌ MongoDB connection error:", err.message);
-    console.error("❌ Connection details:", {
-      name: err.name,
-      code: err.code,
-      codeName: err.codeName
-    });
-    
-    // Don't exit the process, let the app run with fallback mechanisms
-    console.log("⚠️ App will continue with fallback mechanisms for database operations");
+  let retryCount = 0;
+  const maxRetries = 5;
+  
+  while (retryCount < maxRetries) {
+    try {
+      console.log(`🔄 Attempting MongoDB connection (attempt ${retryCount + 1}/${maxRetries})...`);
+      
+      await mongoose.connect(MONGODB_URI, {
+        serverSelectionTimeoutMS: 15000, // Increased timeout
+        socketTimeoutMS: 45000,
+        maxPoolSize: 10,
+        serverSelectionRetryDelayMS: 5000,
+        heartbeatFrequencyMS: 10000,
+        retryWrites: true,
+        w: 'majority'
+      });
+      
+      console.log("✅ Connected to MongoDB Atlas successfully!");
+      
+      // Test the connection with a ping
+      await mongoose.connection.db.admin().ping();
+      console.log("✅ MongoDB ping successful!");
+      
+      // Test database access
+      const collections = await mongoose.connection.db.listCollections().toArray();
+      console.log("✅ Database collections accessible:", collections.length, "collections found");
+      
+      // Ensure cart collection exists
+      const cartCollectionExists = collections.some(col => col.name === 'carts');
+      if (!cartCollectionExists) {
+        console.log("🆕 Creating carts collection...");
+        await mongoose.connection.db.createCollection('carts');
+        console.log("✅ Carts collection created");
+      }
+      
+      return; // Success, exit retry loop
+      
+    } catch (err) {
+      retryCount++;
+      console.error(`❌ MongoDB connection attempt ${retryCount} failed:`, err.message);
+      
+      if (retryCount >= maxRetries) {
+        console.error("❌ All MongoDB connection attempts failed!");
+        console.error("❌ Connection details:", {
+          name: err.name,
+          code: err.code,
+          codeName: err.codeName,
+          message: err.message
+        });
+        
+        // CRITICAL: Exit process if MongoDB connection fails
+        console.error("🚨 CRITICAL: Cannot run without database connection!");
+        process.exit(1);
+      } else {
+        console.log(`⏳ Retrying in 3 seconds... (${maxRetries - retryCount} attempts remaining)`);
+        await new Promise(resolve => setTimeout(resolve, 3000));
+      }
+    }
   }
 }
 
@@ -1448,10 +1477,7 @@ app.post("/api/whatsapp/send", async (req, res) => {
   }
 });
 
-// Cart API endpoints
-// In-memory cart storage for when MongoDB is not available
-const memoryCartStorage = new Map();
-
+// Cart API endpoints - MONGODB ONLY (NO FALLBACK)
 // Get user's cart
 app.get("/api/cart/:userId", async (req, res) => {
   try {
@@ -1459,11 +1485,13 @@ app.get("/api/cart/:userId", async (req, res) => {
     console.log(`📦 Getting cart for user: ${userId}`);
     console.log(`🔗 MongoDB connection state: ${mongoose.connection.readyState} (0=disconnected, 1=connected, 2=connecting, 3=disconnecting)`);
     
-    // Check MongoDB connection
+    // Ensure MongoDB is connected
     if (mongoose.connection.readyState !== 1) {
-      console.log("⚠️ MongoDB not connected, using memory storage");
-      const memoryCart = memoryCartStorage.get(userId) || { userId, items: [], updatedAt: new Date() };
-      return res.json(memoryCart);
+      console.error("❌ MongoDB not connected - cannot access cart");
+      return res.status(503).json({ 
+        error: "Database connection unavailable",
+        message: "Cart service temporarily unavailable. Please try again."
+      });
     }
     
     console.log(`🔍 Searching for cart in MongoDB for user: ${userId}`);
@@ -1483,14 +1511,10 @@ app.get("/api/cart/:userId", async (req, res) => {
   } catch (err) {
     console.error("❌ Error fetching cart:", err.message);
     console.error("❌ Full error:", err);
-    // Fallback to memory storage
-    const memoryCart = memoryCartStorage.get(req.params.userId) || { 
-      userId: req.params.userId, 
-      items: [], 
-      updatedAt: new Date() 
-    };
-    console.log("🔄 Falling back to memory storage for cart");
-    res.json(memoryCart);
+    res.status(500).json({ 
+      error: "Failed to fetch cart",
+      message: "Unable to retrieve cart data. Please try again."
+    });
   }
 });
 
@@ -1519,42 +1543,16 @@ app.post("/api/cart/:userId/add", async (req, res) => {
     
     console.log(`🔗 MongoDB connection state: ${mongoose.connection.readyState} (0=disconnected, 1=connected, 2=connecting, 3=disconnecting)`);
     
-    // Check MongoDB connection
+    // Ensure MongoDB is connected - NO FALLBACK
     if (mongoose.connection.readyState !== 1) {
-      console.log("⚠️ MongoDB not connected, using memory storage for add to cart");
-      
-      // Use memory storage
-      let memoryCart = memoryCartStorage.get(userId) || { userId, items: [], updatedAt: new Date() };
-      
-      // Check if item already exists in cart
-      const existingItemIndex = memoryCart.items.findIndex(item => item.id === product.id);
-      
-      if (existingItemIndex !== -1) {
-        // Update quantity if item exists
-        const oldQuantity = memoryCart.items[existingItemIndex].quantity;
-        memoryCart.items[existingItemIndex].quantity += quantity;
-        console.log(`🔄 Updated existing item quantity in memory: ${oldQuantity} -> ${memoryCart.items[existingItemIndex].quantity}`);
-      } else {
-        // Add new item to cart
-        const newItem = {
-          id: product.id,
-          title: product.title,
-          price: Number(product.price) || 0,
-          quantity: quantity,
-          image: product.image || null
-        };
-        memoryCart.items.push(newItem);
-        console.log("➕ Added new item to memory cart:", newItem);
-      }
-      
-      memoryCart.updatedAt = new Date();
-      memoryCartStorage.set(userId, memoryCart);
-      console.log(`✅ Cart saved to memory successfully. Total items: ${memoryCart.items.length}`);
-      
-      return res.json(memoryCart);
+      console.error("❌ MongoDB not connected - cannot add to cart");
+      return res.status(503).json({ 
+        error: "Database connection unavailable",
+        message: "Cart service temporarily unavailable. Please try again."
+      });
     }
     
-    // Use MongoDB if connected
+    // Use MongoDB ONLY
     let cart = await Cart.findOne({ userId });
     console.log(`📦 Existing cart found: ${!!cart}`);
     
