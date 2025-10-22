@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import axios from "axios";
-import { useAuth } from "./AuthContext";
+import { getCurrentUser } from "../services/auth";
 import { API_BASE_URL_EXPORT, API_CONFIG } from "../config/api";
+import auth from "../firebase";
 
 const CartContext = createContext();
 
@@ -11,7 +12,25 @@ export function CartProvider({ children }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const { user } = useAuth();
+  const [user, setUser] = useState(null);
+
+  // Get current user on mount and listen for auth changes
+  useEffect(() => {
+    const currentUser = getCurrentUser();
+    setUser(currentUser);
+    
+    // Listen for auth state changes
+    const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
+      const mappedUser = firebaseUser ? {
+        userId: firebaseUser.uid,
+        email: firebaseUser.email,
+        username: firebaseUser.displayName || firebaseUser.email
+      } : null;
+      setUser(mappedUser);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   // Load cart from API when user changes
   useEffect(() => {

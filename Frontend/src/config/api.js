@@ -2,10 +2,8 @@
 // This file centralizes all API endpoint configurations
 
 // Get the API base URL from environment variables
-// Force localhost for development when NODE_ENV is not production
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? (process.env.REACT_APP_API_URL || 'https://anne-web-application.vercel.app')
-  : 'http://localhost:5000';
+// Use production backend for both development and production
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://anne-web-application.vercel.app';
 
 // API Configuration object
 export const API_CONFIG = {

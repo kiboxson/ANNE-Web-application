@@ -78,7 +78,7 @@ export default function CartPage({ onBack }) {
             <div className="text-xs text-red-600 mt-2">
               <strong>Debug Info:</strong>
               <br />• User logged in: {isLoggedIn ? 'Yes' : 'No'}
-              <br />• Backend URL: {process.env.NODE_ENV === 'production' ? 'https://anne-web-application.vercel.app' : 'http://localhost:5000'}
+              <br />• Backend URL: https://anne-web-application.vercel.app
               <br />• Environment: {process.env.NODE_ENV || 'development'}
             </div>
           </div>
