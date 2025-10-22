@@ -2,12 +2,16 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useCart } from "../context/CartContext";
 import PayHereCheckout from "./PayHereCheckout";
+import CartDebugInfo from "./CartDebugInfo";
+import { getCurrentUser } from "../services/auth";
 
 export default function CartPage({ onBack }) {
   const { items, setQuantity, removeItem, clearCart, total, loading, error, isLoggedIn, refreshCart } = useCart();
   const [showCheckout, setShowCheckout] = useState(false);
+  const [showDebug, setShowDebug] = useState(false);
 
   const hasItems = items && items.length > 0;
+  const currentUser = getCurrentUser();
 
   const handleCheckoutSuccess = (order) => {
     alert(`Order placed successfully! Order ID: ${order.orderId}`);
@@ -43,6 +47,14 @@ export default function CartPage({ onBack }) {
             onClick={onBack}
           >
             Continue Shopping
+          </motion.button>
+          <motion.button
+            className="px-3 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-600 text-white text-sm"
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => setShowDebug(!showDebug)}
+          >
+            🐛 Debug
           </motion.button>
           {hasItems && (
             <motion.button
@@ -149,6 +161,11 @@ export default function CartPage({ onBack }) {
             </motion.button>
           </div>
         </div>
+      )}
+
+      {/* Debug Information */}
+      {showDebug && (
+        <CartDebugInfo user={currentUser} />
       )}
     </div>
   );

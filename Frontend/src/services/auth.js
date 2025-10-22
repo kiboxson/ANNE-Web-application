@@ -19,13 +19,30 @@ async function registerUserInBackend(user) {
       userId: user.userId,
       username: user.username,
       email: user.email
+    }, {
+      timeout: 10000, // 10 second timeout
+      headers: {
+        'Content-Type': 'application/json'
+      }
     });
     
     console.log('✅ User registered successfully in backend:', response.data);
+    return true;
   } catch (error) {
     console.error('❌ Failed to register user in backend:', error);
     console.error('❌ Request URL:', error.config?.url);
+    console.error('❌ Error status:', error.response?.status);
     console.error('❌ Error details:', error.response?.data || error.message);
+    
+    // Don't throw error - let the app continue even if backend registration fails
+    // The cart will use fallback mechanisms
+    if (error.code === 'ERR_NETWORK') {
+      console.warn('⚠️ Network error during user registration - cart will use fallback mode');
+    } else if (error.response?.status >= 500) {
+      console.warn('⚠️ Server error during user registration - cart will use fallback mode');
+    }
+    
+    return false;
   }
 }
 
@@ -56,7 +73,10 @@ export async function login({ email, password }) {
   
   // Register/update user in backend
   if (user) {
-    await registerUserInBackend(user);
+    const registrationSuccess = await registerUserInBackend(user);
+    if (!registrationSuccess) {
+      console.warn('⚠️ User login succeeded but backend registration failed - cart will use fallback mode');
+    }
   }
   
   return user;
@@ -71,7 +91,10 @@ export async function signup({ username, email, password }) {
   
   // Register user in backend
   if (user) {
-    await registerUserInBackend(user);
+    const registrationSuccess = await registerUserInBackend(user);
+    if (!registrationSuccess) {
+      console.warn('⚠️ User signup succeeded but backend registration failed - cart will use fallback mode');
+    }
   }
   
   return user;

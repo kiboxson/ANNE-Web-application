@@ -108,7 +108,7 @@ export function CartProvider({ children, user }) {
     console.log('🔍 API Base URL:', API_BASE_URL_EXPORT);
     
     if (user?.userId) {
-      // User is logged in - use API
+      // User is logged in - use API with enhanced error handling
       try {
         setLoading(true);
         setError(null);
@@ -137,10 +137,58 @@ export function CartProvider({ children, user }) {
         console.error("❌ Request URL:", err.config?.url);
         console.error("❌ Request method:", err.config?.method);
         
-        const errorMessage = err.response?.data?.error || err.message || "Unknown error occurred";
-        setError(`Failed to add item to cart: ${errorMessage}`);
-        console.log('❌ Error: Failed to add item to cart');
-        return false;
+        // Enhanced error handling with fallback to guest cart
+        let errorMessage = "Failed to add item to cart";
+        let shouldFallbackToGuest = false;
+        
+        if (err.code === 'ERR_NETWORK' || err.response?.status >= 500) {
+          errorMessage = "Server temporarily unavailable. Item added to local cart.";
+          shouldFallbackToGuest = true;
+        } else if (err.response?.status === 404) {
+          errorMessage = "Cart service not found. Item added to local cart.";
+          shouldFallbackToGuest = true;
+        } else if (err.response?.status === 401 || err.response?.status === 403) {
+          errorMessage = "Authentication issue. Item added to local cart.";
+          shouldFallbackToGuest = true;
+        } else {
+          errorMessage = err.response?.data?.error || err.message || "Unknown error occurred";
+        }
+        
+        // Fallback to guest cart behavior if server issues
+        if (shouldFallbackToGuest) {
+          console.log('🔄 Falling back to guest cart due to server issues');
+          try {
+            setItems((prev) => {
+              const idx = prev.findIndex((p) => p.id === product.id);
+              if (idx !== -1) {
+                const copy = [...prev];
+                copy[idx] = { ...copy[idx], quantity: (copy[idx].quantity || 1) + qty };
+                console.log('🔄 Updated existing item quantity in fallback:', copy[idx]);
+                return copy;
+              }
+              const newItem = {
+                id: product.id,
+                title: product.title,
+                price: Number(product.price) || 0,
+                image: product.image || null,
+                quantity: qty,
+              };
+              console.log('➕ Added new item to fallback cart:', newItem);
+              return [...prev, newItem];
+            });
+            setError(errorMessage); // Show warning but still succeed
+            console.log('✅ Item added to fallback cart successfully');
+            return true;
+          } catch (fallbackErr) {
+            console.error("❌ Fallback cart also failed:", fallbackErr);
+            setError("Failed to add item to cart");
+            return false;
+          }
+        } else {
+          setError(errorMessage);
+          console.log('❌ Error: Failed to add item to cart');
+          return false;
+        }
       } finally {
         setLoading(false);
       }
