@@ -453,36 +453,26 @@ app.get("/api/test", (req, res) => {
 // Cart collection health check
 app.get("/api/health/cart", async (req, res) => {
   try {
-    const isConnected = mongoose.connection.readyState === 1;
+    console.log('🏥 Cart health check requested');
+    console.log(`🔗 MongoDB connection state: ${mongoose.connection.readyState}`);
     
-    if (!isConnected) {
-      return res.json({
-        cartCollectionAccessible: false,
+    if (mongoose.connection.readyState !== 1) {
+      console.log('❌ MongoDB not connected for cart health check');
+      return res.status(503).json({
         mongoConnected: false,
-        message: "MongoDB not connected",
+        cartCollectionAccessible: false,
         connectionState: mongoose.connection.readyState,
-        usingFallbackUri: !process.env.MONGODB_URI
+        error: "MongoDB not connected"
       });
     }
-
+    
     // Test cart collection access
-    const collections = await mongoose.connection.db.listCollections({ name: 'carts' }).toArray();
-    const cartCollectionExists = collections.length > 0;
-    
-    // Try to perform a basic cart operation and get count
     const cartCount = await Cart.countDocuments();
-    const testResult = await Cart.findOne().limit(1);
-    
-    // Get database name
-    const dbName = mongoose.connection.db.databaseName;
+    console.log(`📊 Cart collection accessible, ${cartCount} documents found`);
     
     res.json({
-      cartCollectionAccessible: true,
-      cartCollectionExists,
       mongoConnected: true,
-      testQuerySuccessful: true,
-      cartCount,
-      databaseName: dbName,
+      cartCollectionAccessible: true,
       usingFallbackUri: !process.env.MONGODB_URI,
       message: `Cart collection is accessible. Found ${cartCount} carts in database '${dbName}'.`
     });
