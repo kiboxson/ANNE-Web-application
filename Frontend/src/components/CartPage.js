@@ -59,19 +59,28 @@ export default function CartPage({ onBack }) {
 
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          <div className="flex items-center justify-between">
-            <span>{error}</span>
-            {refreshCart && (
-              <motion.button
-                className="ml-4 px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={refreshCart}
-                disabled={loading}
-              >
-                {loading ? "Retrying..." : "Retry"}
-              </motion.button>
-            )}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <span className="font-semibold">Cart Error:</span>
+              {refreshCart && (
+                <motion.button
+                  className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={refreshCart}
+                  disabled={loading}
+                >
+                  {loading ? "Retrying..." : "Retry"}
+                </motion.button>
+              )}
+            </div>
+            <div className="text-sm">{error}</div>
+            <div className="text-xs text-red-600 mt-2">
+              <strong>Debug Info:</strong>
+              <br />• User logged in: {isLoggedIn ? 'Yes' : 'No'}
+              <br />• Backend URL: {process.env.NODE_ENV === 'production' ? 'https://anne-web-application.vercel.app' : 'http://localhost:5000'}
+              <br />• Environment: {process.env.NODE_ENV || 'development'}
+            </div>
           </div>
         </div>
       )}

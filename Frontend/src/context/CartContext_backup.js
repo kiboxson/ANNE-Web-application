@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+// Simple working cart context
+import React, { createContext, useContext, useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { useAuth } from "./AuthContext";
 import { API_BASE_URL_EXPORT, API_CONFIG } from "../services/api";
@@ -13,7 +14,7 @@ export function CartProvider({ children }) {
   const [error, setError] = useState(null);
   const { user } = useAuth();
 
-  // Load cart from API when user changes
+  // Load cart when user changes
   useEffect(() => {
     if (user?.userId) {
       loadCartFromAPI(user.userId);
