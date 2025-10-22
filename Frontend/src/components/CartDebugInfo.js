@@ -75,6 +75,36 @@ const CartDebugInfo = ({ user }) => {
     }
   };
 
+  const testMongoDBHealth = async () => {
+    setTesting(true);
+    try {
+      // Test MongoDB cart health
+      const healthUrl = `${API_BASE_URL_EXPORT}/api/health/cart`;
+      console.log('Testing MongoDB cart health:', healthUrl);
+      
+      const response = await axios.get(healthUrl, { timeout: 10000 });
+      
+      setDebugInfo({
+        success: true,
+        healthUrl,
+        response: response.data,
+        status: response.status,
+        type: 'mongodb'
+      });
+    } catch (err) {
+      setDebugInfo({
+        success: false,
+        error: err.message,
+        status: err.response?.status,
+        data: err.response?.data,
+        healthUrl: `${API_BASE_URL_EXPORT}/api/health/cart`,
+        type: 'mongodb'
+      });
+    } finally {
+      setTesting(false);
+    }
+  };
+
   return (
     <div className="bg-gray-100 p-4 rounded-lg mt-4 text-sm">
       <h3 className="font-bold mb-2">🐛 Cart Debug Information</h3>
@@ -90,34 +120,58 @@ const CartDebugInfo = ({ user }) => {
         )}
       </div>
 
-      {user && (
-        <div className="mt-4 space-x-2">
-          <button
-            onClick={testCartAPI}
-            disabled={testing}
-            className="px-3 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 disabled:opacity-50"
-          >
-            {testing ? '⏳ Testing...' : '🧪 Test Cart API'}
-          </button>
-          <button
-            onClick={testUserAPI}
-            disabled={testing}
-            className="px-3 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600 disabled:opacity-50"
-          >
-            {testing ? '⏳ Testing...' : '🧪 Test User API'}
-          </button>
-        </div>
-      )}
+      <div className="mt-4 space-x-2 space-y-2">
+        <button
+          onClick={testMongoDBHealth}
+          disabled={testing}
+          className="px-3 py-1 bg-purple-500 text-white rounded text-xs hover:bg-purple-600 disabled:opacity-50"
+        >
+          {testing ? '⏳ Testing...' : '🔍 Test MongoDB Health'}
+        </button>
+        {user && (
+          <>
+            <button
+              onClick={testCartAPI}
+              disabled={testing}
+              className="px-3 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 disabled:opacity-50"
+            >
+              {testing ? '⏳ Testing...' : '🧪 Test Cart API'}
+            </button>
+            <button
+              onClick={testUserAPI}
+              disabled={testing}
+              className="px-3 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600 disabled:opacity-50"
+            >
+              {testing ? '⏳ Testing...' : '🧪 Test User API'}
+            </button>
+          </>
+        )}
+      </div>
 
       {debugInfo && (
         <div className="mt-4 p-3 bg-white rounded border">
           <h4 className="font-semibold mb-2">
-            {debugInfo.type === 'user' ? '👤 User API Test Result:' : '🛒 Cart API Test Result:'}
+            {debugInfo.type === 'user' ? '👤 User API Test Result:' : 
+             debugInfo.type === 'mongodb' ? '🔍 MongoDB Health Test Result:' : 
+             '🛒 Cart API Test Result:'}
           </h4>
           {debugInfo.success ? (
             <div className="text-green-600">
               <div>✅ Success (Status: {debugInfo.status})</div>
-              <div className="text-xs mt-1">URL: {debugInfo.cartUrl || debugInfo.userUrl}</div>
+              <div className="text-xs mt-1">URL: {debugInfo.cartUrl || debugInfo.userUrl || debugInfo.healthUrl}</div>
+              {debugInfo.type === 'mongodb' && debugInfo.response && (
+                <div className="mt-2 space-y-1 text-xs">
+                  <div><strong>MongoDB Connected:</strong> {debugInfo.response.mongoConnected ? '✅ Yes' : '❌ No'}</div>
+                  <div><strong>Cart Collection:</strong> {debugInfo.response.cartCollectionAccessible ? '✅ Accessible' : '❌ Not Accessible'}</div>
+                  <div><strong>Using Fallback URI:</strong> {debugInfo.response.usingFallbackUri ? '⚠️ Yes (Set MONGODB_URI in Vercel)' : '✅ No'}</div>
+                  {debugInfo.response.cartCount !== undefined && (
+                    <div><strong>Cart Count:</strong> {debugInfo.response.cartCount}</div>
+                  )}
+                  {debugInfo.response.databaseName && (
+                    <div><strong>Database:</strong> {debugInfo.response.databaseName}</div>
+                  )}
+                </div>
+              )}
               <pre className="text-xs mt-2 bg-gray-100 p-2 rounded overflow-auto">
                 {JSON.stringify(debugInfo.response, null, 2)}
               </pre>
@@ -125,7 +179,7 @@ const CartDebugInfo = ({ user }) => {
           ) : (
             <div className="text-red-600">
               <div>❌ Failed (Status: {debugInfo.status || 'No Response'})</div>
-              <div className="text-xs mt-1">URL: {debugInfo.cartUrl || debugInfo.userUrl}</div>
+              <div className="text-xs mt-1">URL: {debugInfo.cartUrl || debugInfo.userUrl || debugInfo.healthUrl}</div>
               <div className="text-xs mt-1">Error: {debugInfo.error}</div>
               {debugInfo.data && (
                 <pre className="text-xs mt-2 bg-gray-100 p-2 rounded overflow-auto">

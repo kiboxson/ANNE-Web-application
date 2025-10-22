@@ -59,8 +59,13 @@ console.log('🔗 MongoDB Configuration:', {
   hasMongoUri: !!process.env.MONGODB_URI,
   environment: process.env.NODE_ENV,
   uriLength: MONGODB_URI.length,
-  uriStart: MONGODB_URI.substring(0, 20) + '...'
+  uriStart: MONGODB_URI.substring(0, 20) + '...',
+  usingFallback: !process.env.MONGODB_URI
 });
+
+if (!process.env.MONGODB_URI) {
+  console.warn('⚠️ WARNING: Using fallback MongoDB URI. Set MONGODB_URI environment variable in Vercel dashboard.');
+}
 
 // Enhanced MongoDB connection for production
 async function connectToMongoDB() {
@@ -383,7 +388,9 @@ app.get("/api/health/cart", async (req, res) => {
       return res.json({
         cartCollectionAccessible: false,
         mongoConnected: false,
-        message: "MongoDB not connected"
+        message: "MongoDB not connected",
+        connectionState: mongoose.connection.readyState,
+        usingFallbackUri: !process.env.MONGODB_URI
       });
     }
 
@@ -391,22 +398,32 @@ app.get("/api/health/cart", async (req, res) => {
     const collections = await mongoose.connection.db.listCollections({ name: 'carts' }).toArray();
     const cartCollectionExists = collections.length > 0;
     
-    // Try to perform a basic cart operation
+    // Try to perform a basic cart operation and get count
+    const cartCount = await Cart.countDocuments();
     const testResult = await Cart.findOne().limit(1);
+    
+    // Get database name
+    const dbName = mongoose.connection.db.databaseName;
     
     res.json({
       cartCollectionAccessible: true,
       cartCollectionExists,
       mongoConnected: true,
       testQuerySuccessful: true,
-      message: "Cart collection is accessible"
+      cartCount,
+      databaseName: dbName,
+      usingFallbackUri: !process.env.MONGODB_URI,
+      message: `Cart collection is accessible. Found ${cartCount} carts in database '${dbName}'.`
     });
     
   } catch (err) {
+    console.error("❌ Cart health check error:", err);
     res.json({
       cartCollectionAccessible: false,
       mongoConnected: mongoose.connection.readyState === 1,
       error: err.message,
+      connectionState: mongoose.connection.readyState,
+      usingFallbackUri: !process.env.MONGODB_URI,
       message: "Cart collection test failed"
     });
   }
@@ -1422,6 +1439,7 @@ app.get("/api/cart/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
     console.log(`📦 Getting cart for user: ${userId}`);
+    console.log(`🔗 MongoDB connection state: ${mongoose.connection.readyState} (0=disconnected, 1=connected, 2=connecting, 3=disconnecting)`);
     
     // Check MongoDB connection
     if (mongoose.connection.readyState !== 1) {
@@ -1430,26 +1448,30 @@ app.get("/api/cart/:userId", async (req, res) => {
       return res.json(memoryCart);
     }
     
+    console.log(`🔍 Searching for cart in MongoDB for user: ${userId}`);
     let cart = await Cart.findOne({ userId });
     
     if (!cart) {
       // Create empty cart if it doesn't exist
+      console.log(`🆕 Creating new cart in MongoDB for user: ${userId}`);
       cart = new Cart({ userId, items: [] });
       await cart.save();
-      console.log(`✅ Created new cart for user: ${userId}`);
+      console.log(`✅ Created new cart for user: ${userId} in MongoDB`);
     } else {
-      console.log(`✅ Found existing cart for user: ${userId} with ${cart.items.length} items`);
+      console.log(`✅ Found existing cart for user: ${userId} with ${cart.items.length} items in MongoDB`);
     }
     
     res.json(cart);
   } catch (err) {
     console.error("❌ Error fetching cart:", err.message);
+    console.error("❌ Full error:", err);
     // Fallback to memory storage
     const memoryCart = memoryCartStorage.get(req.params.userId) || { 
       userId: req.params.userId, 
       items: [], 
       updatedAt: new Date() 
     };
+    console.log("🔄 Falling back to memory storage for cart");
     res.json(memoryCart);
   }
 });
@@ -1476,6 +1498,8 @@ app.post("/api/cart/:userId/add", async (req, res) => {
       console.log("❌ Missing required product fields:", { title: product.title, price: product.price });
       return res.status(400).json({ error: "Product must have title and valid price" });
     }
+    
+    console.log(`🔗 MongoDB connection state: ${mongoose.connection.readyState} (0=disconnected, 1=connected, 2=connecting, 3=disconnecting)`);
     
     // Check MongoDB connection
     if (mongoose.connection.readyState !== 1) {
