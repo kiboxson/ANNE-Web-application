@@ -89,6 +89,13 @@ export function CartProvider({ children, user }) {
   }
 
   async function addItem(product, qty = 1) {
+    // Check if user is logged in - REQUIRED for add to cart
+    if (!user || !user.userId) {
+      console.log('❌ User not logged in - add to cart disabled');
+      setError("Please sign in to add items to cart");
+      return false;
+    }
+    
     if (!product || !product.id) {
       console.log('❌ Invalid product:', product);
       setError("Invalid product data");
@@ -158,175 +165,91 @@ export function CartProvider({ children, user }) {
       } finally {
         setLoading(false);
       }
-    } else {
-      // Guest user - use local state
-      try {
-        setItems((prev) => {
-          const idx = prev.findIndex((p) => p.id === product.id);
-          if (idx !== -1) {
-            const copy = [...prev];
-            copy[idx] = { ...copy[idx], quantity: (copy[idx].quantity || 1) + qty };
-            console.log('🔄 Updated existing item quantity:', copy[idx]);
-            return copy;
-          }
-          const newItem = {
-            id: product.id,
-            title: product.title,
-            price: Number(product.price) || 0,
-            image: product.image || null,
-            quantity: qty,
-          };
-          console.log('➕ Added new item to guest cart:', newItem);
-          return [...prev, newItem];
-        });
-        console.log('✅ Item added to guest cart successfully');
-        console.log('🎉 Success: Item added to guest cart!');
-        return true;
-      } catch (err) {
-        console.error("❌ Error adding to guest cart:", err);
-        setError("Failed to add item to guest cart");
-        return false;
-      }
     }
   }
 
   async function removeItem(id) {
-    if (user?.userId) {
-      // User is logged in - use API
-      try {
-        setLoading(true);
-        setError(null);
-        console.log('🗑️ Removing item from cart:', id);
-        const response = await axios.delete(
-          `${CART_API_BASE_URL}${API_CONFIG.ENDPOINTS.CART_REMOVE(user.userId, id)}`
-        );
-        console.log('📦 Remove item API response:', response.data);
-        setItems(response.data.items || []);
-        console.log('✅ Item removed from cart successfully');
-      } catch (err) {
-        console.error("❌ Error removing from cart:", err);
-        console.error("❌ Error response:", err.response?.data);
-        setError(`Failed to remove item from cart: ${err.response?.data?.error || err.message}`);
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      // Guest user - use local state
-      try {
-        setItems((prev) => {
-          const filtered = prev.filter((p) => p.id !== id);
-          console.log('🗑️ Removed item from guest cart:', id);
-          return filtered;
-        });
-        console.log('✅ Item removed from guest cart successfully');
-      } catch (err) {
-        console.error("❌ Error removing from guest cart:", err);
-        setError("Failed to remove item from guest cart");
-      }
+    if (!user?.userId) {
+      console.log('❌ User not logged in - remove item disabled');
+      setError("Please sign in to manage cart items");
+      return;
+    }
+    
+    // User is logged in - use API
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('🗑️ Removing item from cart:', id);
+      const response = await axios.delete(
+        `${CART_API_BASE_URL}${API_CONFIG.ENDPOINTS.CART_REMOVE(user.userId, id)}`
+      );
+      console.log('📦 Remove item API response:', response.data);
+      setItems(response.data.items || []);
+      console.log('✅ Item removed from cart successfully');
+    } catch (err) {
+      console.error("❌ Error removing from cart:", err);
+      console.error("❌ Error response:", err.response?.data);
+      setError(`Failed to remove item from cart: ${err.response?.data?.error || err.message}`);
+    } finally {
+      setLoading(false);
     }
   }
 
   async function setQuantity(id, qty) {
-    if (user?.userId) {
-      // User is logged in - use API
-      try {
-        setLoading(true);
-        setError(null);
-        console.log('🔄 Updating item quantity:', id, 'to', qty);
-        const response = await axios.put(
-          `${CART_API_BASE_URL}${API_CONFIG.ENDPOINTS.CART_UPDATE(user.userId, id)}`,
-          { quantity: Math.max(1, qty) }
-        );
-        console.log('📦 Update quantity API response:', response.data);
-        setItems(response.data.items || []);
-        console.log('✅ Item quantity updated successfully');
-      } catch (err) {
-        console.error("❌ Error updating cart quantity:", err);
-        console.error("❌ Error response:", err.response?.data);
-        setError(`Failed to update item quantity: ${err.response?.data?.error || err.message}`);
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      // Guest user - use local state
-      try {
-        setItems((prev) => {
-          const updated = prev.map((p) => (p.id === id ? { ...p, quantity: Math.max(1, qty) } : p));
-          console.log('🔄 Updated guest cart item quantity:', id, 'to', qty);
-          return updated;
-        });
-        console.log('✅ Guest cart quantity updated successfully');
-      } catch (err) {
-        console.error("❌ Error updating guest cart quantity:", err);
-        setError("Failed to update item quantity");
-      }
+    if (!user?.userId) {
+      console.log('❌ User not logged in - set quantity disabled');
+      setError("Please sign in to manage cart items");
+      return;
+    }
+    
+    // User is logged in - use API
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('🔄 Updating item quantity:', id, 'to', qty);
+      const response = await axios.put(
+        `${CART_API_BASE_URL}${API_CONFIG.ENDPOINTS.CART_UPDATE(user.userId, id)}`,
+        { quantity: Math.max(1, qty) }
+      );
+      console.log('📦 Update quantity API response:', response.data);
+      setItems(response.data.items || []);
+      console.log('✅ Item quantity updated successfully');
+    } catch (err) {
+      console.error("❌ Error updating cart quantity:", err);
+      console.error("❌ Error response:", err.response?.data);
+      setError(`Failed to update item quantity: ${err.response?.data?.error || err.message}`);
+    } finally {
+      setLoading(false);
     }
   }
 
   async function clearCart() {
-    if (user?.userId) {
-      // User is logged in - use API
-      try {
-        setLoading(true);
-        setError(null);
-        console.log('🧹 Clearing cart for user:', user.userId);
-        const response = await axios.delete(
-          `${CART_API_BASE_URL}${API_CONFIG.ENDPOINTS.CART_CLEAR(user.userId)}`
-        );
-        console.log('📦 Clear cart API response:', response.data);
-        setItems(response.data.items || []);
-        console.log('✅ Cart cleared successfully');
-      } catch (err) {
-        console.error("❌ Error clearing cart:", err);
-        console.error("❌ Error response:", err.response?.data);
-        setError(`Failed to clear cart: ${err.response?.data?.error || err.message}`);
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      // Guest user - use local state
-      try {
-        setItems([]);
-        console.log('🧹 Guest cart cleared successfully');
-      } catch (err) {
-        console.error("❌ Error clearing guest cart:", err);
-        setError("Failed to clear guest cart");
-      }
+    if (!user?.userId) {
+      console.log('❌ User not logged in - clear cart disabled');
+      setError("Please sign in to manage cart");
+      return;
+    }
+    
+    // User is logged in - use API
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('🧹 Clearing cart for user:', user.userId);
+      const response = await axios.delete(
+        `${CART_API_BASE_URL}${API_CONFIG.ENDPOINTS.CART_CLEAR(user.userId)}`
+      );
+      console.log('📦 Clear cart API response:', response.data);
+      setItems(response.data.items || []);
+      console.log('✅ Cart cleared successfully');
+    } catch (err) {
+      console.error("❌ Error clearing cart:", err);
+      console.error("❌ Error response:", err.response?.data);
+      setError(`Failed to clear cart: ${err.response?.data?.error || err.message}`);
+    } finally {
+      setLoading(false);
     }
   }
 
-  // Transfer guest cart to user cart when user logs in
-  async function transferGuestCart(userId) {
-    if (items.length > 0) {
-      try {
-        setLoading(true);
-        // Add each guest cart item to user's cart
-        for (const item of items) {
-          await axios.post(
-            `${CART_API_BASE_URL}${API_CONFIG.ENDPOINTS.CART_ADD(userId)}`,
-            { 
-              product: {
-                id: item.id,
-                title: item.title,
-                price: item.price,
-                image: item.image
-              }, 
-              quantity: item.quantity 
-            }
-          );
-        }
-        // Clear guest cart from localStorage
-        localStorage.removeItem("guest_cart");
-        // Reload cart from API
-        await loadCartFromAPI(userId);
-      } catch (err) {
-        console.error("Error transferring guest cart:", err);
-        setError("Failed to transfer cart items");
-      } finally {
-        setLoading(false);
-      }
-    }
-  }
 
   // Manual refresh function for cart
   async function refreshCart() {
@@ -345,7 +268,6 @@ export function CartProvider({ children, user }) {
       removeItem, 
       setQuantity, 
       clearCart, 
-      transferGuestCart,
       refreshCart,
       count, 
       total, 

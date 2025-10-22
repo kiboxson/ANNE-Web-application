@@ -4,11 +4,12 @@ import { Star } from "lucide-react"; // for ratings
 import { useCart } from "../context/CartContext";
 import ProductModal from "./ProductModal";
 import { useProducts } from "../context/ProductsContext";
+import { getCurrentUser } from "../services/auth";
 
 // Local product assets are not available; use images provided by context or external URLs
 
 // Product Card Component
-function ProductCard({ image, title, price, rating, discount, variants, onAdd, onView, onBuyNow }) {
+function ProductCard({ image, title, price, rating, discount, variants, onAdd, onView, onBuyNow, isLoggedIn }) {
   return (
     <div className="bg-[white] w-full">
     <motion.div
@@ -55,12 +56,24 @@ function ProductCard({ image, title, price, rating, discount, variants, onAdd, o
 
       {/* Buttons */}
       <motion.button
-        className="mt-auto bg-blue-600 text-white py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg shadow hover:bg-blue-700"
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        onClick={(e) => { e.stopPropagation(); onAdd && onAdd(); }}
+        className={`mt-auto py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg shadow ${
+          isLoggedIn 
+            ? "bg-blue-600 text-white hover:bg-blue-700" 
+            : "bg-gray-400 text-gray-200 cursor-not-allowed"
+        }`}
+        whileHover={isLoggedIn ? { scale: 1.02 } : {}}
+        whileTap={isLoggedIn ? { scale: 0.98 } : {}}
+        onClick={(e) => { 
+          e.stopPropagation(); 
+          if (isLoggedIn) {
+            onAdd && onAdd();
+          } else {
+            alert("Please sign in to add items to cart");
+          }
+        }}
+        disabled={!isLoggedIn}
       >
-        Add to Cart
+        {isLoggedIn ? "Add to Cart" : "Sign in to Add"}
       </motion.button>
       <motion.button
         className="mt-2 bg-emerald-600 text-white py-1.5 text-sm rounded-lg shadow hover:bg-emerald-700"
@@ -80,6 +93,8 @@ export default function ProductsSection({ searchQuery = "", selectedCategories =
   const { products: remoteProducts } = useProducts(); // Use ProductsContext instead of local state
   const { addItem } = useCart(); // Use addItem from CartContext
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const currentUser = getCurrentUser();
+  const isLoggedIn = !!currentUser?.userId;
 
   // Debug: Log products when they change
   useEffect(() => {
@@ -165,6 +180,7 @@ export default function ProductsSection({ searchQuery = "", selectedCategories =
                   price={item.price}
                   rating={4}
                   discount={null}
+                  isLoggedIn={isLoggedIn}
                   onAdd={async () => {
                     try {
                       console.log('🛒 Adding item to cart:', item);
@@ -216,6 +232,7 @@ export default function ProductsSection({ searchQuery = "", selectedCategories =
               price={item.price}
               rating={4}
               discount={null}
+              isLoggedIn={isLoggedIn}
               onAdd={async () => {
                 try {
                   console.log('🛒 Adding item to cart:', item);

@@ -1,9 +1,12 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "../context/CartContext";
+import { getCurrentUser } from "../services/auth";
 
 export default function ProductModal({ open, product, onClose, onBuyNow }) {
   const { addItem } = useCart();
+  const currentUser = getCurrentUser();
+  const isLoggedIn = !!currentUser?.userId;
   if (!open || !product) return null;
 
   const { id, title, price, image, category } = product;
@@ -44,10 +47,20 @@ export default function ProductModal({ open, product, onClose, onBuyNow }) {
                   </div>
                   <div className="flex items-center gap-2">
                     <motion.button
-                      className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.97 }}
+                      className={`px-4 py-2 rounded-lg ${
+                        isLoggedIn 
+                          ? "bg-blue-600 text-white hover:bg-blue-700" 
+                          : "bg-gray-400 text-gray-200 cursor-not-allowed"
+                      }`}
+                      whileHover={isLoggedIn ? { scale: 1.03 } : {}}
+                      whileTap={isLoggedIn ? { scale: 0.97 } : {}}
+                      disabled={!isLoggedIn}
                       onClick={async () => {
+                        if (!isLoggedIn) {
+                          alert("Please sign in to add items to cart");
+                          return;
+                        }
+                        
                         try {
                           console.log('🛒 Adding item to cart from modal:', { id, title, price, image });
                           const success = await addItem({ 
@@ -71,7 +84,7 @@ export default function ProductModal({ open, product, onClose, onBuyNow }) {
                         }
                       }}
                     >
-                      Add to Cart
+                      {isLoggedIn ? "Add to Cart" : "Sign in to Add"}
                     </motion.button>
                     <motion.button
                       className="px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"

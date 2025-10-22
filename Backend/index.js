@@ -80,7 +80,6 @@ async function connectToMongoDB() {
         serverSelectionTimeoutMS: 15000, // Increased timeout
         socketTimeoutMS: 45000,
         maxPoolSize: 10,
-        serverSelectionRetryDelayMS: 5000,
         heartbeatFrequencyMS: 10000,
         retryWrites: true,
         w: 'majority'
@@ -119,9 +118,14 @@ async function connectToMongoDB() {
           message: err.message
         });
         
-        // CRITICAL: Exit process if MongoDB connection fails
-        console.error("🚨 CRITICAL: Cannot run without database connection!");
-        process.exit(1);
+        // CRITICAL: Exit process if MongoDB connection fails in production
+        if (process.env.NODE_ENV === 'production') {
+          console.error("🚨 CRITICAL: Cannot run without database connection in production!");
+          process.exit(1);
+        } else {
+          console.error("🚨 WARNING: Running without database connection in development mode!");
+          console.error("⚠️ Cart functionality will return errors until database is connected.");
+        }
       } else {
         console.log(`⏳ Retrying in 3 seconds... (${maxRetries - retryCount} attempts remaining)`);
         await new Promise(resolve => setTimeout(resolve, 3000));

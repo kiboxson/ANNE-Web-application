@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useCart } from "../context/CartContext";
 import { useFlashProducts } from "../context/FlashProductsContext";
+import { getCurrentUser } from "../services/auth";
 
 // Use stable external image URLs instead of missing local assets
 
@@ -36,7 +37,7 @@ function CountdownTimer({ endTime }) {
 }
 
 // 🛒 Product Card
-function FlashSaleProduct({ image, title, price, stock, variants, onGrabDeal }) {
+function FlashSaleProduct({ image, title, price, stock, variants, onGrabDeal, isLoggedIn }) {
   return (
     <motion.div
       variants={variants}
@@ -71,12 +72,23 @@ function FlashSaleProduct({ image, title, price, stock, variants, onGrabDeal }) 
 
       {/* Button */}
       <motion.button
-        className="mt-auto bg-red-600 text-white py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg shadow-md hover:bg-red-700"
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        onClick={onGrabDeal}
+        className={`mt-auto py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg shadow-md ${
+          isLoggedIn 
+            ? "bg-red-600 text-white hover:bg-red-700" 
+            : "bg-gray-400 text-gray-200 cursor-not-allowed"
+        }`}
+        whileHover={isLoggedIn ? { scale: 1.02 } : {}}
+        whileTap={isLoggedIn ? { scale: 0.98 } : {}}
+        onClick={() => {
+          if (isLoggedIn) {
+            onGrabDeal && onGrabDeal();
+          } else {
+            alert("Please sign in to grab deals");
+          }
+        }}
+        disabled={!isLoggedIn}
       >
-        Grab Deal
+        {isLoggedIn ? "Grab Deal" : "Sign in to Grab"}
       </motion.button>
     </motion.div>
   );
@@ -86,6 +98,8 @@ function FlashSaleProduct({ image, title, price, stock, variants, onGrabDeal }) 
 export default function FlashSalePage({ searchQuery = "", selectedCategories = [], priceRange = [0, 1000], onGrabDeal = () => {} }) {
   const { addItem } = useCart();
   const { flashProducts: items, refreshFlashProducts } = useFlashProducts(); // Use FlashProductsContext instead of local state
+  const currentUser = getCurrentUser();
+  const isLoggedIn = !!currentUser?.userId;
 
   // Debug: Log flash products when they change
   useEffect(() => {
@@ -198,6 +212,7 @@ export default function FlashSalePage({ searchQuery = "", selectedCategories = [
               title={p.title}
               price={p.price}
               stock={p.stock}
+              isLoggedIn={isLoggedIn}
               onGrabDeal={async () => {
                 try {
                   const id = p.id || p.title;

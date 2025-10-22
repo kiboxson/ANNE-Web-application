@@ -85,7 +85,17 @@ export default function CartPage({ onBack }) {
 
       {!loading && !hasItems ? (
         <div className="text-center text-gray-600 py-16 bg-[#F3F4F6] rounded-xl">
-          {isLoggedIn ? "Your cart is empty." : "Your cart is empty. Log in to save items to your cart."}
+          {isLoggedIn ? (
+            <div>
+              <p className="text-lg mb-2">🛒 Your cart is empty</p>
+              <p className="text-sm">Add some products to get started!</p>
+            </div>
+          ) : (
+            <div>
+              <p className="text-lg mb-2">🔒 Please sign in to use cart</p>
+              <p className="text-sm">Sign in to add items to your cart and save them for later.</p>
+            </div>
+          )}
         </div>
       ) : !loading && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
