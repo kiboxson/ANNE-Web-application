@@ -36,7 +36,7 @@ export const API_CONFIG = {
     USER_ROLE: (userId) => `/api/users/${userId}/role`,
     
     // Cart
-    CART: (userId) => `/api/cart/${userId}`,
+    CART_GET: (userId) => `/api/cart/${userId}`,
     CART_ADD: (userId) => `/api/cart/${userId}/add`,
     CART_UPDATE: (userId, itemId) => `/api/cart/${userId}/item/${itemId}`,
     CART_REMOVE: (userId, itemId) => `/api/cart/${userId}/item/${itemId}`,
