@@ -379,6 +379,24 @@ app.get("/api/health/db", (req, res) => {
   });
 });
 
+// Environment check endpoint
+app.get("/api/health/env", (req, res) => {
+  res.json({
+    nodeEnv: process.env.NODE_ENV,
+    hasMongoUri: !!process.env.MONGODB_URI,
+    mongoUriLength: process.env.MONGODB_URI ? process.env.MONGODB_URI.length : 0,
+    mongoUriStart: process.env.MONGODB_URI ? process.env.MONGODB_URI.substring(0, 30) + '...' : 'Not set',
+    usingFallback: !process.env.MONGODB_URI,
+    connectionState: mongoose.connection.readyState,
+    connectionStates: {
+      0: 'disconnected',
+      1: 'connected', 
+      2: 'connecting',
+      3: 'disconnecting'
+    }
+  });
+});
+
 // Cart collection health check
 app.get("/api/health/cart", async (req, res) => {
   try {

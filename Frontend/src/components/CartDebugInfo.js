@@ -105,6 +105,36 @@ const CartDebugInfo = ({ user }) => {
     }
   };
 
+  const testEnvironment = async () => {
+    setTesting(true);
+    try {
+      // Test environment configuration
+      const envUrl = `${API_BASE_URL_EXPORT}/api/health/env`;
+      console.log('Testing environment configuration:', envUrl);
+      
+      const response = await axios.get(envUrl, { timeout: 10000 });
+      
+      setDebugInfo({
+        success: true,
+        envUrl,
+        response: response.data,
+        status: response.status,
+        type: 'environment'
+      });
+    } catch (err) {
+      setDebugInfo({
+        success: false,
+        error: err.message,
+        status: err.response?.status,
+        data: err.response?.data,
+        envUrl: `${API_BASE_URL_EXPORT}/api/health/env`,
+        type: 'environment'
+      });
+    } finally {
+      setTesting(false);
+    }
+  };
+
   return (
     <div className="bg-gray-100 p-4 rounded-lg mt-4 text-sm">
       <h3 className="font-bold mb-2">🐛 Cart Debug Information</h3>
@@ -120,16 +150,25 @@ const CartDebugInfo = ({ user }) => {
         )}
       </div>
 
-      <div className="mt-4 space-x-2 space-y-2">
-        <button
-          onClick={testMongoDBHealth}
-          disabled={testing}
-          className="px-3 py-1 bg-purple-500 text-white rounded text-xs hover:bg-purple-600 disabled:opacity-50"
-        >
-          {testing ? '⏳ Testing...' : '🔍 Test MongoDB Health'}
-        </button>
+      <div className="mt-4 space-y-2">
+        <div className="space-x-2">
+          <button
+            onClick={testEnvironment}
+            disabled={testing}
+            className="px-3 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600 disabled:opacity-50"
+          >
+            {testing ? '⏳ Testing...' : '⚙️ Check Environment'}
+          </button>
+          <button
+            onClick={testMongoDBHealth}
+            disabled={testing}
+            className="px-3 py-1 bg-purple-500 text-white rounded text-xs hover:bg-purple-600 disabled:opacity-50"
+          >
+            {testing ? '⏳ Testing...' : '🔍 Test MongoDB Health'}
+          </button>
+        </div>
         {user && (
-          <>
+          <div className="space-x-2">
             <button
               onClick={testCartAPI}
               disabled={testing}
@@ -144,7 +183,7 @@ const CartDebugInfo = ({ user }) => {
             >
               {testing ? '⏳ Testing...' : '🧪 Test User API'}
             </button>
-          </>
+          </div>
         )}
       </div>
 
@@ -153,12 +192,24 @@ const CartDebugInfo = ({ user }) => {
           <h4 className="font-semibold mb-2">
             {debugInfo.type === 'user' ? '👤 User API Test Result:' : 
              debugInfo.type === 'mongodb' ? '🔍 MongoDB Health Test Result:' : 
+             debugInfo.type === 'environment' ? '⚙️ Environment Check Result:' :
              '🛒 Cart API Test Result:'}
           </h4>
           {debugInfo.success ? (
             <div className="text-green-600">
               <div>✅ Success (Status: {debugInfo.status})</div>
-              <div className="text-xs mt-1">URL: {debugInfo.cartUrl || debugInfo.userUrl || debugInfo.healthUrl}</div>
+              <div className="text-xs mt-1">URL: {debugInfo.cartUrl || debugInfo.userUrl || debugInfo.healthUrl || debugInfo.envUrl}</div>
+              {debugInfo.type === 'environment' && debugInfo.response && (
+                <div className="mt-2 space-y-1 text-xs">
+                  <div><strong>Node Environment:</strong> {debugInfo.response.nodeEnv || 'Not set'}</div>
+                  <div><strong>Has MONGODB_URI:</strong> {debugInfo.response.hasMongoUri ? '✅ Yes' : '❌ No - SET THIS IN VERCEL!'}</div>
+                  <div><strong>Using Fallback URI:</strong> {debugInfo.response.usingFallback ? '⚠️ Yes (Set MONGODB_URI in Vercel)' : '✅ No'}</div>
+                  <div><strong>Connection State:</strong> {debugInfo.response.connectionStates[debugInfo.response.connectionState]} ({debugInfo.response.connectionState})</div>
+                  {debugInfo.response.mongoUriStart && (
+                    <div><strong>MongoDB URI:</strong> {debugInfo.response.mongoUriStart}</div>
+                  )}
+                </div>
+              )}
               {debugInfo.type === 'mongodb' && debugInfo.response && (
                 <div className="mt-2 space-y-1 text-xs">
                   <div><strong>MongoDB Connected:</strong> {debugInfo.response.mongoConnected ? '✅ Yes' : '❌ No'}</div>
