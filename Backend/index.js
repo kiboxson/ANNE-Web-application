@@ -426,7 +426,19 @@ app.get("/api/health/env", (req, res) => {
       1: 'connected', 
       2: 'connecting',
       3: 'disconnecting'
-    }
+    },
+    timestamp: new Date().toISOString(),
+    vercelRegion: process.env.VERCEL_REGION || 'unknown'
+  });
+});
+
+// Simple test endpoint
+app.get("/api/test", (req, res) => {
+  res.json({
+    message: "Backend is working!",
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV,
+    mongoConnected: mongoose.connection.readyState === 1
   });
 });
 
