@@ -150,11 +150,13 @@ export function CartProvider({ children, user }) {
         if (err.code === 'ERR_NETWORK') {
           errorMessage = "Network error - please check your connection and try again";
         } else if (err.response?.status === 503) {
-          errorMessage = "Database service temporarily unavailable - please try again in a moment";
+          errorMessage = err.response?.data?.message || "Database service temporarily unavailable - please try again in a moment";
         } else if (err.response?.status === 404) {
-          errorMessage = "Cart service not found - please contact support";
+          errorMessage = "Backend service not available - please check if the server is running";
         } else if (err.response?.status === 401 || err.response?.status === 403) {
           errorMessage = "Authentication issue - please log in again";
+        } else if (err.response?.status === 500) {
+          errorMessage = err.response?.data?.message || "Server error - please try again later";
         } else {
           errorMessage = err.response?.data?.message || err.response?.data?.error || err.message || "Unknown error occurred";
         }
