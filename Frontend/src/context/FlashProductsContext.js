@@ -13,19 +13,29 @@ export function FlashProductsProvider({ children }) {
     let cancelled = false;
     (async () => {
       try {
-        console.log('🔄 Loading flash products from backend...');
+        console.log('🔄 SIMPLE FLASH PRODUCTS LOAD - Loading from backend...');
         const res = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.FLASH_PRODUCTS));
-        console.log('⚡ Flash products API response status:', res.status);
-        if (!res.ok) throw new Error(`Failed to load flash products: ${res.status}`);
         const data = await res.json();
-        console.log('⚡ Flash products loaded from backend:', data.length, 'products');
-        console.log('Flash products raw data:', data);
+        
+        console.log('⚡ Simple flash products response:', data);
+        
         if (!cancelled) {
-          setFlashProducts(Array.isArray(data) ? data : []);
-          console.log('⚡ Flash products state updated');
+          // Handle new API response format
+          if (data.success && Array.isArray(data.flashProducts)) {
+            setFlashProducts(data.flashProducts);
+            console.log(`⚡ Loaded ${data.flashProducts.length} flash products successfully`);
+          } else if (Array.isArray(data)) {
+            // Fallback for old format
+            setFlashProducts(data);
+            console.log(`⚡ Loaded ${data.length} flash products (legacy format)`);
+          } else {
+            setFlashProducts([]);
+            console.log('⚡ No flash products loaded, using empty array');
+          }
         }
       } catch (err) {
-        console.error('❌ Failed to load flash products:', err);
+        console.error('❌ Simple flash products load error:', err);
+        if (!cancelled) setFlashProducts([]);
       }
     })();
     return () => { cancelled = true; };
@@ -34,13 +44,24 @@ export function FlashProductsProvider({ children }) {
   // Function to refresh flash products from backend
   const refreshFlashProducts = useCallback(async () => {
     try {
+      console.log('🔄 SIMPLE FLASH PRODUCTS REFRESH');
       const res = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.FLASH_PRODUCTS));
-      if (!res.ok) throw new Error(`Failed to load flash products: ${res.status}`);
       const data = await res.json();
-      setFlashProducts(Array.isArray(data) ? data : []);
-      console.log('Flash products refreshed:', data.length, 'products loaded');
+      
+      // Handle new API response format
+      if (data.success && Array.isArray(data.flashProducts)) {
+        setFlashProducts(data.flashProducts);
+        console.log(`⚡ Refreshed ${data.flashProducts.length} flash products successfully`);
+      } else if (Array.isArray(data)) {
+        setFlashProducts(data);
+        console.log(`⚡ Refreshed ${data.length} flash products (legacy format)`);
+      } else {
+        setFlashProducts([]);
+        console.log('⚡ No flash products refreshed, using empty array');
+      }
     } catch (err) {
-      console.error('Failed to refresh flash products:', err);
+      console.error('❌ Simple flash products refresh error:', err);
+      setFlashProducts([]);
     }
   }, []);
 

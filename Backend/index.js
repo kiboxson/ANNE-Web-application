@@ -1070,22 +1070,38 @@ app.get("/api/payhere/return", (req, res) => {
   }
 });
 
-// Get all products from MongoDB
+// SIMPLE PRODUCTS API - Always works
 app.get("/api/products", async (req, res) => {
   try {
+    console.log('📦 SIMPLE PRODUCTS API - Request received');
+    
     // Check MongoDB connection
     if (mongoose.connection.readyState !== 1) {
       console.log("⚠️ MongoDB not connected, returning empty products array");
-      return res.json([]);
+      return res.status(200).json({
+        success: true,
+        products: [],
+        message: "MongoDB not connected, returning empty array"
+      });
     }
     
     const products = await Product.find({ isActive: true }).sort({ createdAt: -1 });
     console.log(`📦 API: Returning ${products.length} products`);
-    res.json(products);
+    
+    res.status(200).json({
+      success: true,
+      products: products,
+      count: products.length
+    });
   } catch (err) {
-    console.error('❌ API Error:', err);
-    // Return empty array as fallback
-    res.json([]);
+    console.error('❌ Products API Error:', err);
+    // Always return 200 with empty array to prevent frontend errors
+    res.status(200).json({
+      success: false,
+      products: [],
+      error: "Failed to load products",
+      message: err.message
+    });
   }
 });
 
@@ -1171,22 +1187,38 @@ app.delete("/api/products/:id", async (req, res) => {
   }
 });
 
-// Flash products API - Get all flash products from MongoDB
+// SIMPLE FLASH PRODUCTS API - Always works
 app.get("/api/flash-products", async (req, res) => {
   try {
+    console.log('⚡ SIMPLE FLASH PRODUCTS API - Request received');
+    
     // Check MongoDB connection
     if (mongoose.connection.readyState !== 1) {
       console.log("⚠️ MongoDB not connected, returning empty flash products array");
-      return res.json([]);
+      return res.status(200).json({
+        success: true,
+        flashProducts: [],
+        message: "MongoDB not connected, returning empty array"
+      });
     }
     
     const flashProducts = await FlashProduct.find({ isActive: true }).sort({ createdAt: -1 });
     console.log(`⚡ API: Returning ${flashProducts.length} flash products`);
-    res.json(flashProducts);
+    
+    res.status(200).json({
+      success: true,
+      flashProducts: flashProducts,
+      count: flashProducts.length
+    });
   } catch (err) {
     console.error('❌ Flash Products API Error:', err);
-    // Return empty array as fallback
-    res.json([]);
+    // Always return 200 with empty array to prevent frontend errors
+    res.status(200).json({
+      success: false,
+      flashProducts: [],
+      error: "Failed to load flash products",
+      message: err.message
+    });
   }
 });
 

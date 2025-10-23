@@ -14,15 +14,29 @@ export function ProductsProvider({ children }) {
     let cancelled = false;
     (async () => {
       try {
-        console.log('🔄 Loading products from backend...');
+        console.log('🔄 SIMPLE PRODUCTS LOAD - Loading from backend...');
         const res = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.PRODUCTS));
-        if (!res.ok) throw new Error(`Failed to load products: ${res.status}`);
         const data = await res.json();
-        console.log('📦 Products loaded from backend:', data.length, 'products');
-        console.log('Products data:', data);
-        if (!cancelled) setProducts(Array.isArray(data) ? data : []);
+        
+        console.log('📦 Simple products response:', data);
+        
+        if (!cancelled) {
+          // Handle new API response format
+          if (data.success && Array.isArray(data.products)) {
+            setProducts(data.products);
+            console.log(`📦 Loaded ${data.products.length} products successfully`);
+          } else if (Array.isArray(data)) {
+            // Fallback for old format
+            setProducts(data);
+            console.log(`📦 Loaded ${data.length} products (legacy format)`);
+          } else {
+            setProducts([]);
+            console.log('📦 No products loaded, using empty array');
+          }
+        }
       } catch (err) {
-        console.error('Failed to load products:', err);
+        console.error('❌ Simple products load error:', err);
+        if (!cancelled) setProducts([]);
       }
     })();
     return () => { cancelled = true; };
@@ -31,13 +45,24 @@ export function ProductsProvider({ children }) {
   // Function to refresh products from backend
   const refreshProducts = useCallback(async () => {
     try {
+      console.log('🔄 SIMPLE PRODUCTS REFRESH');
       const res = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.PRODUCTS));
-      if (!res.ok) throw new Error(`Failed to load products: ${res.status}`);
       const data = await res.json();
-      setProducts(Array.isArray(data) ? data : []);
-      console.log('Products refreshed:', data.length, 'products loaded');
+      
+      // Handle new API response format
+      if (data.success && Array.isArray(data.products)) {
+        setProducts(data.products);
+        console.log(`📦 Refreshed ${data.products.length} products successfully`);
+      } else if (Array.isArray(data)) {
+        setProducts(data);
+        console.log(`📦 Refreshed ${data.length} products (legacy format)`);
+      } else {
+        setProducts([]);
+        console.log('📦 No products refreshed, using empty array');
+      }
     } catch (err) {
-      console.error('Failed to refresh products:', err);
+      console.error('❌ Simple products refresh error:', err);
+      setProducts([]);
     }
   }, []);
 
