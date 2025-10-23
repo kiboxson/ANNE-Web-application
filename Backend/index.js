@@ -37,7 +37,8 @@ app.get("/", (req, res) => {
   res.json({
     message: "🚀 ANNE Web Application Backend API",
     status: "✅ Server is running successfully",
-    version: "1.0.0",
+    version: "1.0.1",
+    lastUpdate: "2025-10-24 - Cart API Fixed",
     endpoints: {
       health: "/api/health/db",
       products: "/api/products",
@@ -46,6 +47,9 @@ app.get("/", (req, res) => {
       chat: "/api/chat",
       users: "/api/users",
       cart: "/api/cart/:userId",
+      cartAdd: "/api/cart/add",
+      cartRemove: "/api/cart/remove",
+      cartClear: "/api/cart/clear",
       email: "/api/test-email"
     },
     documentation: "Visit the API endpoints above for functionality"
