@@ -210,7 +210,7 @@ export function CartProvider({ children }) {
     loading,
     error,
     isLoggedIn: !!user?.userId,
-    refreshCart: () => user?.userId && loadCartFromAPI(user.userId)
+    refreshCart: () => user?.userId && loadCart(user.userId)
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
