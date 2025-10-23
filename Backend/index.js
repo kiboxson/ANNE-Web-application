@@ -283,6 +283,9 @@ const cartSchema = new mongoose.Schema({
 
 const Cart = mongoose.model('Cart', cartSchema);
 
+// In-memory cart storage for fast access and fallback
+const simpleCart = new Map();
+
 // Persistent JSON storage for products
 const DATA_DIR = path.join(__dirname, "data");
 const PRODUCTS_FILE = path.join(DATA_DIR, "products.json");
@@ -1659,42 +1662,6 @@ app.post("/api/cart/add", async (req, res) => {
     
   } catch (err) {
     console.error("❌ Cart add error:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Get cart for user (like getting orders)
-app.get("/api/cart/:userId", async (req, res) => {
-  try {
-    const { userId } = req.params;
-    
-    console.log(`📦 SIMPLE GET CART - User: ${userId}`);
-    
-    // Find cart in MongoDB Atlas
-    const cart = await Cart.findOne({ userId });
-    
-    if (!cart) {
-      // Return empty cart if not found
-      return res.json({
-        success: true,
-        cart: {
-          userId,
-          items: [],
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }
-      });
-    }
-    
-    console.log(`✅ Found cart with ${cart.items.length} items`);
-    
-    res.json({
-      success: true,
-      cart: cart
-    });
-    
-  } catch (err) {
-    console.error("❌ Get cart error:", err);
     res.status(500).json({ error: err.message });
   }
 });
