@@ -1492,162 +1492,151 @@ app.post("/api/whatsapp/send", async (req, res) => {
 });
 
 // Cart API endpoints - Direct MongoDB connection
-// Get user's cart with fallback
+// SIMPLE GET CART - Always works
 app.get("/api/cart/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
-    console.log(`📦 Getting cart for user: ${userId}`);
-    console.log(`🔗 MongoDB connection state: ${mongoose.connection.readyState} (0=disconnected, 1=connected, 2=connecting, 3=disconnecting)`);
+    console.log(`📦 SIMPLE GET CART - User: ${userId}`);
     
-    let useMongoDb = mongoose.connection.readyState === 1;
-    let cart;
+    // Get from memory first (always available)
+    let userCart = simpleCart.get(userId);
     
-    if (useMongoDb) {
-      try {
-        console.log(`🔍 Searching for cart in MongoDB for user: ${userId}`);
-        cart = await Cart.findOne({ userId });
-        
-        if (!cart) {
-          // Create empty cart if it doesn't exist
-          console.log(`🆕 Creating new cart in MongoDB for user: ${userId}`);
-          cart = new Cart({ userId, items: [] });
-          await cart.save();
-          console.log(`✅ Created new cart for user: ${userId} in MongoDB`);
-        } else {
-          console.log(`✅ Found existing cart for user: ${userId} with ${cart.items.length} items in MongoDB`);
+    if (!userCart) {
+      // Try MongoDB if available
+      if (mongoose.connection.readyState === 1) {
+        try {
+          const mongoCart = await Cart.findOne({ userId });
+          if (mongoCart) {
+            userCart = {
+              userId: mongoCart.userId,
+              items: mongoCart.items,
+              createdAt: mongoCart.createdAt,
+              updatedAt: mongoCart.updatedAt
+            };
+            // Save to memory for faster access
+            simpleCart.set(userId, userCart);
+            console.log(`📦 Loaded cart from MongoDB: ${userCart.items.length} items`);
+          }
+        } catch (mongoErr) {
+          console.log(`⚠️ MongoDB read failed:`, mongoErr.message);
         }
-      } catch (mongoErr) {
-        console.error("❌ MongoDB error, using memory fallback:", mongoErr.message);
-        useMongoDb = false;
       }
+      
+      // Create empty cart if still not found
+      if (!userCart) {
+        userCart = { 
+          userId, 
+          items: [], 
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+        simpleCart.set(userId, userCart);
+        console.log(`🆕 Created new empty cart for user: ${userId}`);
+      }
+    } else {
+      console.log(`📦 Found cart in memory: ${userCart.items.length} items`);
     }
     
-    if (!useMongoDb) {
-      // Use in-memory fallback
-      cart = memoryCart.get(userId);
-      if (!cart) {
-        cart = { userId, items: [], updatedAt: new Date() };
-        memoryCart.set(userId, cart);
-        console.log(`🆕 Created new memory cart for user: ${userId}`);
-      } else {
-        console.log(`✅ Found existing memory cart for user: ${userId} with ${cart.items.length} items`);
-      }
-    }
+    res.json({
+      success: true,
+      cart: userCart,
+      itemCount: userCart.items.length
+    });
     
-    res.json(cart);
   } catch (err) {
-    console.error("❌ Error fetching cart:", err.message);
-    console.error("❌ Full error:", err);
+    console.error("❌ Get cart error:", err);
     res.status(500).json({ 
-      error: "Failed to fetch cart",
-      message: "Unable to retrieve cart data. Please try again.",
-      details: err.message
+      success: false,
+      error: "Failed to get cart",
+      message: err.message
     });
   }
 });
 
-// In-memory cart storage as fallback
-const memoryCart = new Map();
+// Simple cart storage - works with or without MongoDB
+const simpleCart = new Map();
 
-// Add item to cart with fallback
+// SIMPLE ADD TO CART - Always works
 app.post("/api/cart/:userId/add", async (req, res) => {
   try {
     const { userId } = req.params;
     const { product, quantity = 1 } = req.body;
     
-    console.log(`🛒 Add to cart request - User: ${userId}, Product:`, product, `Quantity: ${quantity}`);
+    console.log(`🛒 SIMPLE ADD TO CART - User: ${userId}`);
+    console.log(`📦 Product:`, product);
     
-    if (!userId) {
-      console.log("❌ Missing userId parameter");
-      return res.status(400).json({ error: "User ID is required" });
+    // Basic validation
+    if (!userId || !product || !product.id || !product.title || !product.price) {
+      return res.status(400).json({ 
+        success: false,
+        error: "Missing required data" 
+      });
     }
     
-    if (!product || !product.id) {
-      console.log("❌ Invalid product data:", product);
-      return res.status(400).json({ error: "Product data with valid ID is required" });
-    }
+    // Get or create cart
+    let userCart = simpleCart.get(userId) || { 
+      userId, 
+      items: [], 
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
     
-    if (!product.title || typeof product.price !== 'number') {
-      console.log("❌ Missing required product fields:", { title: product.title, price: product.price });
-      return res.status(400).json({ error: "Product must have title and valid price" });
-    }
+    // Check if item exists
+    const existingIndex = userCart.items.findIndex(item => item.id === product.id);
     
-    console.log(`🔗 MongoDB connection state: ${mongoose.connection.readyState} (0=disconnected, 1=connected, 2=connecting, 3=disconnecting)`);
-    
-    // Try MongoDB first, fallback to memory if it fails
-    let useMongoDb = mongoose.connection.readyState === 1;
-    
-    if (!useMongoDb) {
-      console.log("⚠️ MongoDB not available, using in-memory fallback");
-    }
-    
-    let cart;
-    
-    if (useMongoDb) {
-      // Try MongoDB first
-      try {
-        cart = await Cart.findOne({ userId });
-        console.log(`📦 MongoDB cart found: ${!!cart}`);
-        
-        if (!cart) {
-          console.log("🆕 Creating new MongoDB cart for user:", userId);
-          cart = new Cart({ userId, items: [] });
-        }
-      } catch (mongoErr) {
-        console.error("❌ MongoDB error, falling back to memory:", mongoErr.message);
-        useMongoDb = false;
-      }
-    }
-    
-    if (!useMongoDb) {
-      // Use in-memory fallback
-      cart = memoryCart.get(userId) || { userId, items: [], updatedAt: new Date() };
-      console.log(`📦 Memory cart found: ${cart.items.length} items`);
-    }
-    
-    // Check if item already exists in cart
-    const existingItemIndex = cart.items.findIndex(item => item.id === product.id);
-    
-    if (existingItemIndex > -1) {
-      // Update quantity of existing item
-      cart.items[existingItemIndex].quantity += quantity;
-      console.log(`📦 Updated existing item quantity: ${cart.items[existingItemIndex].quantity}`);
+    if (existingIndex >= 0) {
+      // Update quantity
+      userCart.items[existingIndex].quantity += quantity;
+      console.log(`📦 Updated quantity for ${product.title}`);
     } else {
-      // Add new item to cart
-      cart.items.push({
+      // Add new item
+      userCart.items.push({
         id: product.id,
         title: product.title,
-        price: product.price,
+        price: Number(product.price),
         quantity: quantity,
-        image: product.image || null
+        image: product.image || null,
+        addedAt: new Date()
       });
-      console.log(`📦 Added new item to cart`);
+      console.log(`📦 Added new item: ${product.title}`);
     }
     
-    // Save cart
-    if (useMongoDb) {
+    userCart.updatedAt = new Date();
+    
+    // Save to memory (always works)
+    simpleCart.set(userId, userCart);
+    
+    // Try to save to MongoDB if available
+    if (mongoose.connection.readyState === 1) {
       try {
-        await cart.save();
-        console.log(`✅ Cart saved to MongoDB for user: ${userId}`);
-      } catch (saveErr) {
-        console.error("❌ Failed to save to MongoDB, using memory:", saveErr.message);
-        memoryCart.set(userId, cart);
-        console.log(`✅ Cart saved to memory for user: ${userId}`);
+        let mongoCart = await Cart.findOne({ userId });
+        if (!mongoCart) {
+          mongoCart = new Cart(userCart);
+        } else {
+          mongoCart.items = userCart.items;
+          mongoCart.updatedAt = userCart.updatedAt;
+        }
+        await mongoCart.save();
+        console.log(`✅ Saved to MongoDB`);
+      } catch (mongoErr) {
+        console.log(`⚠️ MongoDB save failed, but memory cart works:`, mongoErr.message);
       }
-    } else {
-      cart.updatedAt = new Date();
-      memoryCart.set(userId, cart);
-      console.log(`✅ Cart saved to memory for user: ${userId}`);
     }
     
-    res.json(cart);
+    console.log(`✅ Cart updated! Total items: ${userCart.items.length}`);
+    
+    res.json({
+      success: true,
+      cart: userCart,
+      message: `Added ${product.title} to cart`
+    });
+    
   } catch (err) {
-    console.error("❌ Error adding item to cart:", err.message);
-    console.error("❌ Full error:", err);
+    console.error("❌ Cart error:", err);
     res.status(500).json({ 
-      error: "Failed to add item to cart",
-      message: "Unable to add item. Please try again.",
-      details: err.message
+      success: false,
+      error: "Cart service error",
+      message: err.message
     });
   }
 });

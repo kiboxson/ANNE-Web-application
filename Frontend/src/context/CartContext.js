@@ -46,30 +46,23 @@ export function CartProvider({ children }) {
     try {
       setLoading(true);
       setError(null);
-      console.log('📦 Loading cart for user:', userId);
-      console.log('🔗 API URL:', `${CART_API_BASE_URL}${API_CONFIG.ENDPOINTS.CART_GET(userId)}`);
+      console.log('📦 SIMPLE LOAD CART - User:', userId);
       
       const response = await axios.get(
         `${CART_API_BASE_URL}${API_CONFIG.ENDPOINTS.CART_GET(userId)}`
       );
       
-      console.log('✅ Cart loaded:', response.data);
-      setItems(response.data.items || []);
-    } catch (err) {
-      console.error("❌ Cart load error:", err);
-      console.error("❌ Status:", err.response?.status);
-      console.error("❌ Data:", err.response?.data);
+      console.log('✅ Simple cart loaded:', response.data);
       
-      let errorMessage = "Failed to load cart";
-      if (err.code === 'ERR_NETWORK') {
-        errorMessage = "Cannot connect to server";
-      } else if (err.response?.status === 404) {
-        errorMessage = "Backend server not found";
-      } else if (err.response?.status === 503) {
-        errorMessage = "Database temporarily unavailable";
+      if (response.data.success && response.data.cart) {
+        setItems(response.data.cart.items || []);
+        console.log(`📦 Loaded ${response.data.cart.items.length} items`);
+      } else {
+        setItems([]);
       }
-      
-      setError(errorMessage);
+    } catch (err) {
+      console.error("❌ Simple cart load error:", err);
+      setError("Could not load cart");
       setItems([]);
     } finally {
       setLoading(false);
@@ -85,19 +78,34 @@ export function CartProvider({ children }) {
     try {
       setLoading(true);
       setError(null);
-      console.log('🛒 Adding to cart:', product);
+      console.log('🛒 SIMPLE ADD TO CART:', product);
       
       const response = await axios.post(
         `${CART_API_BASE_URL}${API_CONFIG.ENDPOINTS.CART_ADD(user.userId)}`,
-        { product, quantity }
+        { 
+          product: {
+            id: product.id,
+            title: product.title,
+            price: Number(product.price),
+            image: product.image
+          }, 
+          quantity 
+        }
       );
       
-      console.log('✅ Item added:', response.data);
-      setItems(response.data.items || []);
-      return true;
+      console.log('✅ Simple add response:', response.data);
+      
+      if (response.data.success && response.data.cart) {
+        setItems(response.data.cart.items || []);
+        console.log(`🎉 Added ${product.title} to cart! Total items: ${response.data.cart.items.length}`);
+        return true;
+      } else {
+        setError("Failed to add item");
+        return false;
+      }
     } catch (err) {
-      console.error("❌ Add to cart error:", err);
-      setError("Failed to add item to cart");
+      console.error("❌ Simple add error:", err);
+      setError("Could not add item to cart");
       return false;
     } finally {
       setLoading(false);
