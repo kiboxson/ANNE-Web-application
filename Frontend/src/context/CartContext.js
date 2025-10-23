@@ -120,13 +120,24 @@ export function CartProvider({ children }) {
 
     try {
       setLoading(true);
+      setError(null);
+      console.log('🗑️ SIMPLE REMOVE ITEM:', itemId);
+      
       const response = await axios.delete(
         `${CART_API_BASE_URL}${API_CONFIG.ENDPOINTS.CART_REMOVE(user.userId, itemId)}`
       );
-      setItems(response.data.items || []);
+      
+      console.log('✅ Simple remove response:', response.data);
+      
+      if (response.data.success && response.data.cart) {
+        setItems(response.data.cart.items || []);
+        console.log(`🗑️ Removed item ${itemId} from cart`);
+      } else {
+        setError("Failed to remove item");
+      }
     } catch (err) {
-      console.error("❌ Remove item error:", err);
-      setError("Failed to remove item");
+      console.error("❌ Simple remove error:", err);
+      setError("Could not remove item");
     } finally {
       setLoading(false);
     }
@@ -140,13 +151,61 @@ export function CartProvider({ children }) {
 
     try {
       setLoading(true);
+      setError(null);
+      console.log('🧹 SIMPLE CLEAR CART');
+      
       const response = await axios.delete(
         `${CART_API_BASE_URL}${API_CONFIG.ENDPOINTS.CART_CLEAR(user.userId)}`
       );
-      setItems([]);
+      
+      console.log('✅ Simple clear response:', response.data);
+      
+      if (response.data.success) {
+        setItems([]);
+        console.log('🧹 Cart cleared successfully');
+      } else {
+        setError("Failed to clear cart");
+      }
     } catch (err) {
-      console.error("❌ Clear cart error:", err);
-      setError("Failed to clear cart");
+      console.error("❌ Simple clear error:", err);
+      setError("Could not clear cart");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function setQuantity(itemId, quantity) {
+    if (!user?.userId) {
+      setError("Please sign in to manage cart");
+      return;
+    }
+
+    if (quantity < 1) {
+      // If quantity is 0 or negative, remove the item
+      return removeItem(itemId);
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('🔄 SIMPLE SET QUANTITY:', itemId, quantity);
+      
+      const response = await axios.put(
+        `${CART_API_BASE_URL}${API_CONFIG.ENDPOINTS.CART_UPDATE(user.userId, itemId)}`,
+        { quantity }
+      );
+      
+      console.log('✅ Simple quantity response:', response.data);
+      
+      if (response.data.success && response.data.cart) {
+        setItems(response.data.cart.items || []);
+        console.log(`🔄 Updated ${itemId} quantity to ${quantity}`);
+      } else {
+        setError("Failed to update quantity");
+      }
+    } catch (err) {
+      console.error("❌ Simple quantity error:", err);
+      setError("Could not update quantity");
     } finally {
       setLoading(false);
     }
@@ -160,6 +219,7 @@ export function CartProvider({ children }) {
     addItem,
     removeItem,
     clearCart,
+    setQuantity,
     count,
     total,
     loading,

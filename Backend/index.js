@@ -1641,101 +1641,199 @@ app.post("/api/cart/:userId/add", async (req, res) => {
   }
 });
 
-// Update item quantity in cart
+// SIMPLE UPDATE QUANTITY - Always works
 app.put("/api/cart/:userId/item/:itemId", async (req, res) => {
   try {
     const { userId, itemId } = req.params;
     const { quantity } = req.body;
     
+    console.log(`🔄 SIMPLE UPDATE QUANTITY - User: ${userId}, Item: ${itemId}, Qty: ${quantity}`);
+    
     if (!quantity || quantity < 1) {
-      return res.status(400).json({ error: "Valid quantity is required" });
+      return res.status(400).json({ 
+        success: false,
+        error: "Valid quantity is required" 
+      });
     }
     
-    // Check MongoDB connection
-    if (mongoose.connection.readyState !== 1) {
-      console.log("⚠️ MongoDB not connected, using memory storage for update quantity");
-      
-      let memoryCart = memoryCartStorage.get(userId);
-      if (!memoryCart) {
-        return res.status(404).json({ error: "Cart not found" });
-      }
-      
-      const itemIndex = memoryCart.items.findIndex(item => item.id === itemId);
-      if (itemIndex === -1) {
-        return res.status(404).json({ error: "Item not found in cart" });
-      }
-      
-      memoryCart.items[itemIndex].quantity = quantity;
-      memoryCart.updatedAt = new Date();
-      memoryCartStorage.set(userId, memoryCart);
-      
-      return res.json(memoryCart);
+    // Get cart from memory
+    let userCart = simpleCart.get(userId);
+    if (!userCart) {
+      return res.status(404).json({ 
+        success: false,
+        error: "Cart not found" 
+      });
     }
     
-    const cart = await Cart.findOne({ userId });
-    
-    if (!cart) {
-      return res.status(404).json({ error: "Cart not found" });
-    }
-    
-    const itemIndex = cart.items.findIndex(item => item.id === itemId);
-    
+    // Find and update item
+    const itemIndex = userCart.items.findIndex(item => item.id === itemId);
     if (itemIndex === -1) {
-      return res.status(404).json({ error: "Item not found in cart" });
+      return res.status(404).json({ 
+        success: false,
+        error: "Item not found in cart" 
+      });
     }
     
-    cart.items[itemIndex].quantity = quantity;
-    cart.updatedAt = new Date();
-    await cart.save();
+    userCart.items[itemIndex].quantity = quantity;
+    userCart.updatedAt = new Date();
     
-    res.json(cart);
+    // Save to memory
+    simpleCart.set(userId, userCart);
+    
+    // Try to save to MongoDB if available
+    if (mongoose.connection.readyState === 1) {
+      try {
+        const mongoCart = await Cart.findOne({ userId });
+        if (mongoCart) {
+          const mongoItemIndex = mongoCart.items.findIndex(item => item.id === itemId);
+          if (mongoItemIndex >= 0) {
+            mongoCart.items[mongoItemIndex].quantity = quantity;
+            mongoCart.updatedAt = new Date();
+            await mongoCart.save();
+            console.log(`✅ Updated quantity in MongoDB`);
+          }
+        }
+      } catch (mongoErr) {
+        console.log(`⚠️ MongoDB update failed, but memory cart updated:`, mongoErr.message);
+      }
+    }
+    
+    console.log(`✅ Updated ${itemId} quantity to ${quantity}`);
+    
+    res.json({
+      success: true,
+      cart: userCart,
+      message: `Updated quantity to ${quantity}`
+    });
+    
   } catch (err) {
-    console.error("❌ Error updating cart item:", err.message);
-    res.status(500).json({ error: err.message });
+    console.error("❌ Update quantity error:", err);
+    res.status(500).json({ 
+      success: false,
+      error: "Failed to update quantity",
+      message: err.message 
+    });
   }
 });
 
-// Remove item from cart
+// SIMPLE REMOVE ITEM - Always works
 app.delete("/api/cart/:userId/item/:itemId", async (req, res) => {
   try {
     const { userId, itemId } = req.params;
     
-    const cart = await Cart.findOne({ userId });
+    console.log(`🗑️ SIMPLE REMOVE ITEM - User: ${userId}, Item: ${itemId}`);
     
-    if (!cart) {
-      return res.status(404).json({ error: "Cart not found" });
+    // Get cart from memory
+    let userCart = simpleCart.get(userId);
+    if (!userCart) {
+      return res.status(404).json({ 
+        success: false,
+        error: "Cart not found" 
+      });
     }
     
-    cart.items = cart.items.filter(item => item.id !== itemId);
-    cart.updatedAt = new Date();
-    await cart.save();
+    // Remove item
+    const originalLength = userCart.items.length;
+    userCart.items = userCart.items.filter(item => item.id !== itemId);
     
-    res.json(cart);
+    if (userCart.items.length === originalLength) {
+      return res.status(404).json({ 
+        success: false,
+        error: "Item not found in cart" 
+      });
+    }
+    
+    userCart.updatedAt = new Date();
+    
+    // Save to memory
+    simpleCart.set(userId, userCart);
+    
+    // Try to save to MongoDB if available
+    if (mongoose.connection.readyState === 1) {
+      try {
+        const mongoCart = await Cart.findOne({ userId });
+        if (mongoCart) {
+          mongoCart.items = mongoCart.items.filter(item => item.id !== itemId);
+          mongoCart.updatedAt = new Date();
+          await mongoCart.save();
+          console.log(`✅ Removed item from MongoDB`);
+        }
+      } catch (mongoErr) {
+        console.log(`⚠️ MongoDB remove failed, but memory cart updated:`, mongoErr.message);
+      }
+    }
+    
+    console.log(`✅ Removed item ${itemId} from cart`);
+    
+    res.json({
+      success: true,
+      cart: userCart,
+      message: `Removed item from cart`
+    });
+    
   } catch (err) {
-    console.error("❌ Error removing cart item:", err.message);
-    res.status(500).json({ error: err.message });
+    console.error("❌ Remove item error:", err);
+    res.status(500).json({ 
+      success: false,
+      error: "Failed to remove item",
+      message: err.message 
+    });
   }
 });
 
-// Clear entire cart
+// SIMPLE CLEAR CART - Always works
 app.delete("/api/cart/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
     
-    let cart = await Cart.findOne({ userId });
+    console.log(`🧹 SIMPLE CLEAR CART - User: ${userId}`);
     
-    if (!cart) {
-      cart = new Cart({ userId, items: [] });
+    // Clear from memory
+    let userCart = simpleCart.get(userId);
+    if (userCart) {
+      userCart.items = [];
+      userCart.updatedAt = new Date();
+      simpleCart.set(userId, userCart);
     } else {
-      cart.items = [];
-      cart.updatedAt = new Date();
+      userCart = { 
+        userId, 
+        items: [], 
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      simpleCart.set(userId, userCart);
     }
     
-    await cart.save();
-    res.json(cart);
+    // Try to clear in MongoDB if available
+    if (mongoose.connection.readyState === 1) {
+      try {
+        let mongoCart = await Cart.findOne({ userId });
+        if (mongoCart) {
+          mongoCart.items = [];
+          mongoCart.updatedAt = new Date();
+          await mongoCart.save();
+          console.log(`✅ Cleared cart in MongoDB`);
+        }
+      } catch (mongoErr) {
+        console.log(`⚠️ MongoDB clear failed, but memory cart cleared:`, mongoErr.message);
+      }
+    }
+    
+    console.log(`✅ Cart cleared for user ${userId}`);
+    
+    res.json({
+      success: true,
+      cart: userCart,
+      message: "Cart cleared successfully"
+    });
+    
   } catch (err) {
-    console.error("❌ Error clearing cart:", err.message);
-    res.status(500).json({ error: err.message });
+    console.error("❌ Clear cart error:", err);
+    res.status(500).json({ 
+      success: false,
+      error: "Failed to clear cart",
+      message: err.message 
+    });
   }
 });
 
