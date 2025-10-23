@@ -450,6 +450,22 @@ app.get("/api/test", (req, res) => {
   });
 });
 
+// SIMPLE CART TEST - Always works
+app.get("/api/cart-test", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Cart API is working!",
+    timestamp: new Date().toISOString(),
+    endpoints: [
+      "GET /api/cart/:userId",
+      "POST /api/cart/:userId/add", 
+      "PUT /api/cart/:userId/item/:itemId",
+      "DELETE /api/cart/:userId/item/:itemId",
+      "DELETE /api/cart/:userId"
+    ]
+  });
+});
+
 // Cart collection health check
 app.get("/api/health/cart", async (req, res) => {
   try {

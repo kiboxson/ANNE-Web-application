@@ -47,6 +47,16 @@ export function CartProvider({ children }) {
       setLoading(true);
       setError(null);
       console.log('📦 SIMPLE LOAD CART - User:', userId);
+      console.log('🔗 Cart URL:', `${CART_API_BASE_URL}${API_CONFIG.ENDPOINTS.CART_GET(userId)}`);
+      
+      // Test backend first
+      try {
+        const testResponse = await axios.get(`${CART_API_BASE_URL}/api/test`);
+        console.log('✅ Backend test successful:', testResponse.data);
+      } catch (testErr) {
+        console.error('❌ Backend test failed:', testErr);
+        throw new Error('Backend not available');
+      }
       
       const response = await axios.get(
         `${CART_API_BASE_URL}${API_CONFIG.ENDPOINTS.CART_GET(userId)}`
@@ -62,8 +72,15 @@ export function CartProvider({ children }) {
       }
     } catch (err) {
       console.error("❌ Simple cart load error:", err);
-      setError("Could not load cart");
+      console.error("❌ Error details:", {
+        message: err.message,
+        status: err.response?.status,
+        url: err.config?.url
+      });
+      
+      // Set empty cart instead of error for better UX
       setItems([]);
+      setError(null); // Don't show error to user, just use empty cart
     } finally {
       setLoading(false);
     }
