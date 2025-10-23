@@ -1601,166 +1601,179 @@ app.get("/api/cart/:userId", async (req, res) => {
   }
 });
 
-// Simple cart storage - works with or without MongoDB
-const simpleCart = new Map();
-
-// SIMPLE ADD TO CART - Always works
-app.post("/api/cart/:userId/add", async (req, res) => {
+// SIMPLE CART - Like Order Function
+// Add item to cart (save directly to MongoDB Atlas)
+app.post("/api/cart/add", async (req, res) => {
   try {
-    const { userId } = req.params;
-    const { product, quantity = 1 } = req.body;
+    const { userId, product, quantity = 1 } = req.body;
     
-    console.log(`🛒 SIMPLE ADD TO CART - User: ${userId}`);
-    console.log(`📦 Product:`, product);
+    console.log(`🛒 SIMPLE CART ADD - User: ${userId}, Product: ${product?.title}`);
     
-    // Basic validation
+    // Basic validation (like order function)
     if (!userId || !product || !product.id || !product.title || !product.price) {
-      return res.status(400).json({ 
-        success: false,
-        error: "Missing required data" 
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+    
+    // Find existing cart or create new one
+    let cart = await Cart.findOne({ userId });
+    
+    if (!cart) {
+      // Create new cart (like creating new order)
+      cart = new Cart({
+        userId,
+        items: [],
+        createdAt: new Date(),
+        updatedAt: new Date()
       });
     }
     
-    // Get or create cart
-    let userCart = simpleCart.get(userId) || { 
-      userId, 
-      items: [], 
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
+    // Check if item already exists
+    const existingItemIndex = cart.items.findIndex(item => item.id === product.id);
     
-    // Check if item exists
-    const existingIndex = userCart.items.findIndex(item => item.id === product.id);
-    
-    if (existingIndex >= 0) {
+    if (existingItemIndex >= 0) {
       // Update quantity
-      userCart.items[existingIndex].quantity += quantity;
-      console.log(`📦 Updated quantity for ${product.title}`);
+      cart.items[existingItemIndex].quantity += quantity;
     } else {
       // Add new item
-      userCart.items.push({
+      cart.items.push({
         id: product.id,
         title: product.title,
         price: Number(product.price),
         quantity: quantity,
-        image: product.image || null,
-        addedAt: new Date()
+        image: product.image || null
       });
-      console.log(`📦 Added new item: ${product.title}`);
     }
     
-    userCart.updatedAt = new Date();
+    cart.updatedAt = new Date();
     
-    // Save to memory (always works)
-    simpleCart.set(userId, userCart);
+    // Save to MongoDB (like saving order)
+    const savedCart = await cart.save();
     
-    // Try to save to MongoDB if available
-    if (mongoose.connection.readyState === 1) {
-      try {
-        let mongoCart = await Cart.findOne({ userId });
-        if (!mongoCart) {
-          mongoCart = new Cart(userCart);
-        } else {
-          mongoCart.items = userCart.items;
-          mongoCart.updatedAt = userCart.updatedAt;
-        }
-        await mongoCart.save();
-        console.log(`✅ Saved to MongoDB`);
-      } catch (mongoErr) {
-        console.log(`⚠️ MongoDB save failed, but memory cart works:`, mongoErr.message);
-      }
-    }
+    console.log(`✅ Cart saved to MongoDB Atlas - ${savedCart.items.length} items`);
     
-    console.log(`✅ Cart updated! Total items: ${userCart.items.length}`);
-    
-    res.json({
+    res.status(201).json({
       success: true,
-      cart: userCart,
+      cart: savedCart,
       message: `Added ${product.title} to cart`
     });
     
   } catch (err) {
-    console.error("❌ Cart error:", err);
-    res.status(500).json({ 
-      success: false,
-      error: "Cart service error",
-      message: err.message
-    });
+    console.error("❌ Cart add error:", err);
+    res.status(500).json({ error: err.message });
   }
 });
 
-// SIMPLE UPDATE QUANTITY - Always works
-app.put("/api/cart/:userId/item/:itemId", async (req, res) => {
+// Get cart for user (like getting orders)
+app.get("/api/cart/:userId", async (req, res) => {
   try {
-    const { userId, itemId } = req.params;
-    const { quantity } = req.body;
+    const { userId } = req.params;
     
-    console.log(`🔄 SIMPLE UPDATE QUANTITY - User: ${userId}, Item: ${itemId}, Qty: ${quantity}`);
+    console.log(`📦 SIMPLE GET CART - User: ${userId}`);
     
-    if (!quantity || quantity < 1) {
-      return res.status(400).json({ 
-        success: false,
-        error: "Valid quantity is required" 
-      });
-    }
+    // Find cart in MongoDB Atlas
+    const cart = await Cart.findOne({ userId });
     
-    // Get cart from memory
-    let userCart = simpleCart.get(userId);
-    if (!userCart) {
-      return res.status(404).json({ 
-        success: false,
-        error: "Cart not found" 
-      });
-    }
-    
-    // Find and update item
-    const itemIndex = userCart.items.findIndex(item => item.id === itemId);
-    if (itemIndex === -1) {
-      return res.status(404).json({ 
-        success: false,
-        error: "Item not found in cart" 
-      });
-    }
-    
-    userCart.items[itemIndex].quantity = quantity;
-    userCart.updatedAt = new Date();
-    
-    // Save to memory
-    simpleCart.set(userId, userCart);
-    
-    // Try to save to MongoDB if available
-    if (mongoose.connection.readyState === 1) {
-      try {
-        const mongoCart = await Cart.findOne({ userId });
-        if (mongoCart) {
-          const mongoItemIndex = mongoCart.items.findIndex(item => item.id === itemId);
-          if (mongoItemIndex >= 0) {
-            mongoCart.items[mongoItemIndex].quantity = quantity;
-            mongoCart.updatedAt = new Date();
-            await mongoCart.save();
-            console.log(`✅ Updated quantity in MongoDB`);
-          }
+    if (!cart) {
+      // Return empty cart if not found
+      return res.json({
+        success: true,
+        cart: {
+          userId,
+          items: [],
+          createdAt: new Date(),
+          updatedAt: new Date()
         }
-      } catch (mongoErr) {
-        console.log(`⚠️ MongoDB update failed, but memory cart updated:`, mongoErr.message);
-      }
+      });
     }
     
-    console.log(`✅ Updated ${itemId} quantity to ${quantity}`);
+    console.log(`✅ Found cart with ${cart.items.length} items`);
     
     res.json({
       success: true,
-      cart: userCart,
-      message: `Updated quantity to ${quantity}`
+      cart: cart
     });
     
   } catch (err) {
-    console.error("❌ Update quantity error:", err);
-    res.status(500).json({ 
-      success: false,
-      error: "Failed to update quantity",
-      message: err.message 
+    console.error("❌ Get cart error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Remove item from cart (like order function)
+app.delete("/api/cart/remove", async (req, res) => {
+  try {
+    const { userId, itemId } = req.body;
+    
+    console.log(`🗑️ SIMPLE REMOVE ITEM - User: ${userId}, Item: ${itemId}`);
+    
+    if (!userId || !itemId) {
+      return res.status(400).json({ error: "Missing userId or itemId" });
+    }
+    
+    // Find cart in MongoDB Atlas
+    const cart = await Cart.findOne({ userId });
+    
+    if (!cart) {
+      return res.status(404).json({ error: "Cart not found" });
+    }
+    
+    // Remove item
+    cart.items = cart.items.filter(item => item.id !== itemId);
+    cart.updatedAt = new Date();
+    
+    // Save to MongoDB
+    const savedCart = await cart.save();
+    
+    console.log(`✅ Item removed - ${savedCart.items.length} items remaining`);
+    
+    res.json({
+      success: true,
+      cart: savedCart,
+      message: "Item removed from cart"
     });
+    
+  } catch (err) {
+    console.error("❌ Remove item error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Clear entire cart (like order function)
+app.delete("/api/cart/clear", async (req, res) => {
+  try {
+    const { userId } = req.body;
+    
+    console.log(`🧹 SIMPLE CLEAR CART - User: ${userId}`);
+    
+    if (!userId) {
+      return res.status(400).json({ error: "Missing userId" });
+    }
+    
+    // Find cart in MongoDB Atlas
+    const cart = await Cart.findOne({ userId });
+    
+    if (!cart) {
+      return res.status(404).json({ error: "Cart not found" });
+    }
+    
+    // Clear all items
+    cart.items = [];
+    cart.updatedAt = new Date();
+    
+    // Save to MongoDB
+    const savedCart = await cart.save();
+    
+    console.log(`✅ Cart cleared for user ${userId}`);
+    
+    res.json({
+      success: true,
+      cart: savedCart,
+      message: "Cart cleared successfully"
+    });
+    
+  } catch (err) {
+    console.error("❌ Clear cart error:", err);
+    res.status(500).json({ error: err.message });
   }
 });
 
