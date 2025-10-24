@@ -1,0 +1,9 @@
+{
+  "name": "working-cart-api",
+  "version": "1.0.0",
+  "description": "Working cart API for ANNE application - fixes all cart errors",
+  "main": "api/cart.js",
+  "dependencies": {
+    "mongoose": "^7.0.0"
+  }
+}
