@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import axios from 'axios';
 import { getCurrentUser } from "../services/auth";
 import auth from "../firebase";
@@ -10,65 +10,123 @@ const CartContext = createContext();
 const CART_API_BASE = API_BASE_URL_EXPORT;
 
 export function CartProvider({ children }) {
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(false);
+  // Initialize items from localStorage to prevent empty cart flash on refresh
+  const [items, setItems] = useState(() => {
+    try {
+      const cached = localStorage.getItem('cart_items');
+      return cached ? JSON.parse(cached) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [loading, setLoading] = useState(true); // Start as loading
   const [error, setError] = useState(null);
   const [user, setUser] = useState(null);
+
+  // Save items to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('cart_items', JSON.stringify(items));
+    } catch (err) {
+      console.error('Failed to save cart to localStorage:', err);
+    }
+  }, [items]);
+
+  // Simple load cart (like loading orders) - defined with useCallback
+  const loadCart = useCallback(async (userId) => {
+    if (!userId) {
+      console.warn('⚠️ No userId provided to loadCart');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('📦 LOADING CART - User:', userId);
+      console.log('🔗 API URL:', `${CART_API_BASE}/api/cart/${userId}`);
+      
+      const response = await axios.get(`${CART_API_BASE}/api/cart/${userId}`);
+      
+      console.log('✅ Cart API Response:', response.data);
+      console.log('📊 Response status:', response.status);
+      
+      if (response.data.success && response.data.cart) {
+        const cartItems = response.data.cart.items || [];
+        setItems(cartItems);
+        console.log(`✅ CART LOADED SUCCESSFULLY: ${cartItems.length} items`);
+        if (cartItems.length > 0) {
+          console.log('📦 Cart items:', cartItems.map(item => `${item.title} (qty: ${item.quantity})`).join(', '));
+        }
+      } else {
+        console.warn('⚠️ Cart response not successful or no cart data');
+        setItems([]);
+      }
+    } catch (err) {
+      console.error("❌ LOAD CART ERROR:", err);
+      console.error("❌ Error message:", err.message);
+      console.error("❌ Error response:", err.response?.data);
+      console.error("❌ Error status:", err.response?.status);
+      
+      // Don't clear items on error - keep existing cart
+      // Only show error if it's a real problem
+      if (err.response?.status === 404 || err.response?.status === 500) {
+        console.log('⚠️ Cart not found or server error - initializing empty cart');
+        setItems([]);
+      } else {
+        console.log('⚠️ Network error - keeping existing cart items');
+      }
+    } finally {
+      setLoading(false);
+      console.log('📦 Cart loading finished');
+    }
+  }, []);
 
   // Get current user and listen for auth changes
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
+      console.log('🔐 Auth state changed:', firebaseUser ? 'User logged in' : 'User logged out');
+      
       if (firebaseUser) {
         try {
-          const currentUser = await getCurrentUser();
+          // Map Firebase user to app user format
+          const username = firebaseUser.displayName || (firebaseUser.email ? firebaseUser.email.split("@")[0] : "User");
+          const currentUser = {
+            username,
+            email: firebaseUser.email || "",
+            userId: firebaseUser.uid,
+            displayName: firebaseUser.displayName,
+            phoneNumber: firebaseUser.phoneNumber
+          };
+          
+          console.log('👤 User authenticated:', currentUser.userId);
           setUser(currentUser);
+          
+          // Load cart immediately after user is set
+          if (currentUser.userId) {
+            console.log('📦 Loading cart for user:', currentUser.userId);
+            await loadCart(currentUser.userId);
+          }
         } catch (err) {
           console.error("Error getting current user:", err);
           setUser(null);
+          setItems([]);
         }
       } else {
+        console.log('👤 No user authenticated - clearing cart');
         setUser(null);
+        setItems([]);
+        setError(null);
+        // Clear localStorage when user logs out
+        try {
+          localStorage.removeItem('cart_items');
+        } catch (err) {
+          console.error('Failed to clear cart from localStorage:', err);
+        }
       }
     });
 
     return () => unsubscribe();
-  }, []);
-
-  // Load cart when user changes
-  useEffect(() => {
-    if (user?.userId) {
-      loadCart(user.userId);
-    } else {
-      setItems([]);
-      setError(null);
-    }
-  }, [user?.userId]);
-
-  // Simple load cart (like loading orders)
-  async function loadCart(userId) {
-    try {
-      setLoading(true);
-      setError(null);
-      console.log('📦 SIMPLE LOAD CART - User:', userId);
-      
-      const response = await axios.get(`${CART_API_BASE}/api/cart/${userId}`);
-      
-      console.log('✅ Cart loaded:', response.data);
-      
-      if (response.data.success && response.data.cart) {
-        setItems(response.data.cart.items || []);
-        console.log(`📦 Loaded ${response.data.cart.items.length} items`);
-      } else {
-        setItems([]);
-      }
-    } catch (err) {
-      console.error("❌ Load cart error:", err);
-      setItems([]);
-      setError(null); // Don't show error to user
-    } finally {
-      setLoading(false);
-    }
-  }
+  }, [loadCart]);
 
   // Enhanced add item with complete product and user details
   async function addItem(product, quantity = 1) {
