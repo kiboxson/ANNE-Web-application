@@ -1,0 +1,42 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "Backend/index.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/cart/add",
+      "dest": "Backend/index.js",
+      "methods": ["POST", "OPTIONS"]
+    },
+    {
+      "src": "/api/cart/remove",
+      "dest": "Backend/index.js",
+      "methods": ["DELETE", "OPTIONS"]
+    },
+    {
+      "src": "/api/cart/clear",
+      "dest": "Backend/index.js",
+      "methods": ["DELETE", "OPTIONS"]
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "Backend/index.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "Backend/index.js"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "functions": {
+    "Backend/index.js": {
+      "maxDuration": 30
+    }
+  }
+}
