@@ -7,7 +7,7 @@ async function testCartAdd() {
   console.log('🧪 Testing Vercel Cart Add Endpoint...\n');
   
   try {
-    const response = await axios.post(`${BACKEND_URL}/api/cart/add`, {
+    const response = await axios.post(`${BACKEND_URL}/api/cart`, {
       userId: 'test-' + Date.now(),
       product: {
         id: 'test-1',

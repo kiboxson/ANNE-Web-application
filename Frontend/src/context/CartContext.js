@@ -6,7 +6,7 @@ import { API_BASE_URL_EXPORT } from '../config/api';
 
 const CartContext = createContext();
 
-// Simple cart API (like order function)
+// Use serverless cart API - bypasses deployment issues
 const CART_API_BASE = API_BASE_URL_EXPORT;
 
 export function CartProvider({ children }) {
@@ -51,7 +51,7 @@ export function CartProvider({ children }) {
       setError(null);
       console.log('📦 SIMPLE LOAD CART - User:', userId);
       
-      const response = await axios.get(`${CART_API_BASE}/api/cart/${userId}`);
+      const response = await axios.get(`${CART_API_BASE}/api/cart?userId=${userId}`);
       
       console.log('✅ Cart loaded:', response.data);
       
@@ -104,7 +104,7 @@ export function CartProvider({ children }) {
       console.log('📦 Sending product details:', productDetails);
       console.log('👤 Sending user details:', userDetails);
       
-      const response = await axios.post(`${CART_API_BASE}/api/cart/add`, {
+      const response = await axios.post(`${CART_API_BASE}/api/cart`, {
         userId: user.userId,
         product: productDetails,
         quantity,
