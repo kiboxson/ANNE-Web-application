@@ -37,8 +37,8 @@ app.get("/", (req, res) => {
   res.json({
     message: "🚀 ANNE Web Application Backend API",
     status: "✅ Server is running successfully",
-    version: "1.0.3",
-    lastUpdate: "2025-10-24 - Cart API Fixed for Vercel",
+    version: "1.0.4",
+    lastUpdate: "2025-10-25 - Cart API Endpoints Deployed",
     mongoStatus: mongoose.connection.readyState === 1 ? "✅ Connected" : "❌ Disconnected",
     endpoints: {
       health: "/api/health/db",
