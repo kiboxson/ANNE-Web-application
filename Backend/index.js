@@ -37,10 +37,12 @@ app.get("/", (req, res) => {
   res.json({
     message: "🚀 ANNE Web Application Backend API",
     status: "✅ Server is running successfully",
-    version: "1.0.1",
-    lastUpdate: "2025-10-24 - Cart API Fixed",
+    version: "1.0.2",
+    lastUpdate: "2025-10-24 - Enhanced Cart with Complete Details",
+    mongoStatus: mongoose.connection.readyState === 1 ? "✅ Connected" : "❌ Disconnected",
     endpoints: {
       health: "/api/health/db",
+      cartDiagnostic: "/api/cart/diagnostic",
       products: "/api/products",
       flashProducts: "/api/flash-products",
       orders: "/api/orders",
@@ -487,12 +489,76 @@ app.get("/api/cart-test", (req, res) => {
     timestamp: new Date().toISOString(),
     endpoints: [
       "GET /api/cart/:userId",
-      "POST /api/cart/:userId/add", 
-      "PUT /api/cart/:userId/item/:itemId",
-      "DELETE /api/cart/:userId/item/:itemId",
-      "DELETE /api/cart/:userId"
+      "POST /api/cart/add", 
+      "DELETE /api/cart/remove",
+      "DELETE /api/cart/clear"
     ]
   });
+});
+
+// Cart Diagnostic Endpoint - Check if enhanced cart is working
+app.get("/api/cart/diagnostic", async (req, res) => {
+  try {
+    const diagnostic = {
+      timestamp: new Date().toISOString(),
+      mongoConnection: {
+        state: mongoose.connection.readyState,
+        stateText: ['disconnected', 'connected', 'connecting', 'disconnecting'][mongoose.connection.readyState],
+        isConnected: mongoose.connection.readyState === 1,
+        database: mongoose.connection.readyState === 1 ? mongoose.connection.db.databaseName : 'N/A'
+      },
+      cartEndpoint: {
+        path: '/api/cart/add',
+        method: 'POST',
+        enhanced: true,
+        version: '2.0 - Complete Details'
+      },
+      features: {
+        productDetails: true,
+        userDetails: true,
+        orderSummary: true,
+        taxCalculation: true,
+        shippingCalculation: true
+      }
+    };
+    
+    // Try to count carts if MongoDB is connected
+    if (mongoose.connection.readyState === 1) {
+      try {
+        const cartCount = await Cart.countDocuments();
+        diagnostic.cartsInDatabase = cartCount;
+        
+        // Get a sample cart if any exist
+        if (cartCount > 0) {
+          const sampleCart = await Cart.findOne().limit(1);
+          diagnostic.sampleCartStructure = {
+            hasUserId: !!sampleCart.userId,
+            hasUserDetails: !!sampleCart.userDetails,
+            hasItems: !!sampleCart.items,
+            itemsCount: sampleCart.items.length,
+            hasOrderSummary: !!sampleCart.orderSummary,
+            hasTimestamps: !!(sampleCart.createdAt && sampleCart.updatedAt)
+          };
+        }
+      } catch (err) {
+        diagnostic.cartCollectionError = err.message;
+      }
+    }
+    
+    res.json({
+      success: true,
+      diagnostic,
+      message: diagnostic.mongoConnection.isConnected 
+        ? "✅ Cart system is ready to save to MongoDB" 
+        : "❌ MongoDB not connected - carts will not be saved"
+    });
+    
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
 });
 
 // Cart collection health check

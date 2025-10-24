@@ -35,7 +35,6 @@ function AppContent({ user, isAdmin, setUser }) {
   const [priceRange, setPriceRange] = useState([0, 0]);
   const [view, setView] = useState("home"); // 'home' | 'cart' | 'profile' | 'admin' | 'orders' | 'community'
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const { transferGuestCart } = useCart();
   const dealsRef = useRef(null);
   
   // Debug: Log current view
@@ -222,10 +221,8 @@ function AppContent({ user, isAdmin, setUser }) {
         onSuccess={async (u) => {
           setUser(u);
           setIsOpen(false);
-          // Transfer guest cart to user cart when logging in
-          if (u?.userId) {
-            await transferGuestCart(u.userId);
-          }
+          // Cart automatically loads from server when user logs in
+          console.log('✅ User logged in, cart will load automatically');
         }}
       />
 
