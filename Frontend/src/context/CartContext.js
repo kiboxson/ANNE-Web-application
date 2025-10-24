@@ -6,8 +6,8 @@ import { API_BASE_URL_EXPORT } from '../config/api';
 
 const CartContext = createContext();
 
-// WORKING CART API - Fixes all cart errors immediately
-const CART_API_BASE = 'https://anne-working-cart.vercel.app';
+// Use the correct backend API URL from config
+const CART_API_BASE = API_BASE_URL_EXPORT;
 
 export function CartProvider({ children }) {
   const [items, setItems] = useState([]);
@@ -51,7 +51,7 @@ export function CartProvider({ children }) {
       setError(null);
       console.log('📦 SIMPLE LOAD CART - User:', userId);
       
-      const response = await axios.get(`${CART_API_BASE}/api/cart?userId=${userId}`);
+      const response = await axios.get(`${CART_API_BASE}/api/cart/${userId}`);
       
       console.log('✅ Cart loaded:', response.data);
       
