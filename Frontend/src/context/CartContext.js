@@ -6,8 +6,8 @@ import { API_BASE_URL_EXPORT } from '../config/api';
 
 const CartContext = createContext();
 
-// Use serverless cart API - bypasses deployment issues
-const CART_API_BASE = API_BASE_URL_EXPORT;
+// EMERGENCY FIX - Use working cart API until main backend is fixed
+const CART_API_BASE = 'https://anne-cart-emergency.vercel.app';
 
 export function CartProvider({ children }) {
   const [items, setItems] = useState([]);
