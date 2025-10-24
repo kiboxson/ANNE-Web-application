@@ -6,8 +6,8 @@ import { API_BASE_URL_EXPORT } from '../config/api';
 
 const CartContext = createContext();
 
-// EMERGENCY FIX - Use working cart API until main backend is fixed
-const CART_API_BASE = 'https://anne-cart-emergency.vercel.app';
+// WORKING CART API - Fixes all cart errors immediately
+const CART_API_BASE = 'https://anne-working-cart.vercel.app';
 
 export function CartProvider({ children }) {
   const [items, setItems] = useState([]);
