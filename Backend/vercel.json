@@ -9,13 +9,31 @@
   ],
   "routes": [
     {
+      "src": "/api/cart/add",
+      "dest": "/index.js",
+      "methods": ["POST", "OPTIONS"]
+    },
+    {
+      "src": "/api/cart/remove",
+      "dest": "/index.js",
+      "methods": ["DELETE", "OPTIONS"]
+    },
+    {
+      "src": "/api/cart/clear",
+      "dest": "/index.js",
+      "methods": ["DELETE", "OPTIONS"]
+    },
+    {
+      "src": "/api/cart/(.*)",
+      "dest": "/index.js"
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.js"
     }
   ],
   "env": {
-    "NODE_ENV": "production",
-    "MONGODB_URI": "@mongodb_uri"
+    "NODE_ENV": "production"
   },
   "functions": {
     "index.js": {
