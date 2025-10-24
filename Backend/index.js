@@ -272,16 +272,38 @@ const flashProductSchema = new mongoose.Schema({
 
 const FlashProduct = mongoose.model('FlashProduct', flashProductSchema);
 
-// Cart Schema for user-specific cart storage
+// Cart Schema for user-specific cart storage with complete details
 const cartSchema = new mongoose.Schema({
   userId: { type: String, required: true, unique: true }, // Firebase UID
+  userDetails: {
+    username: { type: String, default: null },
+    email: { type: String, default: null },
+    phone: { type: String, default: null }
+  },
   items: [{
+    // Product Details
     id: { type: String, required: true },
     title: { type: String, required: true },
     price: { type: Number, required: true },
     quantity: { type: Number, required: true, min: 1 },
-    image: { type: String, default: null }
+    image: { type: String, default: null },
+    category: { type: String, default: null },
+    description: { type: String, default: null },
+    stock: { type: Number, default: null },
+    // Order Details for this item
+    addedAt: { type: Date, default: Date.now },
+    subtotal: { type: Number, default: 0 } // price * quantity
   }],
+  // Order Summary
+  orderSummary: {
+    totalItems: { type: Number, default: 0 },
+    totalQuantity: { type: Number, default: 0 },
+    subtotal: { type: Number, default: 0 },
+    tax: { type: Number, default: 0 },
+    shipping: { type: Number, default: 0 },
+    total: { type: Number, default: 0 }
+  },
+  createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
 
@@ -1608,94 +1630,196 @@ app.get("/api/cart/:userId", async (req, res) => {
   }
 });
 
-// SIMPLE CART - Like Order Function
-// Add item to cart (save directly to MongoDB Atlas)
+// ENHANCED CART - Save complete product, user, and order details to MongoDB Atlas
 app.post("/api/cart/add", async (req, res) => {
   try {
-    const { userId, product, quantity = 1 } = req.body;
+    const { userId, product, quantity = 1, userDetails } = req.body;
     
-    console.log(`🛒 SIMPLE CART ADD - User: ${userId}, Product: ${product?.title}`);
+    console.log(`🛒 ENHANCED CART ADD - User: ${userId}, Product: ${product?.title}`);
+    console.log(`📦 Product Details:`, JSON.stringify(product, null, 2));
+    console.log(`👤 User Details:`, userDetails ? JSON.stringify(userDetails, null, 2) : 'Not provided');
     
-    // Basic validation (like order function)
+    // Basic validation
     if (!userId || !product || !product.id || !product.title || !product.price) {
-      return res.status(400).json({ error: "Missing required fields" });
+      return res.status(400).json({ 
+        success: false,
+        error: "Missing required fields: userId, product (id, title, price)" 
+      });
+    }
+    
+    // Check MongoDB connection
+    if (mongoose.connection.readyState !== 1) {
+      console.error('❌ MongoDB not connected');
+      return res.status(503).json({ 
+        success: false,
+        error: "Database not connected",
+        message: "Please try again later"
+      });
     }
     
     // Find existing cart or create new one
     let cart = await Cart.findOne({ userId });
     
     if (!cart) {
-      // Create new cart (like creating new order)
+      // Create new cart with user details
       cart = new Cart({
         userId,
+        userDetails: userDetails || {},
         items: [],
+        orderSummary: {
+          totalItems: 0,
+          totalQuantity: 0,
+          subtotal: 0,
+          tax: 0,
+          shipping: 0,
+          total: 0
+        },
         createdAt: new Date(),
         updatedAt: new Date()
       });
+      console.log(`🆕 Creating new cart for user: ${userId}`);
+    } else {
+      // Update user details if provided
+      if (userDetails) {
+        cart.userDetails = { ...cart.userDetails, ...userDetails };
+      }
     }
+    
+    // Calculate item subtotal
+    const itemSubtotal = Number(product.price) * quantity;
     
     // Check if item already exists
     const existingItemIndex = cart.items.findIndex(item => item.id === product.id);
     
     if (existingItemIndex >= 0) {
-      // Update quantity
+      // Update existing item quantity and subtotal
       cart.items[existingItemIndex].quantity += quantity;
+      cart.items[existingItemIndex].subtotal = cart.items[existingItemIndex].price * cart.items[existingItemIndex].quantity;
+      console.log(`📝 Updated existing item: ${product.title}, new quantity: ${cart.items[existingItemIndex].quantity}`);
     } else {
-      // Add new item
+      // Add new item with complete details
       cart.items.push({
         id: product.id,
         title: product.title,
         price: Number(product.price),
         quantity: quantity,
-        image: product.image || null
+        image: product.image || null,
+        category: product.category || null,
+        description: product.description || null,
+        stock: product.stock || null,
+        addedAt: new Date(),
+        subtotal: itemSubtotal
       });
+      console.log(`➕ Added new item: ${product.title}`);
     }
+    
+    // Calculate order summary
+    const totalItems = cart.items.length;
+    const totalQuantity = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+    const subtotal = cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const tax = subtotal * 0.1; // 10% tax
+    const shipping = subtotal > 100 ? 0 : 10; // Free shipping over $100
+    const total = subtotal + tax + shipping;
+    
+    cart.orderSummary = {
+      totalItems,
+      totalQuantity,
+      subtotal: Number(subtotal.toFixed(2)),
+      tax: Number(tax.toFixed(2)),
+      shipping: Number(shipping.toFixed(2)),
+      total: Number(total.toFixed(2))
+    };
     
     cart.updatedAt = new Date();
     
-    // Save to MongoDB (like saving order)
+    // Save to MongoDB Atlas carts collection
     const savedCart = await cart.save();
     
-    console.log(`✅ Cart saved to MongoDB Atlas - ${savedCart.items.length} items`);
+    console.log(`✅ Cart saved to MongoDB Atlas 'carts' collection`);
+    console.log(`📊 Cart Summary: ${totalItems} items, ${totalQuantity} total quantity, $${total.toFixed(2)} total`);
+    console.log(`💾 MongoDB Document ID: ${savedCart._id}`);
     
     res.status(201).json({
       success: true,
       cart: savedCart,
-      message: `Added ${product.title} to cart`
+      message: `Added ${product.title} to cart`,
+      summary: {
+        itemsInCart: totalItems,
+        totalQuantity: totalQuantity,
+        totalAmount: total
+      }
     });
     
   } catch (err) {
     console.error("❌ Cart add error:", err);
-    res.status(500).json({ error: err.message });
+    console.error("Error details:", err.message);
+    res.status(500).json({ 
+      success: false,
+      error: "Failed to add item to cart",
+      message: err.message 
+    });
   }
 });
 
-// Remove item from cart (like order function)
+// Remove item from cart with order summary recalculation
 app.delete("/api/cart/remove", async (req, res) => {
   try {
     const { userId, itemId } = req.body;
     
-    console.log(`🗑️ SIMPLE REMOVE ITEM - User: ${userId}, Item: ${itemId}`);
+    console.log(`🗑️ ENHANCED REMOVE ITEM - User: ${userId}, Item: ${itemId}`);
     
     if (!userId || !itemId) {
-      return res.status(400).json({ error: "Missing userId or itemId" });
+      return res.status(400).json({ 
+        success: false,
+        error: "Missing userId or itemId" 
+      });
+    }
+    
+    // Check MongoDB connection
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({ 
+        success: false,
+        error: "Database not connected" 
+      });
     }
     
     // Find cart in MongoDB Atlas
     const cart = await Cart.findOne({ userId });
     
     if (!cart) {
-      return res.status(404).json({ error: "Cart not found" });
+      return res.status(404).json({ 
+        success: false,
+        error: "Cart not found" 
+      });
     }
     
     // Remove item
     cart.items = cart.items.filter(item => item.id !== itemId);
+    
+    // Recalculate order summary
+    const totalItems = cart.items.length;
+    const totalQuantity = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+    const subtotal = cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const tax = subtotal * 0.1;
+    const shipping = subtotal > 100 ? 0 : 10;
+    const total = subtotal + tax + shipping;
+    
+    cart.orderSummary = {
+      totalItems,
+      totalQuantity,
+      subtotal: Number(subtotal.toFixed(2)),
+      tax: Number(tax.toFixed(2)),
+      shipping: Number(shipping.toFixed(2)),
+      total: Number(total.toFixed(2))
+    };
+    
     cart.updatedAt = new Date();
     
     // Save to MongoDB
     const savedCart = await cart.save();
     
     console.log(`✅ Item removed - ${savedCart.items.length} items remaining`);
+    console.log(`📊 Updated cart total: $${total.toFixed(2)}`);
     
     res.json({
       success: true,
@@ -1705,36 +1829,66 @@ app.delete("/api/cart/remove", async (req, res) => {
     
   } catch (err) {
     console.error("❌ Remove item error:", err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ 
+      success: false,
+      error: "Failed to remove item",
+      message: err.message 
+    });
   }
 });
 
-// Clear entire cart (like order function)
+// Clear entire cart with order summary reset
 app.delete("/api/cart/clear", async (req, res) => {
   try {
     const { userId } = req.body;
     
-    console.log(`🧹 SIMPLE CLEAR CART - User: ${userId}`);
+    console.log(`🧹 ENHANCED CLEAR CART - User: ${userId}`);
     
     if (!userId) {
-      return res.status(400).json({ error: "Missing userId" });
+      return res.status(400).json({ 
+        success: false,
+        error: "Missing userId" 
+      });
+    }
+    
+    // Check MongoDB connection
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({ 
+        success: false,
+        error: "Database not connected" 
+      });
     }
     
     // Find cart in MongoDB Atlas
     const cart = await Cart.findOne({ userId });
     
     if (!cart) {
-      return res.status(404).json({ error: "Cart not found" });
+      return res.status(404).json({ 
+        success: false,
+        error: "Cart not found" 
+      });
     }
     
     // Clear all items
     cart.items = [];
+    
+    // Reset order summary
+    cart.orderSummary = {
+      totalItems: 0,
+      totalQuantity: 0,
+      subtotal: 0,
+      tax: 0,
+      shipping: 0,
+      total: 0
+    };
+    
     cart.updatedAt = new Date();
     
     // Save to MongoDB
     const savedCart = await cart.save();
     
     console.log(`✅ Cart cleared for user ${userId}`);
+    console.log(`💾 Cart data saved to MongoDB carts collection`);
     
     res.json({
       success: true,
@@ -1744,7 +1898,11 @@ app.delete("/api/cart/clear", async (req, res) => {
     
   } catch (err) {
     console.error("❌ Clear cart error:", err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ 
+      success: false,
+      error: "Failed to clear cart",
+      message: err.message 
+    });
   }
 });
 

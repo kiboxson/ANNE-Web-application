@@ -70,7 +70,7 @@ export function CartProvider({ children }) {
     }
   }
 
-  // Simple add item (like creating order)
+  // Enhanced add item with complete product and user details
   async function addItem(product, quantity = 1) {
     if (!user?.userId) {
       setError("Please sign in to add items to cart");
@@ -80,17 +80,35 @@ export function CartProvider({ children }) {
     try {
       setLoading(true);
       setError(null);
-      console.log('🛒 SIMPLE ADD TO CART:', product);
+      console.log('🛒 ENHANCED ADD TO CART:', product);
+      console.log('👤 User Info:', user);
+      
+      // Prepare complete product details
+      const productDetails = {
+        id: product.id,
+        title: product.title,
+        price: Number(product.price),
+        image: product.image || null,
+        category: product.category || null,
+        description: product.description || null,
+        stock: product.stock || null
+      };
+      
+      // Prepare user details
+      const userDetails = {
+        username: user.username || user.displayName || null,
+        email: user.email || null,
+        phone: user.phoneNumber || null
+      };
+      
+      console.log('📦 Sending product details:', productDetails);
+      console.log('👤 Sending user details:', userDetails);
       
       const response = await axios.post(`${CART_API_BASE}/api/cart/add`, {
         userId: user.userId,
-        product: {
-          id: product.id,
-          title: product.title,
-          price: Number(product.price),
-          image: product.image
-        },
-        quantity
+        product: productDetails,
+        quantity,
+        userDetails
       });
       
       console.log('✅ Add response:', response.data);
@@ -98,6 +116,8 @@ export function CartProvider({ children }) {
       if (response.data.success && response.data.cart) {
         setItems(response.data.cart.items || []);
         console.log(`🎉 Added ${product.title} to cart!`);
+        console.log(`📊 Cart Summary:`, response.data.summary);
+        console.log(`💾 Saved to MongoDB carts collection`);
         return true;
       } else {
         setError("Failed to add item");
@@ -105,7 +125,8 @@ export function CartProvider({ children }) {
       }
     } catch (err) {
       console.error("❌ Add error:", err);
-      setError("Could not add item to cart");
+      console.error("❌ Error details:", err.response?.data || err.message);
+      setError(err.response?.data?.message || "Could not add item to cart");
       return false;
     } finally {
       setLoading(false);
