@@ -104,7 +104,7 @@ export function CartProvider({ children }) {
       console.log('📦 Sending product details:', productDetails);
       console.log('👤 Sending user details:', userDetails);
       
-      const response = await axios.post(`${CART_API_BASE}/api/cart`, {
+      const response = await axios.post(`${CART_API_BASE}/api/cart/add`, {
         userId: user.userId,
         product: productDetails,
         quantity,
