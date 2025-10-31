@@ -1802,7 +1802,16 @@ app.post("/api/cart/add", async (req, res) => {
     // Save to MongoDB Atlas carts collection
     const savedCart = await cart.save();
     
+    // IMPORTANT: Also update memory cache so GET endpoint returns correct data
+    simpleCart.set(userId, {
+      userId: savedCart.userId,
+      items: savedCart.items,
+      createdAt: savedCart.createdAt,
+      updatedAt: savedCart.updatedAt
+    });
+    
     console.log(`✅ Cart saved to MongoDB Atlas 'carts' collection`);
+    console.log(`💾 Cart also cached in memory for faster access`);
     console.log(`📊 Cart Summary: ${totalItems} items, ${totalQuantity} total quantity, $${total.toFixed(2)} total`);
     console.log(`💾 MongoDB Document ID: ${savedCart._id}`);
     
@@ -1903,6 +1912,14 @@ app.put("/api/cart/update", async (req, res) => {
     // Save to MongoDB
     const savedCart = await cart.save();
     
+    // Update memory cache
+    simpleCart.set(userId, {
+      userId: savedCart.userId,
+      items: savedCart.items,
+      createdAt: savedCart.createdAt,
+      updatedAt: savedCart.updatedAt
+    });
+    
     console.log(`✅ Quantity updated - Item: ${itemId}, New quantity: ${quantity}`);
     console.log(`📊 Updated cart total: $${total.toFixed(2)}`);
     
@@ -1979,6 +1996,14 @@ app.delete("/api/cart/remove", async (req, res) => {
     // Save to MongoDB
     const savedCart = await cart.save();
     
+    // Update memory cache
+    simpleCart.set(userId, {
+      userId: savedCart.userId,
+      items: savedCart.items,
+      createdAt: savedCart.createdAt,
+      updatedAt: savedCart.updatedAt
+    });
+    
     console.log(`✅ Item removed - ${savedCart.items.length} items remaining`);
     console.log(`📊 Updated cart total: $${total.toFixed(2)}`);
     
@@ -2047,6 +2072,14 @@ app.delete("/api/cart/clear", async (req, res) => {
     
     // Save to MongoDB
     const savedCart = await cart.save();
+    
+    // Update memory cache
+    simpleCart.set(userId, {
+      userId: savedCart.userId,
+      items: savedCart.items,
+      createdAt: savedCart.createdAt,
+      updatedAt: savedCart.updatedAt
+    });
     
     console.log(`✅ Cart cleared for user ${userId}`);
     console.log(`💾 Cart data saved to MongoDB carts collection`);

@@ -7,16 +7,31 @@ export default function CartPage({ onBack }) {
   const { items, setQuantity, removeItem, clearCart, total, loading, error, isLoggedIn, refreshCart } = useCart();
   const [showCheckout, setShowCheckout] = useState(false);
 
-  // Reload cart when component mounts
+  // Debug: Log cart state changes
   useEffect(() => {
+    console.log('🛒 CartPage - Cart State:', {
+      itemsCount: items?.length || 0,
+      items: items,
+      loading,
+      error,
+      isLoggedIn,
+      total
+    });
+  }, [items, loading, error, isLoggedIn, total]);
+
+  // Reload cart when component mounts or when isLoggedIn changes
+  useEffect(() => {
+    console.log('🔄 CartPage useEffect - isLoggedIn:', isLoggedIn, 'items:', items.length);
     if (isLoggedIn && refreshCart) {
-      console.log('🔄 CartPage mounted - refreshing cart');
+      console.log('🔄 CartPage - calling refreshCart');
       refreshCart();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only run once on mount
+  }, [isLoggedIn]); // Run when isLoggedIn changes
 
   const hasItems = items && items.length > 0;
+  
+  console.log('🛒 CartPage render - hasItems:', hasItems, 'items:', items);
 
   const handleCheckoutSuccess = (order) => {
     alert(`Order placed successfully! Order ID: ${order.orderId}`);
