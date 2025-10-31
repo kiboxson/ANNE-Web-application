@@ -18,6 +18,9 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
   const [users, setUsers] = useState([]);
   const [feedbacks, setFeedbacks] = useState([]);
   const [feedbackFilter, setFeedbackFilter] = useState('all');
+  const [communityContent, setCommunityContent] = useState({});
+  const [communitySection, setCommunitySection] = useState('stats');
+  const [editingCommunity, setEditingCommunity] = useState(null);
 
   const [form, setForm] = useState({ title: "", price: "", stock: "", category: "" });
   const [imageFile, setImageFile] = useState(null);
@@ -141,6 +144,13 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
   useEffect(() => {
     if (tab === "feedback") {
       loadFeedback();
+    }
+  }, [tab]);
+
+  // Load community content when community tab is selected
+  useEffect(() => {
+    if (tab === "community") {
+      loadCommunityContent();
     }
   }, [tab]);
 
@@ -330,6 +340,36 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
     return feedbacks.filter(fb => fb.status === feedbackFilter);
   }, [feedbacks, feedbackFilter]);
 
+  // Community content management functions
+  async function loadCommunityContent() {
+    try {
+      const response = await axios.get(`${API_BASE_URL_EXPORT}/api/community`);
+      if (response.data.success) {
+        setCommunityContent(response.data.sections);
+      }
+    } catch (error) {
+      console.error('Failed to load community content:', error);
+    }
+  }
+
+  async function updateCommunitySection(section, content) {
+    try {
+      await axios.put(`${API_BASE_URL_EXPORT}/api/community/${section}`, { content });
+      
+      // Update local state
+      setCommunityContent(prev => ({
+        ...prev,
+        [section]: { content, updatedAt: new Date() }
+      }));
+      
+      window.alert(`${section} section updated successfully!`);
+      setEditingCommunity(null);
+    } catch (error) {
+      console.error('Failed to update community section:', error);
+      window.alert('Failed to update section: ' + error.message);
+    }
+  }
+
   return (
     <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8">
       {!isAdmin ? (
@@ -394,6 +434,7 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
               { key: "users", label: "Users" },
               { key: "flash", label: "Flash Sale" },
               { key: "feedback", label: "⭐ Feedback" },
+              { key: "community", label: "👥 Community" },
               { key: "chat", label: "Live Chat" },
               { key: "email", label: "📧 Email Setup" },
               { key: "payhere", label: "💳 PayHere Config" },
@@ -1195,6 +1236,203 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                 <li>• Click "Unpublish" to hide feedback from the home page</li>
                 <li>• Delete removes feedback permanently from the database</li>
               </ul>
+            </div>
+          </motion.div>
+        )}
+
+        {tab === "community" && (
+          <motion.div
+            key="community"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="space-y-6"
+          >
+            {/* Header */}
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-6">
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">👥 Community Page Management</h3>
+              <p className="text-gray-600">Edit all sections of the Community page from here</p>
+            </div>
+
+            {/* Section Selector */}
+            <div className="bg-white border rounded-lg p-4">
+              <label className="block text-sm font-semibold text-gray-700 mb-3">Select Section to Edit:</label>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                {[
+                  { key: 'stats', label: '📊 Stats', icon: '📊' },
+                  { key: 'about', label: '📖 About Us', icon: '📖' },
+                  { key: 'team', label: '👨‍💼 Team Members', icon: '👨‍💼' },
+                  { key: 'testimonials', label: '💬 Testimonials', icon: '💬' },
+                  { key: 'contact', label: '📞 Contact Info', icon: '📞' }
+                ].map(section => (
+                  <button
+                    key={section.key}
+                    onClick={() => {
+                      setCommunitySection(section.key);
+                      setEditingCommunity(communityContent[section.key]?.content || null);
+                    }}
+                    className={`px-4 py-3 rounded-lg border-2 font-medium transition-all ${
+                      communitySection === section.key
+                        ? 'bg-blue-600 text-white border-blue-600'
+                        : 'bg-white text-gray-700 border-gray-300 hover:border-blue-400'
+                    }`}
+                  >
+                    <div className="text-2xl mb-1">{section.icon}</div>
+                    <div className="text-xs">{section.label.replace(/^[^\s]+ /, '')}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Content Editor */}
+            <div className="bg-white border rounded-lg p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-xl font-semibold text-gray-900">
+                  {communitySection === 'stats' && '📊 Statistics Section'}
+                  {communitySection === 'about' && '📖 About Us Section'}
+                  {communitySection === 'team' && '👨‍💼 Team Members Section'}
+                  {communitySection === 'testimonials' && '💬 Testimonials Section'}
+                  {communitySection === 'contact' && '📞 Contact Information'}
+                </h4>
+                {communityContent[communitySection] && (
+                  <span className="text-sm text-gray-500">
+                    Last updated: {new Date(communityContent[communitySection].updatedAt).toLocaleString()}
+                  </span>
+                )}
+              </div>
+
+              {/* JSON Editor */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Content (JSON Format)
+                  </label>
+                  <textarea
+                    value={editingCommunity ? JSON.stringify(editingCommunity, null, 2) : JSON.stringify(communityContent[communitySection]?.content || {}, null, 2)}
+                    onChange={(e) => {
+                      try {
+                        const parsed = JSON.parse(e.target.value);
+                        setEditingCommunity(parsed);
+                      } catch (err) {
+                        // Invalid JSON, just update the text
+                        setEditingCommunity(e.target.value);
+                      }
+                    }}
+                    rows={20}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+                    placeholder="Enter JSON content..."
+                  />
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => {
+                      if (typeof editingCommunity === 'string') {
+                        try {
+                          const parsed = JSON.parse(editingCommunity);
+                          updateCommunitySection(communitySection, parsed);
+                        } catch (err) {
+                          window.alert('Invalid JSON format. Please check your syntax.');
+                        }
+                      } else {
+                        updateCommunitySection(communitySection, editingCommunity);
+                      }
+                    }}
+                    className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                  >
+                    💾 Save Changes
+                  </button>
+                  <button
+                    onClick={() => {
+                      setEditingCommunity(communityContent[communitySection]?.content || null);
+                    }}
+                    className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+                  >
+                    ↺ Reset
+                  </button>
+                </div>
+              </div>
+
+              {/* Help Text */}
+              <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <h5 className="font-semibold text-yellow-900 mb-2">💡 Section Guidelines:</h5>
+                <div className="text-sm text-yellow-800 space-y-2">
+                  {communitySection === 'stats' && (
+                    <div>
+                      <p className="font-medium mb-1">Stats format (array of 4 items):</p>
+                      <pre className="bg-yellow-100 p-2 rounded text-xs overflow-x-auto">
+{`[
+  { "label": "Happy Customers", "value": "50K+" },
+  { "label": "Years of Excellence", "value": "8+" },
+  { "label": "Countries Served", "value": "25+" },
+  { "label": "Products Sold", "value": "1M+" }
+]`}
+                      </pre>
+                    </div>
+                  )}
+                  {communitySection === 'about' && (
+                    <div>
+                      <p className="font-medium mb-1">About section format:</p>
+                      <pre className="bg-yellow-100 p-2 rounded text-xs overflow-x-auto">
+{`{
+  "title": "Who We Are",
+  "paragraphs": ["First paragraph...", "Second paragraph..."],
+  "values": ["Customer-First", "Innovation-Driven", "Quality-Focused"],
+  "image": "https://..."
+}`}
+                      </pre>
+                    </div>
+                  )}
+                  {communitySection === 'team' && (
+                    <div>
+                      <p className="font-medium mb-1">Team members format (array):</p>
+                      <pre className="bg-yellow-100 p-2 rounded text-xs overflow-x-auto">
+{`[
+  {
+    "id": 1,
+    "name": "John Doe",
+    "role": "CEO",
+    "image": "https://...",
+    "bio": "Description...",
+    "expertise": ["Skill 1", "Skill 2"]
+  }
+]`}
+                      </pre>
+                    </div>
+                  )}
+                  {communitySection === 'testimonials' && (
+                    <div>
+                      <p className="font-medium mb-1">Testimonials format (array):</p>
+                      <pre className="bg-yellow-100 p-2 rounded text-xs overflow-x-auto">
+{`[
+  {
+    "id": 1,
+    "name": "Customer Name",
+    "role": "Regular Customer",
+    "image": "https://...",
+    "text": "Testimonial text...",
+    "rating": 5
+  }
+]`}
+                      </pre>
+                    </div>
+                  )}
+                  {communitySection === 'contact' && (
+                    <div>
+                      <p className="font-medium mb-1">Contact info format:</p>
+                      <pre className="bg-yellow-100 p-2 rounded text-xs overflow-x-auto">
+{`{
+  "address": "123 Main St, City, Country",
+  "phone": "+1234567890",
+  "email": "contact@example.com",
+  "officeImage": "https://..."
+}`}
+                      </pre>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </motion.div>
         )}

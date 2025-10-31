@@ -324,6 +324,15 @@ const feedbackSchema = new mongoose.Schema({
 
 const Feedback = mongoose.model('Feedback', feedbackSchema);
 
+// Community Content Schema for managing community page sections
+const communitySchema = new mongoose.Schema({
+  section: { type: String, required: true, unique: true }, // 'stats', 'about', 'team', 'testimonials', 'contact'
+  content: { type: mongoose.Schema.Types.Mixed, required: true },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+const Community = mongoose.model('Community', communitySchema);
+
 // In-memory cart storage for fast access and fallback
 const simpleCart = new Map();
 
@@ -1854,6 +1863,190 @@ app.delete("/api/feedback/:id", async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to delete feedback",
+      error: err.message
+    });
+  }
+});
+
+// ===== COMMUNITY CONTENT API ENDPOINTS =====
+
+// Get community content by section
+app.get("/api/community/:section", async (req, res) => {
+  try {
+    const { section } = req.params;
+    
+    console.log(`📖 GET COMMUNITY CONTENT - Section: ${section}`);
+    
+    // Check MongoDB connection
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        success: false,
+        message: "Database not available"
+      });
+    }
+    
+    // Get community content
+    const communityContent = await Community.findOne({ section });
+    
+    if (!communityContent) {
+      return res.status(404).json({
+        success: false,
+        message: "Section not found"
+      });
+    }
+    
+    console.log(`✅ Community content retrieved: ${section}`);
+    
+    res.json({
+      success: true,
+      content: communityContent.content,
+      updatedAt: communityContent.updatedAt
+    });
+    
+  } catch (err) {
+    console.error('❌ Get community content error:', err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to retrieve community content",
+      error: err.message
+    });
+  }
+});
+
+// Get all community content
+app.get("/api/community", async (req, res) => {
+  try {
+    console.log('📖 GET ALL COMMUNITY CONTENT');
+    
+    // Check MongoDB connection
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        success: false,
+        message: "Database not available"
+      });
+    }
+    
+    // Get all community content
+    const allContent = await Community.find({});
+    
+    // Transform to object with section as key
+    const contentMap = {};
+    allContent.forEach(item => {
+      contentMap[item.section] = {
+        content: item.content,
+        updatedAt: item.updatedAt
+      };
+    });
+    
+    console.log(`✅ Retrieved ${allContent.length} community sections`);
+    
+    res.json({
+      success: true,
+      sections: contentMap
+    });
+    
+  } catch (err) {
+    console.error('❌ Get all community content error:', err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to retrieve community content",
+      error: err.message
+    });
+  }
+});
+
+// Update or create community content
+app.put("/api/community/:section", async (req, res) => {
+  try {
+    const { section } = req.params;
+    const { content } = req.body;
+    
+    console.log(`📝 UPDATE COMMUNITY CONTENT - Section: ${section}`);
+    
+    if (!content) {
+      return res.status(400).json({
+        success: false,
+        message: "Content is required"
+      });
+    }
+    
+    // Check MongoDB connection
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        success: false,
+        message: "Database not available"
+      });
+    }
+    
+    // Update or create community content
+    const updatedContent = await Community.findOneAndUpdate(
+      { section },
+      { 
+        content,
+        updatedAt: new Date()
+      },
+      { 
+        new: true,
+        upsert: true // Create if doesn't exist
+      }
+    );
+    
+    console.log(`✅ Community content updated: ${section}`);
+    
+    res.json({
+      success: true,
+      message: "Community content updated successfully",
+      content: updatedContent.content,
+      updatedAt: updatedContent.updatedAt
+    });
+    
+  } catch (err) {
+    console.error('❌ Update community content error:', err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update community content",
+      error: err.message
+    });
+  }
+});
+
+// Delete community section
+app.delete("/api/community/:section", async (req, res) => {
+  try {
+    const { section } = req.params;
+    
+    console.log(`🗑️ DELETE COMMUNITY SECTION - Section: ${section}`);
+    
+    // Check MongoDB connection
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        success: false,
+        message: "Database not available"
+      });
+    }
+    
+    // Delete community section
+    const deletedContent = await Community.findOneAndDelete({ section });
+    
+    if (!deletedContent) {
+      return res.status(404).json({
+        success: false,
+        message: "Section not found"
+      });
+    }
+    
+    console.log(`✅ Community section deleted: ${section}`);
+    
+    res.json({
+      success: true,
+      message: "Community section deleted successfully"
+    });
+    
+  } catch (err) {
+    console.error('❌ Delete community section error:', err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete community section",
       error: err.message
     });
   }
