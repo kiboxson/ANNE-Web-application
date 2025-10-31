@@ -26,7 +26,7 @@ export function CartProvider({ children }) {
       return [];
     }
   });
-  const [loading, setLoading] = useState(true); // Start as loading
+  const [loading, setLoading] = useState(false); // Start as not loading
   const [error, setError] = useState(null);
   const [user, setUser] = useState(null);
 
@@ -123,6 +123,7 @@ export function CartProvider({ children }) {
         setUser(null);
         setItems([]);
         setError(null);
+        setLoading(false); // Ensure loading is false when no user
         // Clear localStorage when user logs out
         try {
           localStorage.removeItem('cart_items');

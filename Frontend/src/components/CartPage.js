@@ -7,13 +7,14 @@ export default function CartPage({ onBack }) {
   const { items, setQuantity, removeItem, clearCart, total, loading, error, isLoggedIn, refreshCart } = useCart();
   const [showCheckout, setShowCheckout] = useState(false);
 
-  // Reload cart when component mounts or when user logs in
+  // Reload cart when component mounts
   useEffect(() => {
     if (isLoggedIn && refreshCart) {
       console.log('🔄 CartPage mounted - refreshing cart');
       refreshCart();
     }
-  }, [isLoggedIn, refreshCart]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
 
   const hasItems = items && items.length > 0;
 
