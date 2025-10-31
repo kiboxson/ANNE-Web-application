@@ -9,6 +9,13 @@ const CartContext = createContext();
 // Use the correct backend API URL from config
 const CART_API_BASE = API_BASE_URL_EXPORT;
 
+// Debug: Log the API base URL being used
+console.log('🔗 CartContext API Configuration:', {
+  CART_API_BASE,
+  environment: process.env.NODE_ENV,
+  envApiUrl: process.env.REACT_APP_API_URL
+});
+
 export function CartProvider({ children }) {
   // Initialize items from localStorage to prevent empty cart flash on refresh
   const [items, setItems] = useState(() => {
@@ -184,7 +191,21 @@ export function CartProvider({ children }) {
     } catch (err) {
       console.error("❌ Add error:", err);
       console.error("❌ Error details:", err.response?.data || err.message);
-      setError(err.response?.data?.message || "Could not add item to cart");
+      console.error("❌ Request URL:", `${CART_API_BASE}/api/cart/add`);
+      console.error("❌ Request config:", err.config);
+      
+      let errorMessage = "Could not add item to cart";
+      
+      if (err.code === 'ERR_NETWORK') {
+        errorMessage = `Network error: Cannot connect to ${CART_API_BASE}. Make sure backend is running.`;
+      } else if (err.response) {
+        errorMessage = err.response.data?.message || `Server error: ${err.response.status}`;
+      } else {
+        errorMessage = err.message;
+      }
+      
+      setError(errorMessage);
+      alert(`❌ ${errorMessage}`);
       return false;
     } finally {
       setLoading(false);
