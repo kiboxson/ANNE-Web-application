@@ -1,11 +1,12 @@
-import React, { useRef } from "react";
-import { motion } from "framer-motion";
-import { Star, Shield, Truck, Clock, Award, Users, Heart } from "lucide-react";
+import React, { useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Star, Shield, Truck, Clock, Award, Users, Heart, MessageSquare } from "lucide-react";
 import PromoBar from "./PromoBar";
 import ImageSlider from "./ImageSlider";
 import FlashSalePage from "./Flashsale";
 import ProductsSection from "./Products";
 import Chatbot from "./Chatbot";
+import FeedbackForm from "./FeedbackForm";
 import "../styles/classic-home.css";
 
 function ClassicHomePage({ 
@@ -16,6 +17,7 @@ function ClassicHomePage({
   onBuyNow 
 }) {
   const dealsRef = useRef(null);
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
 
   const features = [
     {
@@ -259,7 +261,7 @@ function ClassicHomePage({
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
             {testimonials.map((testimonial, index) => (
               <motion.div
                 key={index}
@@ -291,8 +293,36 @@ function ClassicHomePage({
               </motion.div>
             ))}
           </div>
+
+          {/* Write Feedback Button */}
+          <div className="text-center">
+            <motion.button
+              whileHover={{ scale: 1.05, boxShadow: "0 10px 30px rgba(0,0,0,0.15)" }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowFeedbackForm(true)}
+              className="inline-flex items-center gap-3 bg-gradient-to-r from-gray-700 to-gray-900 text-white px-8 py-4 rounded-lg font-semibold text-lg shadow-lg hover:from-gray-800 hover:to-black transition-all duration-300"
+            >
+              <MessageSquare className="w-6 h-6" />
+              Share Your Experience
+            </motion.button>
+            <p className="text-gray-600 mt-4 text-sm">
+              We'd love to hear about your experience with us
+            </p>
+          </div>
         </div>
       </motion.section>
+
+      {/* Feedback Form Modal */}
+      <AnimatePresence>
+        {showFeedbackForm && (
+          <FeedbackForm
+            onClose={() => setShowFeedbackForm(false)}
+            onSuccess={() => {
+              console.log("Feedback submitted successfully!");
+            }}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Call to Action Section */}
       <motion.section 

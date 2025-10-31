@@ -312,6 +312,18 @@ const cartSchema = new mongoose.Schema({
 
 const Cart = mongoose.model('Cart', cartSchema);
 
+// Feedback Schema for customer feedback
+const feedbackSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  rating: { type: Number, required: true, min: 1, max: 5 },
+  feedback: { type: String, required: true },
+  submittedAt: { type: Date, default: Date.now },
+  status: { type: String, default: 'pending', enum: ['pending', 'reviewed', 'published'] }
+});
+
+const Feedback = mongoose.model('Feedback', feedbackSchema);
+
 // In-memory cart storage for fast access and fallback
 const simpleCart = new Map();
 
@@ -1632,6 +1644,119 @@ app.post("/api/whatsapp/send", async (req, res) => {
   } catch (err) {
     const status = err.response?.status || 500;
     res.status(status).json({ error: err.response?.data || err.message });
+  }
+});
+
+// ===== FEEDBACK API ENDPOINTS =====
+
+// Submit customer feedback
+app.post("/api/feedback", async (req, res) => {
+  try {
+    const { name, email, rating, feedback, submittedAt } = req.body;
+    
+    console.log('📝 NEW FEEDBACK SUBMISSION:', { name, email, rating });
+    
+    // Validation
+    if (!name || !email || !rating || !feedback) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required"
+      });
+    }
+    
+    if (rating < 1 || rating > 5) {
+      return res.status(400).json({
+        success: false,
+        message: "Rating must be between 1 and 5"
+      });
+    }
+    
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email address"
+      });
+    }
+    
+    // Check MongoDB connection
+    if (mongoose.connection.readyState !== 1) {
+      console.error('❌ MongoDB not connected');
+      return res.status(503).json({
+        success: false,
+        message: "Database not available. Please try again later."
+      });
+    }
+    
+    // Create new feedback document
+    const newFeedback = new Feedback({
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
+      rating: Number(rating),
+      feedback: feedback.trim(),
+      submittedAt: submittedAt || new Date(),
+      status: 'pending'
+    });
+    
+    // Save to MongoDB
+    const savedFeedback = await newFeedback.save();
+    
+    console.log('✅ Feedback saved successfully:', savedFeedback._id);
+    console.log(`⭐ Rating: ${rating}/5 from ${name}`);
+    
+    res.status(201).json({
+      success: true,
+      message: "Thank you for your feedback!",
+      feedbackId: savedFeedback._id
+    });
+    
+  } catch (err) {
+    console.error('❌ Feedback submission error:', err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to submit feedback. Please try again.",
+      error: err.message
+    });
+  }
+});
+
+// Get all feedback (for admin or display)
+app.get("/api/feedback", async (req, res) => {
+  try {
+    const { status, limit = 50 } = req.query;
+    
+    // Check MongoDB connection
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        success: false,
+        message: "Database not available"
+      });
+    }
+    
+    // Build query
+    const query = status ? { status } : {};
+    
+    // Get feedback from MongoDB
+    const feedbacks = await Feedback.find(query)
+      .sort({ submittedAt: -1 })
+      .limit(Number(limit));
+    
+    console.log(`📋 Retrieved ${feedbacks.length} feedback entries`);
+    
+    res.json({
+      success: true,
+      count: feedbacks.length,
+      feedbacks
+    });
+    
+  } catch (err) {
+    console.error('❌ Get feedback error:', err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to retrieve feedback",
+      error: err.message
+    });
   }
 });
 
