@@ -1,6 +1,8 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, Shield, Truck, Clock, Award, Users, Heart, MessageSquare } from "lucide-react";
+import axios from "axios";
+import { API_BASE_URL_EXPORT } from "../config/api";
 import PromoBar from "./PromoBar";
 import ImageSlider from "./ImageSlider";
 import FlashSalePage from "./Flashsale";
@@ -18,6 +20,8 @@ function ClassicHomePage({
 }) {
   const dealsRef = useRef(null);
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+  const [testimonials, setTestimonials] = useState([]);
+  const [loadingFeedback, setLoadingFeedback] = useState(true);
 
   const features = [
     {
@@ -49,29 +53,69 @@ function ClassicHomePage({
     { icon: Award, number: "8+", label: "Years of Excellence" }
   ];
 
-  const testimonials = [
+  // Default testimonials (fallback)
+  const defaultTestimonials = [
     {
       name: "Sarah Mitchell",
       role: "Verified Buyer",
-      text: "Exceptional quality and service. Every purchase has exceeded my expectations.",
+      feedback: "Exceptional quality and service. Every purchase has exceeded my expectations.",
       rating: 5,
       image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=80&h=80&fit=crop&crop=face"
     },
     {
       name: "David Chen",
       role: "Regular Customer",
-      text: "Fast shipping, great prices, and outstanding customer support. Highly recommended!",
+      feedback: "Fast shipping, great prices, and outstanding customer support. Highly recommended!",
       rating: 5,
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face"
     },
     {
       name: "Emily Rodriguez",
       role: "Premium Member",
-      text: "The quality of products and attention to detail is remarkable. A truly premium experience.",
+      feedback: "The quality of products and attention to detail is remarkable. A truly premium experience.",
       rating: 5,
       image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face"
     }
   ];
+
+  // Fetch published feedback from API
+  useEffect(() => {
+    const fetchFeedback = async () => {
+      try {
+        setLoadingFeedback(true);
+        console.log('📥 Fetching published feedback...');
+        
+        const response = await axios.get(`${API_BASE_URL_EXPORT}/api/feedback?status=published&limit=10`);
+        
+        if (response.data.success && response.data.feedbacks.length > 0) {
+          // Transform feedback to testimonial format
+          const fetchedTestimonials = response.data.feedbacks.map(fb => ({
+            name: fb.name,
+            role: "Customer",
+            feedback: fb.feedback,
+            rating: fb.rating,
+            image: `https://ui-avatars.com/api/?name=${encodeURIComponent(fb.name)}&background=random&size=80`
+          }));
+          
+          // Combine with default testimonials, prioritizing fetched ones
+          setTestimonials([...fetchedTestimonials, ...defaultTestimonials].slice(0, 6));
+          console.log(`✅ Loaded ${fetchedTestimonials.length} published testimonials`);
+        } else {
+          // Use default testimonials if no published feedback
+          setTestimonials(defaultTestimonials);
+          console.log('ℹ️ No published feedback found, using default testimonials');
+        }
+      } catch (err) {
+        console.error('❌ Error fetching feedback:', err);
+        // Fallback to default testimonials on error
+        setTestimonials(defaultTestimonials);
+      } finally {
+        setLoadingFeedback(false);
+      }
+    };
+
+    fetchFeedback();
+  }, []);
 
   return (
     <div className="classic-home-page">
@@ -277,7 +321,7 @@ function ClassicHomePage({
                   ))}
                 </div>
                 <blockquote className="text-gray-700 text-lg leading-relaxed mb-6 italic">
-                  "{testimonial.text}"
+                  "{testimonial.feedback}"
                 </blockquote>
                 <div className="flex items-center gap-4">
                   <img
@@ -319,6 +363,8 @@ function ClassicHomePage({
             onClose={() => setShowFeedbackForm(false)}
             onSuccess={() => {
               console.log("Feedback submitted successfully!");
+              // Note: Feedback needs to be published by admin before appearing
+              // Optionally reload feedback here if auto-publishing is enabled
             }}
           />
         )}

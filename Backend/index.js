@@ -1690,13 +1690,14 @@ app.post("/api/feedback", async (req, res) => {
     }
     
     // Create new feedback document
+    // Auto-publish feedback (change to 'pending' if you want manual approval)
     const newFeedback = new Feedback({
       name: name.trim(),
       email: email.trim().toLowerCase(),
       rating: Number(rating),
       feedback: feedback.trim(),
       submittedAt: submittedAt || new Date(),
-      status: 'pending'
+      status: 'published' // Auto-publish new feedback
     });
     
     // Save to MongoDB
@@ -1755,6 +1756,62 @@ app.get("/api/feedback", async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to retrieve feedback",
+      error: err.message
+    });
+  }
+});
+
+// Update feedback status (for admin - publish/unpublish)
+app.patch("/api/feedback/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    
+    console.log(`📝 UPDATE FEEDBACK STATUS - ID: ${id}, Status: ${status}`);
+    
+    // Validate status
+    if (!['pending', 'reviewed', 'published'].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status. Must be 'pending', 'reviewed', or 'published'"
+      });
+    }
+    
+    // Check MongoDB connection
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        success: false,
+        message: "Database not available"
+      });
+    }
+    
+    // Update feedback status
+    const updatedFeedback = await Feedback.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    );
+    
+    if (!updatedFeedback) {
+      return res.status(404).json({
+        success: false,
+        message: "Feedback not found"
+      });
+    }
+    
+    console.log(`✅ Feedback status updated: ${id} -> ${status}`);
+    
+    res.json({
+      success: true,
+      message: "Feedback status updated successfully",
+      feedback: updatedFeedback
+    });
+    
+  } catch (err) {
+    console.error('❌ Update feedback status error:', err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update feedback status",
       error: err.message
     });
   }
