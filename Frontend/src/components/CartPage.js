@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useCart } from "../context/CartContext";
 import PayHereCheckout from "./PayHereCheckout";
@@ -6,6 +6,14 @@ import PayHereCheckout from "./PayHereCheckout";
 export default function CartPage({ onBack }) {
   const { items, setQuantity, removeItem, clearCart, total, loading, error, isLoggedIn, refreshCart } = useCart();
   const [showCheckout, setShowCheckout] = useState(false);
+
+  // Reload cart when component mounts or when user logs in
+  useEffect(() => {
+    if (isLoggedIn && refreshCart) {
+      console.log('🔄 CartPage mounted - refreshing cart');
+      refreshCart();
+    }
+  }, [isLoggedIn, refreshCart]);
 
   const hasItems = items && items.length > 0;
 

@@ -50,6 +50,7 @@ app.get("/", (req, res) => {
       users: "/api/users",
       cart: "/api/cart/:userId",
       cartAdd: "/api/cart/add",
+      cartUpdate: "/api/cart/update",
       cartRemove: "/api/cart/remove",
       cartClear: "/api/cart/clear",
       email: "/api/test-email"
@@ -1822,6 +1823,100 @@ app.post("/api/cart/add", async (req, res) => {
     res.status(500).json({ 
       success: false,
       error: "Failed to add item to cart",
+      message: err.message 
+    });
+  }
+});
+
+// Update item quantity in cart with order summary recalculation
+app.put("/api/cart/update", async (req, res) => {
+  try {
+    const { userId, itemId, quantity } = req.body;
+    
+    console.log(`🔢 UPDATE QUANTITY - User: ${userId}, Item: ${itemId}, Quantity: ${quantity}`);
+    
+    if (!userId || !itemId || !quantity) {
+      return res.status(400).json({ 
+        success: false,
+        error: "Missing userId, itemId, or quantity" 
+      });
+    }
+    
+    if (quantity < 1) {
+      return res.status(400).json({ 
+        success: false,
+        error: "Quantity must be at least 1" 
+      });
+    }
+    
+    // Check MongoDB connection
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({ 
+        success: false,
+        error: "Database not connected" 
+      });
+    }
+    
+    // Find cart in MongoDB Atlas
+    const cart = await Cart.findOne({ userId });
+    
+    if (!cart) {
+      return res.status(404).json({ 
+        success: false,
+        error: "Cart not found" 
+      });
+    }
+    
+    // Find and update item quantity
+    const itemIndex = cart.items.findIndex(item => item.id === itemId);
+    
+    if (itemIndex === -1) {
+      return res.status(404).json({ 
+        success: false,
+        error: "Item not found in cart" 
+      });
+    }
+    
+    // Update quantity
+    cart.items[itemIndex].quantity = quantity;
+    cart.items[itemIndex].subtotal = cart.items[itemIndex].price * quantity;
+    
+    // Recalculate order summary
+    const totalItems = cart.items.length;
+    const totalQuantity = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+    const subtotal = cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const tax = subtotal * 0.1;
+    const shipping = subtotal > 100 ? 0 : 10;
+    const total = subtotal + tax + shipping;
+    
+    cart.orderSummary = {
+      totalItems,
+      totalQuantity,
+      subtotal: Number(subtotal.toFixed(2)),
+      tax: Number(tax.toFixed(2)),
+      shipping: Number(shipping.toFixed(2)),
+      total: Number(total.toFixed(2))
+    };
+    
+    cart.updatedAt = new Date();
+    
+    // Save to MongoDB
+    const savedCart = await cart.save();
+    
+    console.log(`✅ Quantity updated - Item: ${itemId}, New quantity: ${quantity}`);
+    console.log(`📊 Updated cart total: $${total.toFixed(2)}`);
+    
+    res.json({
+      success: true,
+      cart: savedCart,
+      message: "Quantity updated successfully"
+    });
+    
+  } catch (err) {
+    console.error("❌ Update quantity error:", err);
+    res.status(500).json({ 
+      success: false,
+      error: "Failed to update quantity",
       message: err.message 
     });
   }

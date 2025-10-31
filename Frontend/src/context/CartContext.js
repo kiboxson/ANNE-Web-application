@@ -292,8 +292,32 @@ export function CartProvider({ children }) {
       return removeItem(itemId);
     }
 
-    // For simplicity, just reload the cart
-    loadCart(user.userId);
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('🔢 UPDATE QUANTITY:', itemId, quantity);
+      
+      const response = await axios.put(`${CART_API_BASE}/api/cart/update`, {
+        userId: user.userId,
+        itemId: itemId,
+        quantity: quantity
+      });
+      
+      console.log('✅ Update quantity response:', response.data);
+      
+      if (response.data.success && response.data.cart) {
+        setItems(response.data.cart.items || []);
+        console.log(`🔢 Updated quantity for item ${itemId}`);
+      } else {
+        setError("Failed to update quantity");
+      }
+    } catch (err) {
+      console.error("❌ Update quantity error:", err);
+      // Fallback: reload the cart
+      await loadCart(user.userId);
+    } finally {
+      setLoading(false);
+    }
   }
 
   const count = useMemo(() => items.reduce((acc, it) => acc + (it.quantity || 1), 0), [items]);
