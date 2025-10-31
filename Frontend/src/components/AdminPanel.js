@@ -16,6 +16,8 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
   const { flashProducts, addFlashProduct: ctxAddFlashProduct, removeFlashProduct: ctxRemoveFlashProduct, refreshFlashProducts } = useFlashProducts();
   const [orders, setOrders] = useState([]);
   const [users, setUsers] = useState([]);
+  const [feedbacks, setFeedbacks] = useState([]);
+  const [feedbackFilter, setFeedbackFilter] = useState('all');
 
   const [form, setForm] = useState({ title: "", price: "", stock: "", category: "" });
   const [imageFile, setImageFile] = useState(null);
@@ -132,6 +134,13 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
   useEffect(() => {
     if (tab === "orders") {
       loadOrders();
+    }
+  }, [tab]);
+
+  // Load feedback when feedback tab is selected
+  useEffect(() => {
+    if (tab === "feedback") {
+      loadFeedback();
     }
   }, [tab]);
 
@@ -265,6 +274,62 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
     }
   }
 
+  // Feedback management functions
+  async function loadFeedback() {
+    try {
+      const response = await axios.get(`${API_BASE_URL_EXPORT}/api/feedback`);
+      if (response.data.success) {
+        setFeedbacks(response.data.feedbacks);
+      }
+    } catch (error) {
+      console.error('Failed to load feedback:', error);
+    }
+  }
+
+  async function updateFeedbackStatus(feedbackId, newStatus) {
+    try {
+      await axios.patch(`${API_BASE_URL_EXPORT}/api/feedback/${feedbackId}`, { status: newStatus });
+      
+      // Update local state
+      setFeedbacks(prev => 
+        prev.map(fb => 
+          fb._id === feedbackId 
+            ? { ...fb, status: newStatus }
+            : fb
+        )
+      );
+      
+      window.alert(`Feedback ${newStatus} successfully!`);
+    } catch (error) {
+      console.error('Failed to update feedback status:', error);
+      window.alert('Failed to update feedback status: ' + error.message);
+    }
+  }
+
+  async function deleteFeedback(feedbackId) {
+    if (!window.confirm('Are you sure you want to delete this feedback? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      await axios.delete(`${API_BASE_URL_EXPORT}/api/feedback/${feedbackId}`);
+      
+      // Remove from local state
+      setFeedbacks(prev => prev.filter(fb => fb._id !== feedbackId));
+      
+      window.alert('Feedback deleted successfully!');
+    } catch (error) {
+      console.error('Failed to delete feedback:', error);
+      window.alert('Failed to delete feedback: ' + error.message);
+    }
+  }
+
+  // Filter feedbacks based on status
+  const filteredFeedbacks = useMemo(() => {
+    if (feedbackFilter === 'all') return feedbacks;
+    return feedbacks.filter(fb => fb.status === feedbackFilter);
+  }, [feedbacks, feedbackFilter]);
+
   return (
     <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8">
       {!isAdmin ? (
@@ -328,6 +393,7 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
               { key: "orders", label: "Orders" },
               { key: "users", label: "Users" },
               { key: "flash", label: "Flash Sale" },
+              { key: "feedback", label: "⭐ Feedback" },
               { key: "chat", label: "Live Chat" },
               { key: "email", label: "📧 Email Setup" },
               { key: "payhere", label: "💳 PayHere Config" },
@@ -965,6 +1031,170 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                   ))}
                 </tbody>
               </table>
+            </div>
+          </motion.div>
+        )}
+
+        {tab === "feedback" && (
+          <motion.div
+            key="feedback"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="space-y-4"
+          >
+            {/* Header with filter */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg p-4">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">⭐ Customer Feedback Management</h3>
+                <p className="text-sm text-gray-600 mt-1">Manage testimonials displayed on the home page</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-gray-700">Filter:</label>
+                <select
+                  value={feedbackFilter}
+                  onChange={(e) => setFeedbackFilter(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-yellow-400"
+                >
+                  <option value="all">All ({feedbacks.length})</option>
+                  <option value="published">Published ({feedbacks.filter(f => f.status === 'published').length})</option>
+                  <option value="pending">Pending ({feedbacks.filter(f => f.status === 'pending').length})</option>
+                  <option value="reviewed">Reviewed ({feedbacks.filter(f => f.status === 'reviewed').length})</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Feedback Stats */}
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+              <div className="bg-white border rounded-lg p-4">
+                <div className="text-2xl font-bold text-gray-900">{feedbacks.length}</div>
+                <div className="text-sm text-gray-600">Total Feedback</div>
+              </div>
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div className="text-2xl font-bold text-green-700">
+                  {feedbacks.filter(f => f.status === 'published').length}
+                </div>
+                <div className="text-sm text-green-600">Published</div>
+              </div>
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div className="text-2xl font-bold text-yellow-700">
+                  {feedbacks.filter(f => f.status === 'pending').length}
+                </div>
+                <div className="text-sm text-yellow-600">Pending Review</div>
+              </div>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="text-2xl font-bold text-blue-700">
+                  {feedbacks.length > 0 ? (feedbacks.reduce((sum, f) => sum + f.rating, 0) / feedbacks.length).toFixed(1) : '0.0'}
+                </div>
+                <div className="text-sm text-blue-600">Avg Rating</div>
+              </div>
+            </div>
+
+            {/* Feedback List */}
+            {filteredFeedbacks.length === 0 ? (
+              <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                <div className="text-4xl mb-3">📝</div>
+                <div className="text-gray-600">No feedback found</div>
+                <div className="text-sm text-gray-500 mt-1">
+                  {feedbackFilter !== 'all' ? 'Try changing the filter' : 'Customer feedback will appear here'}
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {filteredFeedbacks.map((feedback) => (
+                  <div
+                    key={feedback._id}
+                    className="bg-white border rounded-lg p-4 hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      {/* Avatar */}
+                      <div className="flex-shrink-0">
+                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white text-2xl font-bold">
+                          {feedback.name.charAt(0).toUpperCase()}
+                        </div>
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1">
+                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-2">
+                          <div>
+                            <h4 className="font-semibold text-gray-900">{feedback.name}</h4>
+                            <p className="text-sm text-gray-600">{feedback.email}</p>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            {[...Array(5)].map((_, i) => (
+                              <span key={i} className={`text-lg ${i < feedback.rating ? 'text-yellow-400' : 'text-gray-300'}`}>
+                                ⭐
+                              </span>
+                            ))}
+                            <span className="ml-2 text-sm font-medium text-gray-700">
+                              {feedback.rating}/5
+                            </span>
+                          </div>
+                        </div>
+
+                        <p className="text-gray-700 mb-3 italic">"{feedback.feedback}"</p>
+
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500">
+                          <span>📅 {new Date(feedback.submittedAt).toLocaleDateString()}</span>
+                          <span>•</span>
+                          <span>🕐 {new Date(feedback.submittedAt).toLocaleTimeString()}</span>
+                          <span>•</span>
+                          <span className={`px-2 py-1 rounded font-medium ${
+                            feedback.status === 'published' ? 'bg-green-100 text-green-800' :
+                            feedback.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-blue-100 text-blue-800'
+                          }`}>
+                            {feedback.status.toUpperCase()}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Actions */}
+                      <div className="flex sm:flex-col gap-2">
+                        {feedback.status !== 'published' && (
+                          <button
+                            onClick={() => updateFeedbackStatus(feedback._id, 'published')}
+                            className="px-3 py-2 rounded bg-green-600 text-white hover:bg-green-700 text-sm font-medium whitespace-nowrap"
+                            title="Publish to home page"
+                          >
+                            ✓ Publish
+                          </button>
+                        )}
+                        {feedback.status === 'published' && (
+                          <button
+                            onClick={() => updateFeedbackStatus(feedback._id, 'pending')}
+                            className="px-3 py-2 rounded bg-yellow-600 text-white hover:bg-yellow-700 text-sm font-medium whitespace-nowrap"
+                            title="Unpublish from home page"
+                          >
+                            ⏸ Unpublish
+                          </button>
+                        )}
+                        <button
+                          onClick={() => deleteFeedback(feedback._id)}
+                          className="px-3 py-2 rounded bg-red-600 text-white hover:bg-red-700 text-sm font-medium whitespace-nowrap"
+                          title="Delete feedback"
+                        >
+                          🗑 Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Help Text */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h4 className="font-medium text-blue-900 mb-2">ℹ️ How it works</h4>
+              <ul className="text-sm text-blue-800 space-y-1">
+                <li>• <strong>Published</strong> feedback appears in the "Voices of Satisfaction" section on the home page</li>
+                <li>• <strong>Pending</strong> feedback is hidden from public view</li>
+                <li>• Click "Publish" to make feedback visible to customers</li>
+                <li>• Click "Unpublish" to hide feedback from the home page</li>
+                <li>• Delete removes feedback permanently from the database</li>
+              </ul>
             </div>
           </motion.div>
         )}

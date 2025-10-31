@@ -1817,6 +1817,48 @@ app.patch("/api/feedback/:id", async (req, res) => {
   }
 });
 
+// Delete feedback
+app.delete("/api/feedback/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    console.log(`🗑️ DELETE FEEDBACK - ID: ${id}`);
+    
+    // Check MongoDB connection
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        success: false,
+        message: "Database not available"
+      });
+    }
+    
+    // Delete feedback
+    const deletedFeedback = await Feedback.findByIdAndDelete(id);
+    
+    if (!deletedFeedback) {
+      return res.status(404).json({
+        success: false,
+        message: "Feedback not found"
+      });
+    }
+    
+    console.log(`✅ Feedback deleted: ${id}`);
+    
+    res.json({
+      success: true,
+      message: "Feedback deleted successfully"
+    });
+    
+  } catch (err) {
+    console.error('❌ Delete feedback error:', err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete feedback",
+      error: err.message
+    });
+  }
+});
+
 // Cart API endpoints - Direct MongoDB connection
 // SIMPLE GET CART - Always works
 app.get("/api/cart/:userId", async (req, res) => {
