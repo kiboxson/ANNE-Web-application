@@ -14,48 +14,8 @@ function Community({ onBack, onContactClick }) {
       name: "PRAKASH LEENA",
       role: "Founder & CEO",
       image: kibo,
-      bio: "With over 15 years in e-commerce, Sarah founded ShopEase to revolutionize online shopping experiences.",
+      bio: "Passionate entrepreneur dedicated to revolutionizing the e-commerce experience and bringing quality products to customers worldwide.",
       expertise: ["E-commerce Strategy", "Business Development", "Customer Experience"]
-    },
-    {
-      id: 2,
-      name: "Michael Chen",
-      role: "CTO & Co-founder",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop&crop=face",
-      bio: "Michael leads our technical vision with expertise in scalable systems and innovative solutions.",
-      expertise: ["Full-Stack Development", "System Architecture", "AI Integration"]
-    },
-    {
-      id: 3,
-      name: "Emily Rodriguez",
-      role: "Head of Design",
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop&crop=face",
-      bio: "Emily crafts beautiful, user-centered designs that make shopping delightful and intuitive.",
-      expertise: ["UI/UX Design", "Brand Identity", "User Research"]
-    },
-    {
-      id: 4,
-      name: "David Kim",
-      role: "Head of Operations",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face",
-      bio: "David ensures smooth operations and exceptional customer service across all touchpoints.",
-      expertise: ["Operations Management", "Supply Chain", "Customer Success"]
-    },
-    {
-      id: 5,
-      name: "Lisa Thompson",
-      role: "Marketing Director",
-      image: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=300&h=300&fit=crop&crop=face",
-      bio: "Lisa drives our brand presence and connects with customers through innovative marketing strategies.",
-      expertise: ["Digital Marketing", "Brand Strategy", "Content Creation"]
-    },
-    {
-      id: 6,
-      name: "James Wilson",
-      role: "Product Manager",
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=300&fit=crop&crop=face",
-      bio: "James bridges the gap between customer needs and product development, ensuring we build what matters.",
-      expertise: ["Product Strategy", "Market Analysis", "Feature Development"]
     }
   ];
 
