@@ -7,31 +7,14 @@ export default function CartPage({ onBack }) {
   const { items, setQuantity, removeItem, clearCart, total, loading, error, isLoggedIn, refreshCart } = useCart();
   const [showCheckout, setShowCheckout] = useState(false);
 
-  // Debug: Log cart state changes
   useEffect(() => {
-    console.log('🛒 CartPage - Cart State:', {
-      itemsCount: items?.length || 0,
-      items: items,
-      loading,
-      error,
-      isLoggedIn,
-      total
-    });
-  }, [items, loading, error, isLoggedIn, total]);
-
-  // Reload cart when component mounts or when isLoggedIn changes
-  useEffect(() => {
-    console.log('🔄 CartPage useEffect - isLoggedIn:', isLoggedIn, 'items:', items.length);
     if (isLoggedIn && refreshCart) {
-      console.log('🔄 CartPage - calling refreshCart');
       refreshCart();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoggedIn]); // Run when isLoggedIn changes
+  }, [isLoggedIn]);
 
   const hasItems = items && items.length > 0;
-  
-  console.log('🛒 CartPage render - hasItems:', hasItems, 'items:', items);
 
   const handleCheckoutSuccess = (order) => {
     alert(`Order placed successfully! Order ID: ${order.orderId}`);
@@ -56,23 +39,23 @@ export default function CartPage({ onBack }) {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 gap-3 sm:gap-0">
-        <h1 className="text-xl sm:text-2xl font-bold">Your Cart</h1>
-        <div className="flex items-center gap-2 sm:gap-3">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 bg-[#07080d] min-h-[calc(100vh-64px)] font-dmsans text-[#e8eaf2]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+        <h1 className="text-2xl sm:text-3xl font-syne font-bold text-[#e8eaf2]">Your Cart</h1>
+        <div className="flex items-center gap-3">
           <motion.button
-            className="px-3 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800"
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
+            className="px-4 py-2 rounded-lg bg-[#161921] border border-[#1e2130] hover:border-[#6c63ff] hover:text-[#e8eaf2] text-[#6b7094] font-medium transition-colors text-sm"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={onBack}
           >
             Continue Shopping
           </motion.button>
           {hasItems && (
             <motion.button
-              className="px-3 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white"
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
+              className="px-4 py-2 rounded-lg bg-[#ff6584]/10 text-[#ff6584] hover:bg-[#ff6584]/20 border border-[#ff6584]/30 font-medium transition-colors text-sm"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={clearCart}
             >
               Clear Cart
@@ -82,13 +65,13 @@ export default function CartPage({ onBack }) {
       </div>
 
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        <div className="bg-[#ff6584]/10 border border-[#ff6584]/30 text-[#ff6584] px-4 py-3 rounded-lg mb-6">
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <span className="font-semibold">Cart Error:</span>
+              <span className="font-semibold font-syne">Cart Error:</span>
               {refreshCart && (
                 <motion.button
-                  className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
+                  className="px-3 py-1 bg-[#ff6584] text-white rounded hover:opacity-90 text-sm font-medium"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={refreshCart}
@@ -99,98 +82,130 @@ export default function CartPage({ onBack }) {
               )}
             </div>
             <div className="text-sm">{error}</div>
-            <div className="text-xs text-red-600 mt-2">
-              <strong>Debug Info:</strong>
-              <br />• User logged in: {isLoggedIn ? 'Yes' : 'No'}
-              <br />• Backend URL: https://anne-web-application.vercel.app
-              <br />• Environment: {process.env.NODE_ENV || 'development'}
-            </div>
           </div>
         </div>
       )}
 
       {loading && (
-        <div className="text-center text-gray-600 py-8">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-          <p className="mt-2">Loading cart...</p>
+        <div className="text-center text-[#6b7094] py-16">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#6c63ff]"></div>
+          <p className="mt-4 font-medium">Loading your cart...</p>
         </div>
       )}
 
       {!loading && !hasItems ? (
-        <div className="text-center text-gray-600 py-16 bg-[#F3F4F6] rounded-xl">
+        <div className="text-center py-20 bg-[#12141e] border border-[#1e2130] rounded-2xl shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
           {isLoggedIn ? (
             <div>
-              <p className="text-lg mb-2">🛒 Your cart is empty</p>
-              <p className="text-sm">Add some products to get started!</p>
+              <div className="text-5xl mb-4">🛒</div>
+              <p className="text-xl font-syne font-bold text-[#e8eaf2] mb-2">Your cart is empty</p>
+              <p className="text-[#6b7094]">Looks like you haven't added anything yet.</p>
+              <button 
+                className="mt-6 px-6 py-2.5 bg-[#6c63ff] text-white rounded-lg font-medium hover:opacity-90 transition-opacity shadow-[0_0_15px_rgba(108,99,255,0.3)]"
+                onClick={onBack}
+              >
+                Start Shopping
+              </button>
             </div>
           ) : (
             <div>
-              <p className="text-lg mb-2">🔒 Please sign in to use cart</p>
-              <p className="text-sm">Sign in to add items to your cart and save them for later.</p>
+              <div className="text-5xl mb-4">🔒</div>
+              <p className="text-xl font-syne font-bold text-[#e8eaf2] mb-2">Please sign in to use cart</p>
+              <p className="text-[#6b7094] max-w-sm mx-auto">Sign in to add items to your cart and save them for later.</p>
             </div>
           )}
         </div>
       ) : !loading && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
-          <div className="lg:col-span-2 flex flex-col gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+          
+          {/* Cart Items List */}
+          <div className="lg:col-span-2 flex flex-col gap-4">
             {items.map((it) => (
-              <div key={it.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 bg-white rounded-xl shadow p-3 sm:p-4">
-                {it.image ? (
-                  <img src={it.image} alt={it.title} className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded mx-auto sm:mx-0" />
-                ) : (
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-200 rounded mx-auto sm:mx-0" />
-                )}
-                <div className="flex-1 text-center sm:text-left">
-                  <div className="font-semibold text-sm sm:text-base">{it.title}</div>
-                  <div className="text-gray-600 text-xs sm:text-sm">${it.price.toFixed(2)}</div>
-                  <div className="mt-2 flex items-center justify-center sm:justify-start gap-2">
-                    <label className="text-xs sm:text-sm text-gray-600">Qty</label>
+              <div key={it.id} className="flex flex-col sm:flex-row items-center gap-4 bg-[#12141e] border border-[#1e2130] rounded-2xl p-4 sm:p-5 transition-all hover:border-[#6c63ff]">
+                
+                <div className="w-20 h-20 sm:w-24 sm:h-24 shrink-0 bg-[#0f1118] rounded-xl overflow-hidden shadow-inner flex items-center justify-center">
+                  {it.image ? (
+                    <img src={it.image} alt={it.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-2xl text-[#6b7094]">📦</span>
+                  )}
+                </div>
+                
+                <div className="flex-1 text-center sm:text-left w-full">
+                  <div className="font-syne font-bold text-[#e8eaf2] text-lg mb-1">{it.title}</div>
+                  <div className="text-[#6c63ff] font-bold">${it.price.toFixed(2)}</div>
+                </div>
+
+                <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto mt-4 sm:mt-0 gap-4 sm:gap-0">
+                  <div className="flex items-center gap-3 sm:mb-3">
+                    <label className="text-sm font-medium text-[#6b7094]">Qty</label>
                     <input
                       type="number"
                       min={1}
                       value={it.quantity}
                       onChange={(e) => setQuantity(it.id, Number(e.target.value) || 1)}
-                      className="w-16 sm:w-20 border rounded px-2 py-1 text-sm"
+                      className="w-16 bg-[#0f1118] border border-[#1e2130] rounded-lg px-2 py-1 text-sm text-[#e8eaf2] focus:outline-none focus:border-[#6c63ff] text-center"
                     />
                   </div>
+                  
+                  <div className="flex items-center gap-4 sm:gap-0">
+                    <div className="font-syne font-bold text-lg sm:hidden">${(it.price * it.quantity).toFixed(2)}</div>
+                    <motion.button
+                      className="text-[#ff6584] hover:text-[#ff6584]/80 text-sm font-medium"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => removeItem(it.id)}
+                    >
+                      Remove
+                    </motion.button>
+                  </div>
                 </div>
-                <div className="text-center sm:text-right w-full sm:w-auto">
-                  <div className="font-semibold mb-2 text-sm sm:text-base">${(it.price * it.quantity).toFixed(2)}</div>
-                  <motion.button
-                    className="px-3 py-1.5 rounded bg-red-500 text-white hover:bg-red-600 text-xs sm:text-sm w-full sm:w-auto"
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                    onClick={() => removeItem(it.id)}
-                  >
-                    Remove
-                  </motion.button>
+                
+                {/* Total per item on desktop */}
+                <div className="hidden sm:block w-24 text-right">
+                  <div className="font-syne font-bold text-lg">${(it.price * it.quantity).toFixed(2)}</div>
                 </div>
+
               </div>
             ))}
           </div>
-          <div className="bg-white rounded-xl shadow p-3 sm:p-4 h-fit sticky top-4">
-            <h2 className="text-base sm:text-lg font-semibold mb-3">Order Summary</h2>
-            <div className="flex items-center justify-between mb-1 text-sm sm:text-base">
-              <span>Subtotal</span>
-              <span>${total.toFixed(2)}</span>
+
+          {/* Order Summary Sidebar */}
+          <div className="bg-[#12141e] border border-[#1e2130] rounded-2xl p-6 h-fit sticky top-[80px] shadow-[0_10px_40px_rgba(0,0,0,0.2)]">
+            <h2 className="text-xl font-syne font-bold mb-6 text-[#e8eaf2]">Order Summary</h2>
+            
+            <div className="space-y-4 mb-6">
+              <div className="flex items-center justify-between text-[#6b7094]">
+                <span>Subtotal</span>
+                <span className="text-[#e8eaf2]">${total.toFixed(2)}</span>
+              </div>
+              <div className="flex items-center justify-between text-[#6b7094]">
+                <span>Shipping</span>
+                <span className="text-sm">Calculated at checkout</span>
+              </div>
             </div>
-            <div className="flex items-center justify-between mb-3 text-xs sm:text-sm text-gray-600">
-              <span>Shipping</span>
-              <span>Calculated at checkout</span>
-            </div>
-            <div className="flex items-center justify-between font-bold text-base sm:text-lg">
+            
+            <div className="h-[1px] bg-[#1e2130] w-full mb-6"></div>
+            
+            <div className="flex items-center justify-between font-syne font-bold text-xl mb-8 text-[#e8eaf2]">
               <span>Total</span>
-              <span>${total.toFixed(2)}</span>
+              <span className="text-[#43e97b]">${total.toFixed(2)}</span>
             </div>
+            
             <motion.button
-              className="w-full mt-4 px-3 sm:px-4 py-2 sm:py-3 rounded bg-blue-600 text-white hover:bg-blue-700 text-sm sm:text-base"
+              className="w-full px-4 py-3.5 rounded-xl bg-[#6c63ff] text-white font-syne font-bold text-sm shadow-[0_0_20px_rgba(108,99,255,0.3)] hover:opacity-90"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setShowCheckout(true)}
             >
               Proceed to Checkout
             </motion.button>
+            <div className="mt-4 flex items-center justify-center gap-2 text-xs text-[#6b7094]">
+              <span>🔒</span>
+              <span>Secure Encrypted Checkout</span>
+            </div>
           </div>
+
         </div>
       )}
     </div>

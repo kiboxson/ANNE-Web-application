@@ -8,83 +8,59 @@ import { getCurrentUser } from "../services/auth";
 
 // Local product assets are not available; use images provided by context or external URLs
 
-// Product Card Component
-function ProductCard({ image, title, price, rating, discount, variants, onAdd, onView, onBuyNow, isLoggedIn }) {
+function ProductCard({ image, title, price, category, rating, discount, variants, onAdd, onView, onBuyNow, isLoggedIn }) {
   return (
-    <div className="bg-[white] w-full">
     <motion.div
       variants={variants}
-      className="bg-white/5 rounded-xl shadow-md p-2 sm:p-3 cursor-pointer flex flex-col w-full"
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
+      className="prod-card cursor-pointer"
+      whileHover={{ y: -4 }}
       transition={{ type: "spring", stiffness: 200 }}
       onClick={onView}
     >
-      {/* Image with Discount Badge */}
-      <div className="relative">
+      <div className="prod-image">
         <motion.img
           src={image}
           alt={title}
-          className="w-full h-24 sm:h-32 object-cover rounded-lg mb-2"
-          whileHover={{ rotate: 1 }}
-          transition={{ duration: 0.3 }}
+          whileHover={{ scale: 1.08 }}
+          transition={{ duration: 0.5 }}
         />
         {discount && (
-          <span className="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-0.5 rounded-lg shadow">
+          <div className="prod-badge">
             {discount}% OFF
-          </span>
+          </div>
         )}
       </div>
 
-      {/* Title */}
-      <h2 className="text-xs sm:text-sm font-semibold text-gray-800 truncate">{title}</h2>
-
-      {/* Price */}
-      <p className="text-red-600 font-bold text-sm sm:text-base mb-1">${price}</p>
-
-      {/* Rating */}
-      <div className="flex items-center text-yellow-500 text-xs mb-2">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <Star
-            key={i}
-            size={12}
-            className={i < rating ? "fill-yellow-400" : "text-gray-300"}
-          />
-        ))}
-        <span className="ml-1 text-gray-500 text-xs">({rating}.0)</span>
+      <div className="prod-info">
+        <div className="prod-cat">{category || 'General'}</div>
+        <div className="prod-name">{title}</div>
+        <div className="prod-price">${price}</div>
+        
+        <div className="flex gap-2 mt-auto">
+          <button
+            className="add-to-cart-btn flex-1"
+            onClick={(e) => { 
+              e.stopPropagation(); 
+              if (isLoggedIn) {
+                onAdd && onAdd();
+              } else {
+                alert("Please sign in to add items to cart");
+              }
+            }}
+          >
+            {isLoggedIn ? "Add to Cart" : "Sign in to Add"}
+          </button>
+          <button
+            className="add-to-cart-btn !bg-[#43e97b]/10 !text-[#43e97b] hover:!bg-[#43e97b] hover:!text-[#07080d] !border-[#43e97b]/30"
+            style={{ width: 'auto', padding: '10px 14px' }}
+            title="Buy Now"
+            onClick={(e) => { e.stopPropagation(); onBuyNow && onBuyNow(); }}
+          >
+            Buy Now
+          </button>
+        </div>
       </div>
-
-      {/* Buttons */}
-      <motion.button
-        className={`mt-auto py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg shadow ${
-          isLoggedIn 
-            ? "bg-blue-600 text-white hover:bg-blue-700" 
-            : "bg-gray-400 text-gray-200 cursor-not-allowed"
-        }`}
-        whileHover={isLoggedIn ? { scale: 1.02 } : {}}
-        whileTap={isLoggedIn ? { scale: 0.98 } : {}}
-        onClick={(e) => { 
-          e.stopPropagation(); 
-          if (isLoggedIn) {
-            onAdd && onAdd();
-          } else {
-            alert("Please sign in to add items to cart");
-          }
-        }}
-        disabled={!isLoggedIn}
-      >
-        {isLoggedIn ? "Add to Cart" : "Sign in to Add"}
-      </motion.button>
-      <motion.button
-        className="mt-2 bg-emerald-600 text-white py-1.5 text-sm rounded-lg shadow hover:bg-emerald-700"
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.9 }}
-        onClick={(e) => { e.stopPropagation(); onBuyNow && onBuyNow(); }}
-      >
-        Buy Now
-      </motion.button>
     </motion.div>
-    </div>
   );
 }
 
@@ -118,8 +94,8 @@ export default function ProductsSection({ searchQuery = "", selectedCategories =
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
       {/* Section Title */}
-      <h1 className="text-2xl font-bold text-center mb-8">
-        🌟 Featured Products
+      <h1 className="text-2xl font-syne font-bold text-center mb-8 text-[#e8eaf2]">
+        Store Catalog
       </h1>
 
       {/* Grid */}
@@ -176,6 +152,7 @@ export default function ProductsSection({ searchQuery = "", selectedCategories =
                   key={item.key}
                   variants={itemVariants}
                   image={item.image}
+                  category={item.category}
                   title={item.title}
                   price={item.price}
                   rating={4}
@@ -228,6 +205,7 @@ export default function ProductsSection({ searchQuery = "", selectedCategories =
               key={item.key}
               variants={itemVariants}
               image={item.image}
+              category={item.category}
               title={item.title}
               price={item.price}
               rating={4}
