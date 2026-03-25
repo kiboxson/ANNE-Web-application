@@ -200,20 +200,176 @@ const COMPONENTS = [
       </div>
     ),
   },
+  {
+    id: "marquee-banner", category: "section", name: "Scroll Marquee Banner",
+    desc: "Infinite scrolling marquee for logos, features, or announcements",
+    tags: ["marquee", "infinite", "announcement"],
+    emoji: "🧵",
+    previewStyle: { background: "#0a0b10", overflow: "hidden" },
+    previewContent: (
+      <div style={{ width: "100%", padding: 16 }}>
+        <div style={{ display: "flex", gap: 8, width: "max-content" }}>
+          {["React", "Tailwind", "Framer", "Next.js", "TypeScript", "React", "Tailwind"].map((t, idx) => (
+            <span key={`${t}-${idx}`} style={{ background: "rgba(108,99,255,.14)", border: "1px solid rgba(108,99,255,.3)", color: "#a89ffc", fontSize: ".55rem", padding: "4px 10px", borderRadius: 999, whiteSpace: "nowrap" }}>{t}</span>
+          ))}
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "faq-accordion", category: "layout", name: "FAQ Accordion",
+    desc: "Expandable FAQ list with smooth open/close animation",
+    tags: ["faq", "accordion", "utility"],
+    emoji: "❓",
+    previewStyle: { background: "#0a0b10" },
+    previewContent: (
+      <div style={{ padding: 16, display: "flex", flexDirection: "column", gap: 8 }}>
+        <div style={{ background: "#12141e", border: "1px solid #1e2130", borderRadius: 10, padding: 10 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: ".62rem", color: "#e8eaf2", fontWeight: 700 }}>
+            <span>What do you build?</span><span style={{ color: "#6c63ff" }}>▲</span>
+          </div>
+          <div style={{ fontSize: ".58rem", color: "#6b7094", marginTop: 6, lineHeight: 1.4 }}>Modern animated websites.</div>
+        </div>
+        <div style={{ background: "#12141e", border: "1px solid #1e2130", borderRadius: 10, padding: 10 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: ".62rem", color: "#e8eaf2", fontWeight: 700 }}>
+            <span>How fast is delivery?</span><span style={{ color: "#6b7094" }}>▼</span>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "contact-form", category: "layout", name: "Contact Form",
+    desc: "Clean contact form layout with focus styles and validation states",
+    tags: ["form", "contact", "lead"],
+    emoji: "📮",
+    previewStyle: { background: "#0a0b10" },
+    previewContent: (
+      <div style={{ padding: 16, display: "flex", flexDirection: "column", gap: 8 }}>
+        <div style={{ background: "#12141e", border: "1px solid #6c63ff", borderRadius: 10, padding: 10, color: "#e8eaf2", fontSize: ".58rem" }}>Your name…</div>
+        <div style={{ background: "#12141e", border: "1px solid #1e2130", borderRadius: 10, padding: 10, color: "#6b7094", fontSize: ".58rem" }}>Email address…</div>
+        <div style={{ background: "#12141e", border: "1px solid #1e2130", borderRadius: 10, padding: 10, color: "#6b7094", fontSize: ".58rem" }}>Message…</div>
+        <div style={{ background: "#6c63ff", borderRadius: 10, padding: "8px 10px", textAlign: "center", color: "#fff", fontSize: ".6rem", fontWeight: 800 }}>Send Message →</div>
+      </div>
+    ),
+  },
+  {
+    id: "stats-metrics", category: "data", name: "Metrics Dashboard",
+    desc: "KPI stat boxes with color accents and compact grid layout",
+    tags: ["stats", "kpi", "dashboard"],
+    emoji: "📊",
+    previewStyle: { background: "#0a0b10" },
+    previewContent: (
+      <div style={{ padding: 16, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+        {[["98%","Satisfaction"],["2.4s","Load"],["840+","Clients"],["99.9%","Uptime"]].map(([v,l]) => (
+          <div key={l} style={{ background: "#12141e", border: "1px solid #1e2130", borderRadius: 10, padding: 10, textAlign: "center" }}>
+            <div style={{ fontFamily: "Syne,sans-serif", fontSize: ".85rem", fontWeight: 900, color: "#a89ffc" }}>{v}</div>
+            <div style={{ fontSize: ".55rem", color: "#6b7094", marginTop: 2 }}>{l}</div>
+          </div>
+        ))}
+      </div>
+    ),
+  },
+  {
+    id: "progress-bars", category: "data", name: "Skill Progress Bars",
+    desc: "Animated progress bars with gradient fills and labels",
+    tags: ["progress", "charts", "portfolio"],
+    emoji: "📈",
+    previewStyle: { background: "#0a0b10" },
+    previewContent: (
+      <div style={{ padding: 16, display: "flex", flexDirection: "column", gap: 10 }}>
+        {[["React","90%","linear-gradient(90deg,#6c63ff,#9b88ff)"],["Design","75%","linear-gradient(90deg,#ff6584,#ffb3c6)"],["Motion","85%","linear-gradient(90deg,#43e97b,#38f9d7)"]].map(([k,v,bg]) => (
+          <div key={k} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: ".55rem", color: "#6b7094" }}><span>{k}</span><span>{v}</span></div>
+            <div style={{ height: 6, background: "#161921", borderRadius: 999, overflow: "hidden", border: "1px solid #1e2130" }}>
+              <div style={{ height: "100%", width: v, background: bg }}></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    ),
+  },
+  {
+    id: "bento-grid", category: "layout", name: "Bento Grid Layout",
+    desc: "Modern bento-style grid for landing pages",
+    tags: ["bento", "grid", "trending"],
+    emoji: "🧩",
+    previewStyle: { background: "#0a0b10" },
+    previewContent: (
+      <div style={{ padding: 16, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+        <div style={{ gridColumn: "span 2", background: "#12141e", border: "1px solid #1e2130", borderRadius: 10, padding: 10, fontSize: ".6rem", color: "#6b7094" }}>🏠 Hero</div>
+        <div style={{ background: "#12141e", border: "1px solid #1e2130", borderRadius: 10, padding: 10, fontSize: ".6rem", color: "#6b7094" }}>📊 Stats</div>
+        <div style={{ background: "#12141e", border: "1px solid #1e2130", borderRadius: 10, padding: 10, fontSize: ".6rem", color: "#6b7094" }}>✨ CTA</div>
+      </div>
+    ),
+  },
+  {
+    id: "social-icons", category: "ui", name: "Social Links Bar",
+    desc: "Hoverable social icons row with subtle lift and glow",
+    tags: ["social", "icons", "footer"],
+    emoji: "🔗",
+    previewStyle: { background: "#0a0b10" },
+    previewContent: (
+      <div style={{ padding: 16, display: "flex", gap: 10, justifyContent: "center" }}>
+        {["𝕏","in","▶","📸","💬"].map((s, idx) => (
+          <div key={idx} style={{ width: 34, height: 34, borderRadius: 10, border: "1px solid #1e2130", display: "flex", alignItems: "center", justifyContent: "center", color: "#6b7094", background: "#12141e" }}>{s}</div>
+        ))}
+      </div>
+    ),
+  },
+  {
+    id: "cookie-banner", category: "ui", name: "Cookie Banner",
+    desc: "Modern cookie consent bar with accept/decline buttons",
+    tags: ["cookie", "legal", "banner"],
+    emoji: "🍪",
+    previewStyle: { background: "#0a0b10" },
+    previewContent: (
+      <div style={{ padding: 16, display: "flex", flexDirection: "column", gap: 10 }}>
+        <div style={{ background: "#12141e", border: "1px solid #1e2130", borderRadius: 12, padding: 10, display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
+          <div style={{ fontSize: ".55rem", color: "#6b7094" }}>🍪 We use cookies to improve your experience.</div>
+          <div style={{ display: "flex", gap: 6 }}>
+            <div style={{ background: "#6c63ff", color: "#fff", fontSize: ".55rem", padding: "4px 10px", borderRadius: 8, fontWeight: 800 }}>Accept</div>
+            <div style={{ border: "1px solid #1e2130", color: "#6b7094", fontSize: ".55rem", padding: "4px 10px", borderRadius: 8 }}>Decline</div>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "loading-states", category: "ui", name: "Loading Animations",
+    desc: "Spinners and dots loaders for smoother perceived performance",
+    tags: ["loader", "spinner", "micro"],
+    emoji: "⏳",
+    previewStyle: { background: "#0a0b10" },
+    previewContent: (
+      <div style={{ padding: 16, display: "flex", alignItems: "center", justifyContent: "center", gap: 14 }}>
+        <div style={{ width: 18, height: 18, borderRadius: 999, border: "2px solid #1e2130", borderTopColor: "#6c63ff" }}></div>
+        <div style={{ display: "flex", gap: 5 }}>
+          {[0,1,2].map(i => (
+            <div key={i} style={{ width: 6, height: 6, borderRadius: 999, background: i === 1 ? "#ff6584" : i === 2 ? "#43e97b" : "#6c63ff" }}></div>
+          ))}
+        </div>
+      </div>
+    ),
+  },
 ];
 
 const CATEGORIES = [
   { id: "all", label: "🎨 All", count: COMPONENTS.length },
-  { id: "hero", label: "🚀 Hero", count: 2 },
-  { id: "shader", label: "✨ Shaders", count: 1 },
-  { id: "button", label: "🔘 Buttons", count: 1 },
-  { id: "text", label: "🔤 Text", count: 1 },
-  { id: "feature", label: "⚡ Features", count: 1 },
-  { id: "cta", label: "📣 CTA", count: 1 },
-  { id: "pricing", label: "💰 Pricing", count: 1 },
-  { id: "testimonial", label: "💬 Reviews", count: 1 },
-  { id: "aichat", label: "🤖 AI Chat", count: 1 },
-  { id: "navbar", label: "🧭 Navbar", count: 1 },
+  { id: "hero", label: "🚀 Hero", count: COMPONENTS.filter(c => c.category === "hero").length },
+  { id: "shader", label: "✨ Shaders", count: COMPONENTS.filter(c => c.category === "shader").length },
+  { id: "button", label: "🔘 Buttons", count: COMPONENTS.filter(c => c.category === "button").length },
+  { id: "text", label: "🔤 Text", count: COMPONENTS.filter(c => c.category === "text").length },
+  { id: "feature", label: "⚡ Features", count: COMPONENTS.filter(c => c.category === "feature").length },
+  { id: "cta", label: "📣 CTA", count: COMPONENTS.filter(c => c.category === "cta").length },
+  { id: "pricing", label: "💰 Pricing", count: COMPONENTS.filter(c => c.category === "pricing").length },
+  { id: "testimonial", label: "💬 Reviews", count: COMPONENTS.filter(c => c.category === "testimonial").length },
+  { id: "navbar", label: "🧭 Navbar", count: COMPONENTS.filter(c => c.category === "navbar").length },
+  { id: "section", label: "🧵 Sections", count: COMPONENTS.filter(c => c.category === "section").length },
+  { id: "layout", label: "🧩 Layouts", count: COMPONENTS.filter(c => c.category === "layout").length },
+  { id: "ui", label: "🧷 UI", count: COMPONENTS.filter(c => c.category === "ui").length },
+  { id: "data", label: "📊 Data", count: COMPONENTS.filter(c => c.category === "data").length },
+  { id: "aichat", label: "🤖 AI Chat", count: COMPONENTS.filter(c => c.category === "aichat").length },
 ];
 
 const PRICING = [
@@ -269,6 +425,31 @@ function ClassicHomePage({ onBuyNow }) {
   const [testimonials, setTestimonials] = useState([]);
   const [activeCategory, setActiveCategory] = useState("all");
   const [selected, setSelected] = useState(new Set());
+  const [query, setQuery] = useState("");
+  const [sort, setSort] = useState("default");
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("selected_components");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          const valid = parsed.filter((id) => COMPONENTS.some((c) => c.id === id));
+          setSelected(new Set(valid));
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("selected_components", JSON.stringify([...selected]));
+    } catch {
+      // ignore
+    }
+  }, [selected]);
 
   const defaultTestimonials = useMemo(() => ([
     { name: "Sarah M.", role: "Founder, NovaTech SaaS", feedback: "The animated hero they built transformed our landing page. Conversion rate went up 40% in the first month!", rating: 5, image: "https://ui-avatars.com/api/?name=Sarah+M&background=6c63ff&color=fff&size=80" },
@@ -288,7 +469,20 @@ function ClassicHomePage({ onBuyNow }) {
       }).catch(() => setTestimonials(defaultTestimonials));
   }, [defaultTestimonials]);
 
-  const visibleComponents = activeCategory === "all" ? COMPONENTS : COMPONENTS.filter(c => c.category === activeCategory);
+  const visibleComponents = useMemo(() => {
+    const byCategory = activeCategory === "all" ? COMPONENTS : COMPONENTS.filter((c) => c.category === activeCategory);
+    const q = query.trim().toLowerCase();
+    const byQuery = q
+      ? byCategory.filter((c) =>
+          `${c.name} ${c.desc} ${c.tags.join(" ")}`.toLowerCase().includes(q)
+        )
+      : byCategory;
+
+    if (sort === "az") return [...byQuery].sort((a, b) => a.name.localeCompare(b.name));
+    if (sort === "za") return [...byQuery].sort((a, b) => b.name.localeCompare(a.name));
+    if (sort === "category") return [...byQuery].sort((a, b) => a.category.localeCompare(b.category));
+    return byQuery;
+  }, [activeCategory, query, sort]);
 
   const toggleComponent = (id) => setSelected(prev => {
     const next = new Set(prev);
@@ -297,6 +491,21 @@ function ClassicHomePage({ onBuyNow }) {
   });
 
   const selectedNames = [...selected].map(id => COMPONENTS.find(c => c.id === id)?.name).filter(Boolean);
+
+  const exportSelectionText = useMemo(() => {
+    if (selectedNames.length === 0) return "";
+    return `Selected components (${selectedNames.length}):\n- ${selectedNames.join("\n- ")}`;
+  }, [selectedNames]);
+
+  const copySelection = async () => {
+    if (!exportSelectionText) return;
+    try {
+      await navigator.clipboard.writeText(exportSelectionText);
+      alert("Copied selection to clipboard");
+    } catch {
+      alert(exportSelectionText);
+    }
+  };
 
   return (
     <div className="bg-[#07080d] text-[#e8eaf2] w-full pt-16 font-dmsans overflow-x-hidden">
@@ -373,9 +582,33 @@ function ClassicHomePage({ onBuyNow }) {
                   <span className="w-3 h-3 rounded-full" style={{ background: "#febc2e" }}></span>
                   <span className="w-3 h-3 rounded-full" style={{ background: "#28c840" }}></span>
                 </div>
-                <span className="text-xs font-syne font-semibold" style={{ color: "#6b7094" }}>Component Preview</span>
+                <div className="hidden sm:flex items-center gap-2">
+                  <div className="relative">
+                    <input
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      placeholder="Search components…"
+                      className="text-xs px-3 py-1.5 rounded-lg focus:outline-none"
+                      style={{ background: "#0f1118", border: "1px solid #1e2130", color: "#e8eaf2", width: 220 }}
+                    />
+                  </div>
+                  <select
+                    value={sort}
+                    onChange={(e) => setSort(e.target.value)}
+                    className="text-xs px-2.5 py-1.5 rounded-lg focus:outline-none"
+                    style={{ background: "#0f1118", border: "1px solid #1e2130", color: "#6b7094" }}
+                  >
+                    <option value="default">Sort</option>
+                    <option value="az">A → Z</option>
+                    <option value="za">Z → A</option>
+                    <option value="category">Category</option>
+                  </select>
+                </div>
                 <div className="flex gap-2">
                   <button onClick={() => setSelected(new Set())} className="text-xs px-3 py-1 rounded-lg transition-colors" style={{ background: "#0f1118", border: "1px solid #1e2130", color: "#6b7094" }}>Clear</button>
+                  <button onClick={copySelection} className="hidden sm:inline-flex text-xs px-3 py-1 rounded-lg transition-colors" style={{ background: "#0f1118", border: "1px solid #1e2130", color: "#6b7094" }}>
+                    Copy
+                  </button>
                   <button onClick={() => setShowQuote(true)} className="text-xs px-3 py-1 rounded-lg font-semibold transition-colors" style={{ border: "1px solid #6c63ff", color: "#6c63ff", background: "transparent" }}>Order Now →</button>
                 </div>
               </div>
