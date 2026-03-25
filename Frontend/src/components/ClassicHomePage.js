@@ -339,7 +339,7 @@ function ClassicHomePage({ onBuyNow }) {
 
       {/* ─── COMPONENT LIBRARY ─── */}
       <section id="builder" ref={builderRef}>
-        <div className="max-w-[1160px] mx-auto w-full">
+        <div className="section-inner">
           <div className="section-label">Component Library</div>
           <h2 className="section-title">Pick Your Style</h2>
           <p className="section-desc">Click any component you want for your website. Mix and match — we build exactly what you select.</p>
@@ -461,7 +461,7 @@ function ClassicHomePage({ onBuyNow }) {
 
       {/* ─── HOW IT WORKS ─── */}
       <section style={{ background: "#0f1118", borderTop: "1px solid #1e2130" }}>
-        <div className="max-w-[1160px] mx-auto w-full">
+        <div className="section-inner">
           <div className="section-label">The Process</div>
           <h2 className="section-title">How It Works</h2>
           <p className="section-desc">From selection to launch in 4 simple steps.</p>
@@ -485,7 +485,7 @@ function ClassicHomePage({ onBuyNow }) {
 
       {/* ─── PRICING ─── */}
       <section id="pricing" style={{ background: "#07080d" }}>
-        <div className="max-w-[1160px] mx-auto w-full">
+        <div className="section-inner">
           <div className="section-label">Pricing Plans</div>
           <h2 className="section-title">Simple, Transparent Pricing</h2>
           <p className="section-desc">No hidden fees. Choose the plan that fits your needs.</p>
@@ -537,7 +537,7 @@ function ClassicHomePage({ onBuyNow }) {
 
       {/* ─── TESTIMONIALS ─── */}
       <section style={{ background: "#0f1118", borderTop: "1px solid #1e2130" }}>
-        <div className="max-w-[1160px] mx-auto w-full">
+        <div className="section-inner">
           <div className="section-label">What Clients Say</div>
           <h2 className="section-title">Loved by Businesses</h2>
           <p className="section-desc">Real feedback from business owners who trusted us to build their digital presence.</p>
@@ -569,7 +569,7 @@ function ClassicHomePage({ onBuyNow }) {
 
       {/* ─── CTA BANNER ─── */}
       <section style={{ background: "#07080d" }}>
-        <div className="max-w-[1160px] mx-auto w-full text-center">
+        <div className="section-inner text-center">
           <div className="rounded-3xl p-6 sm:p-8 md:p-12" style={{ background: "linear-gradient(135deg,rgba(108,99,255,.18),rgba(255,101,132,.12))", border: "1px solid rgba(108,99,255,.3)" }}>
             <h2 className="section-title" style={{ marginBottom: 12 }}>Ready to Build Something Incredible?</h2>
             <p className="text-base sm:text-lg mb-8 max-w-xl mx-auto" style={{ color: "#6b7094" }}>

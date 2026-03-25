@@ -8,12 +8,14 @@ const CartContext = createContext();
 // Use the correct backend API URL from config
 const CART_API_BASE = API_BASE_URL_EXPORT;
 
-// Debug: Log the API base URL being used
-console.log('🔗 CartContext API Configuration:', {
-  CART_API_BASE,
-  environment: process.env.NODE_ENV,
-  envApiUrl: process.env.REACT_APP_API_URL
-});
+const __DEV__ = process.env.NODE_ENV !== 'production';
+if (__DEV__) {
+  console.log('🔗 CartContext API Configuration:', {
+    CART_API_BASE,
+    environment: process.env.NODE_ENV,
+    envApiUrl: process.env.REACT_APP_API_URL
+  });
+}
 
 export function CartProvider({ children }) {
   // Initialize items from localStorage to prevent empty cart flash on refresh
@@ -48,49 +50,47 @@ export function CartProvider({ children }) {
     try {
       setLoading(true);
       setError(null);
-      console.log('📦 LOADING CART - User:', userId);
-      console.log('🔗 API URL:', `${CART_API_BASE}/api/cart/${userId}`);
+      if (__DEV__) {
+        console.log('📦 LOADING CART - User:', userId);
+        console.log('🔗 API URL:', `${CART_API_BASE}/api/cart/${userId}`);
+      }
       
       const response = await axios.get(`${CART_API_BASE}/api/cart/${userId}`);
-      
-      console.log('✅ Cart API Response:', response.data);
-      console.log('📊 Response status:', response.status);
+      if (__DEV__) console.log('📊 Cart response status:', response.status);
       
       if (response.data.success && response.data.cart) {
         const cartItems = response.data.cart.items || [];
         setItems(cartItems);
-        console.log(`✅ CART LOADED SUCCESSFULLY: ${cartItems.length} items`);
-        if (cartItems.length > 0) {
-          console.log('📦 Cart items:', cartItems.map(item => `${item.title} (qty: ${item.quantity})`).join(', '));
-        }
+        if (__DEV__) console.log(`✅ CART LOADED: ${cartItems.length} items`);
       } else {
-        console.warn('⚠️ Cart response not successful or no cart data');
+        if (__DEV__) console.warn('⚠️ Cart response not successful or no cart data');
         setItems([]);
       }
     } catch (err) {
       console.error("❌ LOAD CART ERROR:", err);
-      console.error("❌ Error message:", err.message);
-      console.error("❌ Error response:", err.response?.data);
-      console.error("❌ Error status:", err.response?.status);
+      if (__DEV__) {
+        console.error("❌ Error message:", err.message);
+        console.error("❌ Error status:", err.response?.status);
+      }
       
       // Don't clear items on error - keep existing cart
       // Only show error if it's a real problem
       if (err.response?.status === 404 || err.response?.status === 500) {
-        console.log('⚠️ Cart not found or server error - initializing empty cart');
+        if (__DEV__) console.log('⚠️ Cart not found or server error - initializing empty cart');
         setItems([]);
       } else {
-        console.log('⚠️ Network error - keeping existing cart items');
+        if (__DEV__) console.log('⚠️ Network error - keeping existing cart items');
       }
     } finally {
       setLoading(false);
-      console.log('📦 Cart loading finished');
+      if (__DEV__) console.log('📦 Cart loading finished');
     }
   }, []);
 
   // Get current user and listen for auth changes
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
-      console.log('🔐 Auth state changed:', firebaseUser ? 'User logged in' : 'User logged out');
+      if (__DEV__) console.log('🔐 Auth state changed:', firebaseUser ? 'User logged in' : 'User logged out');
       
       if (firebaseUser) {
         try {
@@ -104,12 +104,12 @@ export function CartProvider({ children }) {
             phoneNumber: firebaseUser.phoneNumber
           };
           
-          console.log('👤 User authenticated:', currentUser.userId);
+          if (__DEV__) console.log('👤 User authenticated:', currentUser.userId);
           setUser(currentUser);
           
           // Load cart immediately after user is set
           if (currentUser.userId) {
-            console.log('📦 Loading cart for user:', currentUser.userId);
+            if (__DEV__) console.log('📦 Loading cart for user:', currentUser.userId);
             await loadCart(currentUser.userId);
           }
         } catch (err) {
@@ -118,7 +118,7 @@ export function CartProvider({ children }) {
           setItems([]);
         }
       } else {
-        console.log('👤 No user authenticated - clearing cart');
+        if (__DEV__) console.log('👤 No user authenticated - clearing cart');
         setUser(null);
         setItems([]);
         setError(null);
@@ -145,8 +145,7 @@ export function CartProvider({ children }) {
     try {
       setLoading(true);
       setError(null);
-      console.log('🛒 ENHANCED ADD TO CART:', product);
-      console.log('👤 User Info:', user);
+      if (__DEV__) console.log('🛒 ADD TO CART:', { productId: product?.id, quantity });
       
       // Prepare complete product details
       const productDetails = {
@@ -166,8 +165,10 @@ export function CartProvider({ children }) {
         phone: user.phoneNumber || null
       };
       
-      console.log('📦 Sending product details:', productDetails);
-      console.log('👤 Sending user details:', userDetails);
+      if (__DEV__) {
+        console.log('📦 Sending product details:', productDetails);
+        console.log('👤 Sending user details:', userDetails);
+      }
       
       const response = await axios.post(`${CART_API_BASE}/api/cart/add`, {
         userId: user.userId,
@@ -176,13 +177,11 @@ export function CartProvider({ children }) {
         userDetails
       });
       
-      console.log('✅ Add response:', response.data);
+      if (__DEV__) console.log('✅ Add to cart response success:', !!response.data?.success);
       
       if (response.data.success && response.data.cart) {
         setItems(response.data.cart.items || []);
-        console.log(`🎉 Added ${product.title} to cart!`);
-        console.log(`📊 Cart Summary:`, response.data.summary);
-        console.log(`💾 Saved to MongoDB carts collection`);
+        if (__DEV__) console.log(`🎉 Added ${product.title} to cart`);
         return true;
       } else {
         setError("Failed to add item");
@@ -190,9 +189,10 @@ export function CartProvider({ children }) {
       }
     } catch (err) {
       console.error("❌ Add error:", err);
-      console.error("❌ Error details:", err.response?.data || err.message);
-      console.error("❌ Request URL:", `${CART_API_BASE}/api/cart/add`);
-      console.error("❌ Request config:", err.config);
+      if (__DEV__) {
+        console.error("❌ Error details:", err.response?.data || err.message);
+        console.error("❌ Request URL:", `${CART_API_BASE}/api/cart/add`);
+      }
       
       let errorMessage = "Could not add item to cart";
       

@@ -44,11 +44,11 @@ export default function SideNav({ onHomeClick, onCartClick, onFiltersClick, onDe
             animate={{ x: 0 }}
             exit={{ x: -280 }}
             transition={{ type: "spring", stiffness: 280, damping: 28 }}
-            className="w-56 h-full bg-[#0f1118] border-r border-[#1e2130] p-4"
+            className="w-56 h-full bg-[#0f1118] border-r border-[#1e2130] p-4 overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#1e2130]">
-              <span className="font-syne font-bold text-[#6c63ff] text-lg">Anne Menu</span>
+              <span className="font-syne font-bold text-[#6c63ff] text-lg">Menu</span>
               <button onClick={() => setOpen(false)} className="text-[#6b7094] hover:text-[#e8eaf2]">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -72,7 +72,7 @@ export default function SideNav({ onHomeClick, onCartClick, onFiltersClick, onDe
       )}
 
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex md:flex-col w-12 shrink-0 bg-[#0f1118] border-r border-[#1e2130] sticky top-16 h-[calc(100vh-64px)] pt-4 overflow-y-auto">
+      <aside className="hidden md:flex md:flex-col w-12 shrink-0 bg-[#0f1118] border-r border-[#1e2130] sticky top-16 h-[calc(100vh-64px)] pt-4 overflow-y-auto overflow-x-hidden">
         <div className="flex flex-col items-center gap-1 px-1">
           {items.map((item) => (
             <motion.button

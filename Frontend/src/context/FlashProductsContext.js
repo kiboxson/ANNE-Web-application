@@ -13,24 +13,18 @@ export function FlashProductsProvider({ children }) {
     let cancelled = false;
     (async () => {
       try {
-        console.log('🔄 SIMPLE FLASH PRODUCTS LOAD - Loading from backend...');
         const res = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.FLASH_PRODUCTS));
         const data = await res.json();
-        
-        console.log('⚡ Simple flash products response:', data);
         
         if (!cancelled) {
           // Handle new API response format
           if (data.success && Array.isArray(data.flashProducts)) {
             setFlashProducts(data.flashProducts);
-            console.log(`⚡ Loaded ${data.flashProducts.length} flash products successfully`);
           } else if (Array.isArray(data)) {
             // Fallback for old format
             setFlashProducts(data);
-            console.log(`⚡ Loaded ${data.length} flash products (legacy format)`);
           } else {
             setFlashProducts([]);
-            console.log('⚡ No flash products loaded, using empty array');
           }
         }
       } catch (err) {
@@ -44,20 +38,16 @@ export function FlashProductsProvider({ children }) {
   // Function to refresh flash products from backend
   const refreshFlashProducts = useCallback(async () => {
     try {
-      console.log('🔄 SIMPLE FLASH PRODUCTS REFRESH');
       const res = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.FLASH_PRODUCTS));
       const data = await res.json();
       
       // Handle new API response format
       if (data.success && Array.isArray(data.flashProducts)) {
         setFlashProducts(data.flashProducts);
-        console.log(`⚡ Refreshed ${data.flashProducts.length} flash products successfully`);
       } else if (Array.isArray(data)) {
         setFlashProducts(data);
-        console.log(`⚡ Refreshed ${data.length} flash products (legacy format)`);
       } else {
         setFlashProducts([]);
-        console.log('⚡ No flash products refreshed, using empty array');
       }
     } catch (err) {
       console.error('❌ Simple flash products refresh error:', err);
@@ -83,8 +73,6 @@ export function FlashProductsProvider({ children }) {
         endsAt: endsAt || null,
       };
 
-      console.log('⚡ Adding flash product via context:', p);
-
       // Persist to backend
       const res = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.FLASH_PRODUCTS), {
         method: 'POST',
@@ -96,13 +84,10 @@ export function FlashProductsProvider({ children }) {
         throw new Error(err.error || `Failed to save flash product: ${res.status}`);
       }
       const saved = await res.json();
-      console.log('⚡ Flash product saved to backend:', saved);
       
       // Update local state with the new flash product
       setFlashProducts((prev) => {
-        const updated = [...prev, saved];
-        console.log('⚡ Updated flash products state:', updated.length, 'products');
-        return updated;
+        return [...prev, saved];
       });
 
       // Also refresh from backend to ensure consistency across views (home/admin)

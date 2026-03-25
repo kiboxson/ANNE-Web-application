@@ -86,30 +86,31 @@ function AppContent({ user, isAdmin, setUser }) {
         }}
       />
 
-      <div className="flex">
-        <SideNav
-          onHomeClick={() => setView("home")}
-          onCartClick={() => setView("cart")}
-          onFiltersClick={() => setFiltersOpen(true)}
-          onDealsClick={() => {
-            // Reset filters so Flash Sale items aren't hidden
-            setSearchQuery("");
-            setSelectedCategories([]);
-            setPriceRange([0, 0]);
-            setView("home");
-            setTimeout(() => {
-              if (dealsRef.current) {
-                dealsRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
-              }
-            }, 0);
-          }}
-          onProfileClick={() => setView("profile")}
-          onOrdersClick={() => setView("orders")}
-          onAdminClick={() => setView("admin")}
-          onCommunityClick={() => setView("community")}
-          isAdmin={isAdmin}
-        />
-        <div className="flex-1 min-h-screen">
+      <div className="w-full">
+        <div className="flex w-full">
+          <SideNav
+            onHomeClick={() => setView("home")}
+            onCartClick={() => setView("cart")}
+            onFiltersClick={() => setFiltersOpen(true)}
+            onDealsClick={() => {
+              // Reset filters so Flash Sale items aren't hidden
+              setSearchQuery("");
+              setSelectedCategories([]);
+              setPriceRange([0, 0]);
+              setView("home");
+              setTimeout(() => {
+                if (dealsRef.current) {
+                  dealsRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+              }, 0);
+            }}
+            onProfileClick={() => setView("profile")}
+            onOrdersClick={() => setView("orders")}
+            onAdminClick={() => setView("admin")}
+            onCommunityClick={() => setView("community")}
+            isAdmin={isAdmin}
+          />
+          <div className="flex-1 min-h-screen w-full">
           {view === "cart" && (
             <div className="w-full">
               <CartPage onBack={() => setView("home")} />
@@ -160,6 +161,7 @@ function AppContent({ user, isAdmin, setUser }) {
               onBuyNow={() => setView("cart")}
             />
           )}
+          </div>
         </div>
       </div>
 

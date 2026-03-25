@@ -42,13 +42,7 @@ function ClassicNavbar({ user, onLoginClick, onSignupClick, onLogoutClick, searc
 
           {/* Logo */}
           <div className="flex items-center gap-2 cursor-pointer shrink-0" onClick={() => window.scrollTo(0, 0)}>
-            <img src={img} alt="Anne Logo" className="w-8 h-8 object-contain" />
-            <span className="font-syne font-extrabold text-xl" style={{
-              background: 'linear-gradient(135deg, #6c63ff, #ff6584)',
-              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
-            }}>
-              Anne
-            </span>
+            <img src={img} alt="Logo" className="w-8 h-8 object-contain" />
           </div>
 
           {/* Center nav links — desktop only */}

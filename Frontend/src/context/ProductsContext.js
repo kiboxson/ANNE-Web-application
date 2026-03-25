@@ -14,24 +14,18 @@ export function ProductsProvider({ children }) {
     let cancelled = false;
     (async () => {
       try {
-        console.log('🔄 SIMPLE PRODUCTS LOAD - Loading from backend...');
         const res = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.PRODUCTS));
         const data = await res.json();
-        
-        console.log('📦 Simple products response:', data);
-        
+
         if (!cancelled) {
           // Handle new API response format
           if (data.success && Array.isArray(data.products)) {
             setProducts(data.products);
-            console.log(`📦 Loaded ${data.products.length} products successfully`);
           } else if (Array.isArray(data)) {
             // Fallback for old format
             setProducts(data);
-            console.log(`📦 Loaded ${data.length} products (legacy format)`);
           } else {
             setProducts([]);
-            console.log('📦 No products loaded, using empty array');
           }
         }
       } catch (err) {
@@ -45,20 +39,16 @@ export function ProductsProvider({ children }) {
   // Function to refresh products from backend
   const refreshProducts = useCallback(async () => {
     try {
-      console.log('🔄 SIMPLE PRODUCTS REFRESH');
       const res = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.PRODUCTS));
       const data = await res.json();
       
       // Handle new API response format
       if (data.success && Array.isArray(data.products)) {
         setProducts(data.products);
-        console.log(`📦 Refreshed ${data.products.length} products successfully`);
       } else if (Array.isArray(data)) {
         setProducts(data);
-        console.log(`📦 Refreshed ${data.length} products (legacy format)`);
       } else {
         setProducts([]);
-        console.log('📦 No products refreshed, using empty array');
       }
     } catch (err) {
       console.error('❌ Simple products refresh error:', err);
@@ -125,12 +115,10 @@ export function ProductsProvider({ children }) {
         throw new Error(err.error || `Failed to save product: ${res.status}`);
       }
       const saved = await res.json();
-      console.log('Product saved to backend:', saved);
       
       // Update local state with the new product
       setProducts((prev) => {
         const updated = [...prev, saved];
-        console.log('Updated products state:', updated.length, 'products');
         return updated;
       });
       
