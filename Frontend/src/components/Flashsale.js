@@ -4,9 +4,7 @@ import { useCart } from "../context/CartContext";
 import { useFlashProducts } from "../context/FlashProductsContext";
 import { getCurrentUser } from "../services/auth";
 
-// Use stable external image URLs instead of missing local assets
-
-// ⏳ Countdown Timer Component
+// ⏳ Countdown Timer
 function CountdownTimer({ endTime }) {
   const [timeLeft, setTimeLeft] = useState("");
 
@@ -14,10 +12,9 @@ function CountdownTimer({ endTime }) {
     const interval = setInterval(() => {
       const now = new Date();
       const diff = endTime - now;
-
       if (diff <= 0) {
         clearInterval(interval);
-        setTimeLeft("Sale Ended");
+        setTimeLeft("Offer Expired");
       } else {
         const hours = Math.floor(diff / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -25,215 +22,145 @@ function CountdownTimer({ endTime }) {
         setTimeLeft(`${hours}h ${minutes}m ${seconds}s`);
       }
     }, 1000);
-
     return () => clearInterval(interval);
   }, [endTime]);
 
   return (
-    <span className="text-lg font-bold text-red-600 bg-red-100 px-3 py-1 rounded-lg">
+    <span className="text-sm font-bold" style={{ color: '#ff6584', background: 'rgba(255,101,132,.1)', padding: '4px 12px', borderRadius: '8px', border: '1px solid rgba(255,101,132,.3)' }}>
       ⏰ {timeLeft}
     </span>
   );
 }
 
-// 🛒 Product Card
-function FlashSaleProduct({ image, title, price, stock, variants, onGrabDeal, isLoggedIn }) {
+// 🔥 Flash Deal Card
+function FlashDealCard({ image, title, price, stock, variants, onGrabDeal, isLoggedIn }) {
   return (
     <motion.div
       variants={variants}
-      className="bg-white/5 rounded-xl shadow-md p-2 sm:p-3 cursor-pointer flex flex-col w-full"
-      whileHover={{ scale: 1.02, boxShadow: "0 10px 20px rgba(0,0,0,0.12)" }}
-      whileTap={{ scale: 0.98 }}
+      className="prod-card cursor-pointer"
+      whileHover={{ y: -4 }}
       transition={{ type: "spring", stiffness: 200 }}
     >
-      {/* Image */}
-      <motion.img
-        src={image}
-        alt={title}
-        className="w-full h-20 sm:h-24 lg:h-28 object-cover rounded-lg mb-2"
-        whileHover={{ rotate: 1, scale: 1.02 }}
-        transition={{ duration: 0.3 }}
-      />
-
-      {/* Title */}
-      <h2 className="text-xs sm:text-sm font-semibold text-gray-800 truncate">{title}</h2>
-
-      {/* Price */}
-      <p className="text-red-600 font-bold text-sm sm:text-base mb-1">${price}</p>
-
-      {/* Stock Progress */}
-      <div className="w-full bg-gray-200 rounded-full h-1.5 mb-2">
-        <div
-          className="bg-red-500 h-1.5 rounded-full"
-          style={{ width: `${stock}%` }}
-        ></div>
+      <div className="prod-image" style={{ height: '160px' }}>
+        {image ? (
+          <motion.img src={image} alt={title} whileHover={{ scale: 1.08 }} transition={{ duration: 0.4 }} />
+        ) : (
+          <div className="flex flex-col items-center justify-center w-full h-full gap-2" style={{ background: 'rgba(255,101,132,.08)' }}>
+            <span className="text-3xl">⚡</span>
+            <span className="text-xs font-syne font-bold uppercase tracking-widest" style={{ color: '#ff6584' }}>Flash Offer</span>
+          </div>
+        )}
+        <div className="prod-badge" style={{ background: 'rgba(255,101,132,.9)' }}>DEAL ⚡</div>
       </div>
-      <p className="text-xs text-gray-500 mb-2">{stock}% Stock Left</p>
 
-      {/* Button */}
-      <motion.button
-        className={`mt-auto py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg shadow-md ${
-          isLoggedIn 
-            ? "bg-red-600 text-white hover:bg-red-700" 
-            : "bg-gray-400 text-gray-200 cursor-not-allowed"
-        }`}
-        whileHover={isLoggedIn ? { scale: 1.02 } : {}}
-        whileTap={isLoggedIn ? { scale: 0.98 } : {}}
-        onClick={() => {
-          if (isLoggedIn) {
-            onGrabDeal && onGrabDeal();
-          } else {
-            alert("Please sign in to grab deals");
-          }
-        }}
-        disabled={!isLoggedIn}
-      >
-        {isLoggedIn ? "Grab Deal" : "Sign in to Grab"}
-      </motion.button>
+      <div className="prod-info">
+        <div className="prod-cat" style={{ color: '#ff6584' }}>Limited Time Offer</div>
+        <div className="prod-name">{title}</div>
+        <div className="prod-price" style={{ color: '#ff6584' }}>${price}</div>
+
+        <div className="w-full rounded-full h-1.5 mb-1" style={{ background: '#1e2130' }}>
+          <div className="h-1.5 rounded-full" style={{ width: `${stock}%`, background: '#ff6584' }}></div>
+        </div>
+        <p className="text-xs mb-3" style={{ color: '#6b7094' }}>{stock}% Slots Left</p>
+
+        <button
+          className="add-to-cart-btn"
+          style={isLoggedIn ? { borderColor: 'rgba(255,101,132,.4)', color: '#ff6584' } : { opacity: 0.5, cursor: 'not-allowed' }}
+          onClick={() => {
+            if (isLoggedIn) onGrabDeal && onGrabDeal();
+            else alert("Please sign in to grab this deal");
+          }}
+          disabled={!isLoggedIn}
+        >
+          {isLoggedIn ? "⚡ Grab This Deal" : "Sign in to Grab"}
+        </button>
+      </div>
     </motion.div>
   );
 }
 
-// ⚡ Flash Sale Page
-export default function FlashSalePage({ searchQuery = "", selectedCategories = [], priceRange = [0, 1000], onGrabDeal = () => {} }) {
+// ⚡ Flash Deals Section
+export default function FlashSalePage({ searchQuery = "", selectedCategories = [], priceRange = [0, 100000], onGrabDeal = () => {} }) {
   const { addItem } = useCart();
-  const { flashProducts: items, refreshFlashProducts } = useFlashProducts(); // Use FlashProductsContext instead of local state
+  const { flashProducts: items, refreshFlashProducts } = useFlashProducts();
   const currentUser = getCurrentUser();
   const isLoggedIn = !!currentUser?.userId;
 
-  // Debug: Log flash products when they change
-  useEffect(() => {
-    console.log('🔥 Flash Sale Component - Mounted/Updated');
-    console.log('🔥 Flash Sale - Products from context:', items?.length || 0, 'products');
-    console.log('🔥 Flash Sale - Raw items data:', items);
-    console.log('🔥 Flash Sale - Items type:', typeof items, Array.isArray(items));
-  }, [items]);
-
-  // Debug: Log component mount
-  useEffect(() => {
-    console.log('🔥 Flash Sale Component - MOUNTED');
-    return () => console.log('🔥 Flash Sale Component - UNMOUNTED');
-  }, []);
-
-  // Ensure latest flash products when visiting the Flash Sale section
   useEffect(() => {
     (async () => {
-      try {
-        await refreshFlashProducts();
-        console.log('🔄 Flash Sale - refreshed products on mount');
-      } catch (e) {
-        console.error('❌ Flash Sale - failed to refresh on mount', e);
-      }
+      try { await refreshFlashProducts(); } catch (e) {}
     })();
-    // Only run once on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Sale ending 2 hours from now
   const saleEnd = new Date();
   saleEnd.setHours(saleEnd.getHours() + 2);
 
   const container = {
     hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.06, delayChildren: 0.1 }
-    }
+    show: { opacity: 1, transition: { staggerChildren: 0.06, delayChildren: 0.1 } }
   };
-
   const item = {
     hidden: { opacity: 0, y: 14 },
     show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
   };
 
-  // Filter by search query - ensure items is an array
   const safeItems = Array.isArray(items) ? items : [];
   const q = searchQuery ? String(searchQuery).trim().toLowerCase() : "";
   const selCats = Array.isArray(selectedCategories) ? selectedCategories : [];
-  let [minPrice, maxPrice] = priceRange;
-  // Normalize price bounds similar to Products: non-positive max => Infinity; swap if min>max
-  const effectiveMin = Number.isFinite(minPrice) ? Math.max(0, minPrice) : 0;
-  let effectiveMax = Number.isFinite(maxPrice) ? maxPrice : Infinity;
-  if (!effectiveMax || effectiveMax <= 0) effectiveMax = Infinity;
-  let minB = effectiveMin, maxB = effectiveMax;
-  if (minB > maxB) {
-    const t = minB; minB = maxB; maxB = t;
-  }
-  const hasCategoryFilter = selCats.length > 0;
-  // Do not constrain by price when the default range [0, 1000] is active
-  const isDefaultPriceRange = Array.isArray(priceRange) && Number(priceRange[0]) === 0 && Number(priceRange[1]) === 1000;
+
   const filtered = safeItems.filter((p) => {
-    const title = (p.title || "");
-    const category = p.category || title;
-    const price = Number(p.price) || 0;
-    const matchesQuery = q ? title.toLowerCase().includes(q) : true;
-    const matchesCategory = hasCategoryFilter ? selCats.includes(category) : true;
-    const matchesPrice = isDefaultPriceRange ? true : (price >= minB && price <= maxB);
-    return matchesQuery && matchesCategory && matchesPrice;
+    const matchesQuery = q ? (p.title || "").toLowerCase().includes(q) : true;
+    const matchesCategory = selCats.length > 0 ? selCats.includes(p.category || p.title) : true;
+    return matchesQuery && matchesCategory;
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-10">
-      {/* Header */}
-      <motion.div className="flex justify-between items-center mb-6"
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      <motion.div
+        className="flex justify-between items-center mb-6"
         initial={{ opacity: 0, y: -10 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
       >
-        <h1 className="text-2xl font-bold text-red-600">🔥 Flash Sale</h1>
+        <h2 className="text-2xl font-syne font-bold" style={{ color: '#ff6584' }}>⚡ Limited Time Deals</h2>
         <CountdownTimer endTime={saleEnd} />
       </motion.div>
 
-      {/* Products Grid */}
       <motion.div
-        className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 sm:gap-3 lg:gap-4"
+        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
         variants={container}
         initial="hidden"
         animate="show"
-        whileInView="show"
         viewport={{ amount: 0.2 }}
-        key={`fs-${selCats.sort().join(',')}-${q}-${minB}-${maxB}`}
+        key={`fs-${selCats.sort().join(',')}-${q}`}
       >
         {safeItems.length === 0 ? (
-          <div className="col-span-full text-center text-gray-500 py-8">
-            No flash sale items available.
+          <div className="col-span-full text-center py-10" style={{ color: '#6b7094' }}>
+            No flash deals available right now. Check back soon!
           </div>
         ) : filtered.length === 0 ? (
-          <div className="col-span-full text-center text-gray-500 py-8">
-            No flash sale items found{q ? ` for "${searchQuery}"` : ""}.
+          <div className="col-span-full text-center py-10" style={{ color: '#6b7094' }}>
+            No deals found{q ? ` for "${searchQuery}"` : ""}.
           </div>
         ) : (
           filtered.map((p) => (
-            <FlashSaleProduct
+            <FlashDealCard
               key={p.id || `${p.title}-${p.price}`}
               variants={item}
               image={p.image}
               title={p.title}
               price={p.price}
-              stock={p.stock}
+              stock={p.stock || 80}
               isLoggedIn={isLoggedIn}
               onGrabDeal={async () => {
                 try {
-                  const id = p.id || p.title;
-                  console.log('🛒 Adding flash sale item to cart:', p);
-                  const success = await addItem({ 
-                    id, 
-                    title: p.title, 
-                    price: Number(p.price), 
-                    image: p.image 
-                  }, 1);
-                  
-                  if (success) {
-                    console.log('✅ Flash sale item added to cart successfully');
-                    onGrabDeal();
-                  } else {
-                    console.log('❌ Failed to add flash sale item to cart');
-                    alert('❌ Failed to add item to cart. Please try again.');
-                  }
+                  const success = await addItem({ id: p.id || p.title, title: p.title, price: Number(p.price), image: p.image }, 1);
+                  if (success) onGrabDeal();
+                  else alert("❌ Failed to add deal. Please try again.");
                 } catch (error) {
-                  console.error('❌ Error adding flash sale item to cart:', error);
-                  alert('Failed to add item to cart: ' + error.message);
+                  alert("Failed to add: " + error.message);
                 }
               }}
             />

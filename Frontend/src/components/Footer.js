@@ -3,70 +3,61 @@ import { Facebook, Twitter, Instagram, Github } from "lucide-react";
 
 function Footer({ onCommunityClick }) {
   return (
-    <footer className="bg-gray-900 text-gray-300 py-10 mt-10">
+    <footer style={{ background: '#0f1118', borderTop: '1px solid #1e2130', color: '#6b7094' }} className="py-12 mt-0">
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8">
         
-        {/* Brand Section */}
-        <div>
-          <h2 className="text-2xl font-bold text-white">ANNE</h2>
-          <p className="mt-3 text-sm">
-            Your one-stop shop for everything you love. Quality products, fast delivery.
+        {/* Brand */}
+        <div className="md:col-span-2">
+          <h2 className="text-2xl font-syne font-extrabold text-white mb-3">Kiyu</h2>
+          <p className="text-sm leading-relaxed max-w-xs">
+            We build fast, beautiful, conversion-focused websites for businesses and creators worldwide. From idea to launch in days.
           </p>
-        </div>
-
-        {/* Links */}
-        <div>
-          <h3 className="text-lg font-semibold text-white mb-3">Quick Links</h3>
-          <ul className="space-y-2 text-sm">
-            <li><a href="/" className="hover:text-white">Home</a></li>
-            <li><a href="/products" className="hover:text-white">Products</a></li>
-            <li><a href="/flashsale" className="hover:text-white">Flash Sale</a></li>
-            <li>
-              <button 
-                onClick={onCommunityClick}
-                className="hover:text-white text-left"
-              >
-                Community
-              </button>
-            </li>
-            <li><a href="/contact" className="hover:text-white">Contact</a></li>
-          </ul>
-        </div>
-
-        {/* Support */}
-        <div>
-          <h3 className="text-lg font-semibold text-white mb-3">Support</h3>
-          <ul className="space-y-2 text-sm">
-            <li><a href="/faq" className="hover:text-white">FAQ</a></li>
-            <li><a href="/shipping" className="hover:text-white">Shipping & Returns</a></li>
-            <li><a href="/privacy" className="hover:text-white">Privacy Policy</a></li>
-            <li><a href="/terms" className="hover:text-white">Terms & Conditions</a></li>
-          </ul>
-        </div>
-
-        {/* Social Media */}
-        <div>
-          <h3 className="text-lg font-semibold text-white mb-3">Follow Us</h3>
-          <div className="flex space-x-4">
-            <a href="https://facebook.com" target="_blank" rel="noreferrer">
-              <Facebook className="w-5 h-5 hover:text-white" />
+          <div className="flex gap-4 mt-5">
+            <a href="https://facebook.com" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
+              <Facebook className="w-5 h-5" />
             </a>
-            <a href="https://twitter.com" target="_blank" rel="noreferrer">
-              <Twitter className="w-5 h-5 hover:text-white" />
+            <a href="https://twitter.com" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
+              <Twitter className="w-5 h-5" />
             </a>
-            <a href="https://www.instagram.com/kiboxson/" target="_blank" rel="noreferrer">
-              <Instagram className="w-5 h-5 hover:text-white" />
+            <a href="https://www.instagram.com/kiboxson/" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
+              <Instagram className="w-5 h-5" />
             </a>
-            <a href="https://github.com" target="_blank" rel="noreferrer">
-              <Github className="w-5 h-5 hover:text-white" />
+            <a href="https://github.com/kiboxson" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
+              <Github className="w-5 h-5" />
             </a>
           </div>
         </div>
+
+        {/* Services */}
+        <div>
+          <h3 className="text-sm font-syne font-bold text-white uppercase tracking-widest mb-4">Services</h3>
+          <ul className="space-y-2 text-sm">
+            <li><a href="#packages" className="hover:text-white transition-colors">Portfolio Websites</a></li>
+            <li><a href="#packages" className="hover:text-white transition-colors">E-Commerce Stores</a></li>
+            <li><a href="#packages" className="hover:text-white transition-colors">Business Websites</a></li>
+            <li><a href="#packages" className="hover:text-white transition-colors">Blog & Content Sites</a></li>
+            <li><a href="#packages" className="hover:text-white transition-colors">Custom Development</a></li>
+          </ul>
+        </div>
+
+        {/* Company */}
+        <div>
+          <h3 className="text-sm font-syne font-bold text-white uppercase tracking-widest mb-4">Company</h3>
+          <ul className="space-y-2 text-sm">
+            <li><a href="#why" className="hover:text-white transition-colors">About Us</a></li>
+            <li><a href="#process" className="hover:text-white transition-colors">Our Process</a></li>
+            <li>
+              <button onClick={onCommunityClick} className="hover:text-white transition-colors text-left">Community</button>
+            </li>
+            <li><a href="mailto:contact@kiyu.dev" className="hover:text-white transition-colors">Contact</a></li>
+            <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
+          </ul>
+        </div>
       </div>
 
-      {/* Bottom Bar */}
-      <div className="border-t border-gray-700 mt-8 pt-6 text-center text-sm">
-        © {new Date().getFullYear()} ShopEase. All rights reserved.
+      <div className="max-w-7xl mx-auto px-6 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4" style={{ borderTop: '1px solid #1e2130' }}>
+        <p className="text-sm">© {new Date().getFullYear()} Kiyu. All rights reserved.</p>
+        <p className="text-sm">Crafted with ❤️ for the web.</p>
       </div>
     </footer>
   );

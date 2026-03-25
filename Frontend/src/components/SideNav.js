@@ -2,119 +2,90 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 
 export default function SideNav({ onHomeClick, onCartClick, onFiltersClick, onDealsClick, onProfileClick, onOrdersClick, onAdminClick, onCommunityClick, isAdmin = false }) {
-  const [collapsed, setCollapsed] = useState(true);
+  const [open, setOpen] = useState(false);
 
-  const Item = ({ label, onClick, children }) => (
-    <motion.button
-      className={`w-full flex items-center ${collapsed ? "justify-center" : "justify-start"} gap-2 px-1.5 py-1.5 rounded-md hover:bg-[white] hover:text-black text-white/90 cursor-pointer`}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      onClick={onClick}
-      title={collapsed ? label : undefined}
-    >
-      <span className="inline-flex items-center justify-center">{children}</span>
-      {!collapsed && <span className="text-xs truncate">{label}</span>}
-    </motion.button>
-  );
+  const items = [
+    { icon: "🏠", label: "Home", onClick: onHomeClick },
+    { icon: "🛒", label: "Cart", onClick: onCartClick },
+    { icon: "🔍", label: "Filters", onClick: onFiltersClick },
+    { icon: "⚡", label: "Flash Deals", onClick: onDealsClick },
+    { icon: "👤", label: "Profile", onClick: onProfileClick },
+    { icon: "📦", label: "Orders", onClick: onOrdersClick },
+    { icon: "👥", label: "Community", onClick: onCommunityClick },
+  ];
+  if (isAdmin) items.push({ icon: "⚙️", label: "Admin", onClick: onAdminClick });
 
   return (
     <>
-      {/* Mobile floating action button */}
+      {/* Mobile Hamburger FAB */}
       <motion.button
-        className="md:hidden fixed top-36 left-4 z-[60] w-10 h-10 bg-black/90 text-white rounded-full shadow-lg flex items-center justify-center"
+        className="md:hidden fixed top-20 left-4 z-[60] w-10 h-10 bg-[#12141e] border border-[#1e2130] text-[#e8eaf2] rounded-full shadow-lg flex items-center justify-center"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
-        onClick={() => setCollapsed(!collapsed)}
+        onClick={() => setOpen(!open)}
+        aria-label="Open menu"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M3 12h18M3 6h18M3 18h18" />
         </svg>
       </motion.button>
 
-      {/* Mobile overlay sidebar */}
-      {!collapsed && (
+      {/* Mobile Drawer */}
+      {open && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="md:hidden fixed inset-0 z-[55] bg-black/50"
-          onClick={() => setCollapsed(true)}
+          className="md:hidden fixed inset-0 z-[55] bg-black/60 backdrop-blur-sm"
+          onClick={() => setOpen(false)}
         >
           <motion.div
-            initial={{ x: -300 }}
+            initial={{ x: -280 }}
             animate={{ x: 0 }}
-            exit={{ x: -300 }}
-            className="w-32 h-full bg-black/95 text-white p-2"
+            exit={{ x: -280 }}
+            transition={{ type: "spring", stiffness: 280, damping: 28 }}
+            className="w-56 h-full bg-[#0f1118] border-r border-[#1e2130] p-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-semibold">Menu</h2>
-              <button
-                onClick={() => setCollapsed(true)}
-                className="text-white hover:text-gray-300"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#1e2130]">
+              <span className="font-syne font-bold text-[#6c63ff] text-lg">Kiyu Menu</span>
+              <button onClick={() => setOpen(false)} className="text-[#6b7094] hover:text-[#e8eaf2]">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
-            <div className="space-y-3">
-              <Item label="Home" onClick={() => { onHomeClick(); setCollapsed(true); }}>
-                🏠
-              </Item>
-              <Item label="Cart" onClick={() => { onCartClick(); setCollapsed(true); }}>
-                🛒
-              </Item>
-              <Item label="Filters" onClick={() => { onFiltersClick(); setCollapsed(true); }}>
-                🔍
-              </Item>
-              <Item label="Flash Deals" onClick={() => { onDealsClick(); setCollapsed(true); }}>
-                ⚡
-              </Item>
-              <Item label="Profile" onClick={() => { onProfileClick(); setCollapsed(true); }}>
-                👤
-              </Item>
-              <Item label="Orders" onClick={() => { onOrdersClick(); setCollapsed(true); }}>
-                📦
-              </Item>
-              <Item label="Community" onClick={() => { onCommunityClick(); setCollapsed(true); }}>
-                👥
-              </Item>
-              {isAdmin && (
-                <Item label="Admin" onClick={() => { onAdminClick(); setCollapsed(true); }}>
-                  ⚙️
-                </Item>
-              )}
+            <div className="space-y-1">
+              {items.map((item) => (
+                <button
+                  key={item.label}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#6b7094] hover:bg-[#161921] hover:text-[#e8eaf2] transition-colors text-left"
+                  onClick={() => { item.onClick(); setOpen(false); }}
+                >
+                  <span>{item.icon}</span>
+                  <span className="text-sm font-medium">{item.label}</span>
+                </button>
+              ))}
             </div>
           </motion.div>
         </motion.div>
       )}
 
-      {/* Desktop sidebar */}
-      <aside className={`hidden md:flex md:flex-col ${collapsed ? "md:w-12" : "md:w-44"} shrink-0 bg-[black]/95 text-white max-h-[55vh] sticky top-52 pt-2 rounded-md overflow-y-auto`}>
-        <div className="px-1.5 sticky top-0 bg-[black]/95 z-10">
-          <motion.button
-            className={`w-full ${collapsed ? "justify-center" : "justify-between"} flex items-center gap-2 px-1.5 py-1.5 rounded-md hover:bg-[white] hover:text-black text-white/90 cursor-pointer`}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => setCollapsed((c) => !c)}
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-              <path d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-            {!collapsed && <span className="text-xs">Menu</span>}
-          </motion.button>
-        </div>
-        <div className="px-1.5 pb-2 space-y-1">
-          <Item label="Home" onClick={onHomeClick}>🏠</Item>
-          <Item label="Cart" onClick={onCartClick}>🛒</Item>
-          <Item label="Filters" onClick={onFiltersClick}>🔍</Item>
-          <Item label="Flash Deals" onClick={onDealsClick}>⚡</Item>
-          <Item label="Profile" onClick={onProfileClick}>👤</Item>
-          <Item label="Orders" onClick={onOrdersClick}>📦</Item>
-          <Item label="Community" onClick={onCommunityClick}>👥</Item>
-          {isAdmin && <Item label="Admin" onClick={onAdminClick}>⚙️</Item>}
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex md:flex-col w-12 shrink-0 bg-[#0f1118] border-r border-[#1e2130] sticky top-16 h-[calc(100vh-64px)] pt-4 overflow-y-auto">
+        <div className="flex flex-col items-center gap-1 px-1">
+          {items.map((item) => (
+            <motion.button
+              key={item.label}
+              title={item.label}
+              className="w-9 h-9 rounded-lg flex items-center justify-center text-[#6b7094] hover:bg-[#161921] hover:text-[#e8eaf2] transition-colors"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={item.onClick}
+            >
+              <span>{item.icon}</span>
+            </motion.button>
+          ))}
         </div>
       </aside>
     </>

@@ -14,33 +14,28 @@
   --glow: rgba(108,99,255,0.35);
 }
 
-body.kiyu-theme {
+body {
   background: var(--bg);
   color: var(--text);
   font-family: 'DM Sans', sans-serif;
 }
 
-/* ─── SCROLL MARQUEE ─── */
-.marquee-wrap {
-  overflow: hidden; 
-  border-top: 1px solid var(--border); 
-  border-bottom: 1px solid var(--border);
-  padding: 14px 0; 
-  background: var(--surface);
-}
-.marquee-track {
-  display: flex; gap: 48px; width: max-content;
-  animation: marquee 24s linear infinite;
-}
-.marquee-track span {
-  font-family: 'Syne', sans-serif; font-size: .78rem;
-  font-weight: 600; color: var(--muted); text-transform: uppercase;
-  letter-spacing: .12em; white-space: nowrap;
-}
-.marquee-track span.accent { color: var(--accent); }
-@keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+/* ─── FONT UTILITY CLASSES ─── */
+.font-syne { font-family: 'Syne', sans-serif; }
+.font-dmsans { font-family: 'DM Sans', sans-serif; }
 
-/* ─── HERO EFFECTS ─── */
+/* ─── HERO SECTION ─── */
+.hero {
+  position: relative;
+  min-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120px 24px 80px;
+  overflow: hidden;
+  text-align: center;
+}
 .hero-bg {
   position: absolute; inset: 0; z-index: 0;
   background:
@@ -53,22 +48,99 @@ body.kiyu-theme {
   background-image: linear-gradient(var(--border) 1px, transparent 1px),
     linear-gradient(90deg, var(--border) 1px, transparent 1px);
   background-size: 60px 60px;
-  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black, transparent);
-  opacity: .4;
+  opacity: .25;
 }
+.hero > * { position: relative; z-index: 1; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(108,99,255,.12); border: 1px solid rgba(108,99,255,.3);
+  color: var(--accent); padding: 6px 16px; border-radius: 100px;
+  font-family: 'Syne', sans-serif; font-size: .75rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .08em; margin-bottom: 28px;
+}
+.hero-badge span {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--accent); display: block; animation: badge-pulse 1.5s infinite;
+}
+.hero h1 {
+  font-family: 'Syne', sans-serif; font-size: clamp(2.4rem, 7vw, 5.5rem);
+  font-weight: 800; line-height: 1.05; letter-spacing: -.03em;
+  color: #fff; margin-bottom: 24px;
+}
+.hero h1 em {
+  font-style: normal;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-sub {
+  font-size: clamp(1rem, 2.5vw, 1.2rem); color: var(--muted);
+  max-width: 600px; line-height: 1.7; margin-bottom: 40px;
+}
+.hero-btns {
+  display: flex; flex-wrap: wrap; gap: 16px; align-items: center;
+  justify-content: center;
+}
+.btn-primary {
+  background: var(--accent); color: #fff;
+  padding: 14px 32px; border-radius: 10px;
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: .95rem;
+  border: none; cursor: pointer;
+  box-shadow: 0 0 24px rgba(108,99,255,.35);
+  transition: opacity .2s, transform .15s;
+}
+.btn-primary:hover { opacity: .88; transform: translateY(-2px); }
+.btn-secondary {
+  background: transparent; color: var(--text);
+  padding: 14px 32px; border-radius: 10px;
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: .95rem;
+  border: 1px solid var(--border); cursor: pointer;
+  transition: border-color .2s, color .2s, transform .15s;
+}
+.btn-secondary:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
 
-.hero-badge span { 
-  width: 6px; height: 6px; border-radius: 50%; 
-  background: var(--accent); display: block; animation: badge-pulse 1.5s infinite; 
-}
 @keyframes badge-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.8)} }
 
-/* ─── TYPOGRAPHY CLASSES ─── */
-.font-syne {
-  font-family: 'Syne', sans-serif;
+/* ─── MARQUEE ─── */
+.marquee-wrap {
+  overflow: hidden;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 0;
+  background: var(--surface);
 }
-.font-dmsans {
-  font-family: 'DM Sans', sans-serif;
+.marquee-track {
+  display: flex; gap: 48px; width: max-content;
+  animation: marquee 28s linear infinite;
+}
+.marquee-track span {
+  font-family: 'Syne', sans-serif; font-size: .78rem;
+  font-weight: 600; color: var(--muted); text-transform: uppercase;
+  letter-spacing: .12em; white-space: nowrap;
+}
+.marquee-track span.accent { color: var(--accent); }
+@keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+/* ─── SECTIONS ─── */
+section {
+  padding: 80px 24px;
+}
+.section-label {
+  display: inline-block;
+  font-family: 'Syne', sans-serif; font-size: .72rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .15em;
+  color: var(--accent); margin-bottom: 12px;
+}
+.section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-weight: 800; color: #fff;
+  margin-bottom: 16px; line-height: 1.15;
+}
+.section-desc {
+  color: var(--muted); max-width: 560px;
+  font-size: 1.05rem; line-height: 1.7;
+  margin-bottom: 40px;
 }
 
 /* ─── PRODUCT CARDS ─── */
@@ -81,7 +153,7 @@ body.kiyu-theme {
 .prod-image {
   height: 220px; background: var(--surface2);
   display: flex; align-items: center; justify-content: center;
-  position: relative; overflow: hidden; font-size: 3rem;
+  position: relative; overflow: hidden;
 }
 .prod-image img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s; }
 .prod-card:hover .prod-image img { transform: scale(1.08); }
@@ -99,6 +171,14 @@ body.kiyu-theme {
   width: 100%; background: var(--surface2); color: var(--text);
   border: 1px solid var(--border); padding: 10px; border-radius: 8px;
   font-family: 'Syne', sans-serif; font-weight: 700; font-size: .85rem;
-  cursor: pointer; transition: all .2s; margin-top: auto;
+  cursor: pointer; transition: all .2s;
 }
 .add-to-cart-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* ─── RESPONSIVE FIXES ─── */
+@media (max-width: 768px) {
+  .hero { padding: 100px 20px 60px; min-height: 70vh; }
+  section { padding: 60px 16px; }
+  .hero-btns { flex-direction: column; width: 100%; }
+  .btn-primary, .btn-secondary { width: 100%; text-align: center; }
+}

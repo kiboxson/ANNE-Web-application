@@ -41,15 +41,16 @@ export default function CartPage({ onBack }) {
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 bg-[#07080d] min-h-[calc(100vh-64px)] font-dmsans text-[#e8eaf2]">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
-        <h1 className="text-2xl sm:text-3xl font-syne font-bold text-[#e8eaf2]">Your Cart</h1>
+        <h1 className="text-2xl sm:text-3xl font-syne font-bold text-[#e8eaf2]">Your Order</h1>
         <div className="flex items-center gap-3">
           <motion.button
-            className="px-4 py-2 rounded-lg bg-[#161921] border border-[#1e2130] hover:border-[#6c63ff] hover:text-[#e8eaf2] text-[#6b7094] font-medium transition-colors text-sm"
+            className="px-4 py-2 rounded-lg font-medium transition-colors text-sm"
+            style={{ background: '#161921', border: '1px solid #1e2130', color: '#6b7094' }}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={onBack}
           >
-            Continue Shopping
+            Browse Packages
           </motion.button>
           {hasItems && (
             <motion.button
