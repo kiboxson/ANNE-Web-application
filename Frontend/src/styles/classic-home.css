@@ -8,13 +8,13 @@
   .classic-home-page h1 {
     line-height: 1.2;
     letter-spacing: 0.5px;
-    font-size: 0.875rem !important; /* 14px - very small */
+    font-size: inherit;
   }
   
   .classic-home-page .hero-button {
     letter-spacing: 1px;
     font-weight: 600;
-    font-size: 0.75rem !important; /* 12px - very small */
+    font-size: inherit;
   }
 }
 
@@ -22,11 +22,11 @@
   .classic-home-page h1 {
     line-height: 1.1;
     letter-spacing: 0.25px;
-    font-size: 0.75rem !important; /* 12px - extra small */
+    font-size: inherit;
   }
   
   .classic-home-page .hero-button {
-    font-size: 0.625rem !important; /* 10px - extra small */
+    font-size: inherit;
   }
 }
 
@@ -244,6 +244,11 @@
   padding: 30px;
   background: #ffffff;
   border-left: 4px solid #6c757d;
+}
+
+.classic-home-page img {
+  max-width: 100%;
+  height: auto;
 }
 
 .classic-testimonial::before {

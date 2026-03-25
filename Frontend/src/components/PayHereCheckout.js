@@ -85,7 +85,7 @@ export default function PayHereCheckout({ cartItems, totalAmount, onSuccess, onC
       const order = orderResponse.data;
 
       // Initiate PayHere payment
-      const paymentResult = await initiatePayHerePayment(
+      await initiatePayHerePayment(
         {
           ...order,
           phone: shippingInfo.phone

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Star, Send, CheckCircle, X } from "lucide-react";
 import axios from "axios";
 import { API_BASE_URL_EXPORT } from "../config/api";

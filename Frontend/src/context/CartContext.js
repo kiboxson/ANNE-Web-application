@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import axios from 'axios';
-import { getCurrentUser } from "../services/auth";
 import auth from "../firebase";
 import { API_BASE_URL_EXPORT } from '../config/api';
 

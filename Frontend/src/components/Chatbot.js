@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState, useEffect } from "react";
+import React, { useMemo, useRef, useState, useEffect, useCallback } from "react";
 import axios from 'axios';
 import { API_BASE_URL_EXPORT } from '../config/api';
 import { motion, AnimatePresence } from "framer-motion";
@@ -44,12 +44,31 @@ export default function Chatbot() {
     }
   }, []);
 
+  const loadMessages = useCallback(async () => {
+    if (!sessionId) return;
+    try {
+      const response = await axios.get(`${API_BASE_URL_EXPORT}/api/chat/${sessionId}`);
+      const chatMessages = response.data.map(msg => ({
+        role: msg.sender === 'user' ? 'user' : 'admin',
+        text: msg.message,
+        timestamp: msg.timestamp,
+        senderName: msg.senderName
+      }));
+      setMessages(prev => {
+        if (chatMessages.length > 0 || prev.length === 0) return chatMessages;
+        return prev;
+      });
+    } catch (error) {
+      console.error('Failed to load messages:', error);
+    }
+  }, [sessionId]);
+
   // Load messages when session is restored
   useEffect(() => {
     if (sessionId && !showNameInput && customerName) {
       loadMessages();
     }
-  }, [sessionId, showNameInput, customerName]);
+  }, [sessionId, showNameInput, customerName, loadMessages]);
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
@@ -66,26 +85,7 @@ export default function Chatbot() {
       const interval = setInterval(loadMessages, 3000);
       return () => clearInterval(interval);
     }
-  }, [open, sessionId, showNameInput]);
-
-  async function loadMessages() {
-    try {
-      const response = await axios.get(`${API_BASE_URL_EXPORT}/api/chat/${sessionId}`);
-      const chatMessages = response.data.map(msg => ({
-        role: msg.sender === 'user' ? 'user' : 'admin',
-        text: msg.message,
-        timestamp: msg.timestamp,
-        senderName: msg.senderName
-      }));
-      
-      // Only update if we have messages from backend or if local messages are empty
-      if (chatMessages.length > 0 || messages.length === 0) {
-        setMessages(chatMessages);
-      }
-    } catch (error) {
-      console.error('Failed to load messages:', error);
-    }
-  }
+  }, [open, sessionId, showNameInput, loadMessages]);
 
   const quickReplies = useMemo(
     () => [

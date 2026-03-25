@@ -1,19 +1,15 @@
 import React, { useEffect, useState, useRef } from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import ImageSlider from "./components/ImageSlider";
-import PromoBar from "./components/PromoBar";
 import reportWebVitals from "./reportWebVitals";
 import ClassicNavbar from "./components/ClassicNavbar";
 import SideNav from "./components/SideNav";
-import FlashSalePage from "./components/Flashsale";
-import ProductsSection from "./components/Products";
 import AuthModal from "./components/AuthModal";
 import FiltersSidebar from "./components/FiltersSidebar";
 import Footer from "./components/Footer";
 import ClassicHomePage from "./components/ClassicHomePage";
 import { logout } from "./services/auth";
-import { CartProvider, useCart } from "./context/CartContext";
+import { CartProvider } from "./context/CartContext";
 import { ProductsProvider } from "./context/ProductsContext";
 import { FlashProductsProvider } from "./context/FlashProductsContext";
 import CartPage from "./components/CartPage";
@@ -23,7 +19,6 @@ import Orders from "./components/Orders";
 import Community from "./components/Community";
 import { motion, AnimatePresence } from "framer-motion";
 import { BrowserRouter } from "react-router-dom";
-import Chatbot from "./components/Chatbot";
 import auth from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
 

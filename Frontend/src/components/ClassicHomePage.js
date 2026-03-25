@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageSquare, Check, X } from "lucide-react";
 import axios from "axios";
@@ -262,7 +262,6 @@ const PRICING = [
 // Main Page
 // ──────────────────────────────────────────────────────────
 function ClassicHomePage({ onBuyNow }) {
-  const packagesRef = useRef(null);
   const builderRef = useRef(null);
 
   const [showFeedback, setShowFeedback] = useState(false);
@@ -271,11 +270,11 @@ function ClassicHomePage({ onBuyNow }) {
   const [activeCategory, setActiveCategory] = useState("all");
   const [selected, setSelected] = useState(new Set());
 
-  const defaultTestimonials = [
+  const defaultTestimonials = useMemo(() => ([
     { name: "Sarah M.", role: "Founder, NovaTech SaaS", feedback: "The animated hero they built transformed our landing page. Conversion rate went up 40% in the first month!", rating: 5, image: "https://ui-avatars.com/api/?name=Sarah+M&background=6c63ff&color=fff&size=80" },
     { name: "James K.", role: "Creative Director, Studio72", feedback: "I selected 8 components and they nailed every single one. The shader backgrounds are breathtaking. 10/10.", rating: 5, image: "https://ui-avatars.com/api/?name=James+K&background=ff6584&color=fff&size=80" },
     { name: "Priya L.", role: "CEO, GreenLeaf Commerce", feedback: "The component picker made it so easy to communicate what I wanted. The final result exceeded every expectation.", rating: 5, image: "https://ui-avatars.com/api/?name=Priya+L&background=43e97b&color=000&size=80" },
-  ];
+  ]), []);
 
   useEffect(() => {
     axios.get(`${API_BASE_URL_EXPORT}/api/feedback?status=published&limit=6`)
@@ -287,7 +286,7 @@ function ClassicHomePage({ onBuyNow }) {
           })).concat(defaultTestimonials).slice(0, 6));
         } else setTestimonials(defaultTestimonials);
       }).catch(() => setTestimonials(defaultTestimonials));
-  }, []);
+  }, [defaultTestimonials]);
 
   const visibleComponents = activeCategory === "all" ? COMPONENTS : COMPONENTS.filter(c => c.category === activeCategory);
 
@@ -300,7 +299,7 @@ function ClassicHomePage({ onBuyNow }) {
   const selectedNames = [...selected].map(id => COMPONENTS.find(c => c.id === id)?.name).filter(Boolean);
 
   return (
-    <div className="bg-[#07080d] text-[#e8eaf2] w-full pt-16 font-dmsans overflow-hidden">
+    <div className="bg-[#07080d] text-[#e8eaf2] w-full pt-16 font-dmsans overflow-x-hidden">
 
       {/* ─── HERO ─── */}
       <section className="hero">
@@ -338,27 +337,26 @@ function ClassicHomePage({ onBuyNow }) {
 
       {/* ─── COMPONENT LIBRARY ─── */}
       <section id="builder" ref={builderRef}>
-        <div className="max-w-[1160px] mx-auto">
+        <div className="max-w-[1160px] mx-auto w-full">
           <div className="section-label">Component Library</div>
           <h2 className="section-title">Pick Your Style</h2>
           <p className="section-desc">Click any component you want for your website. Mix and match — we build exactly what you select.</p>
 
-          <div className="flex flex-col lg:flex-row gap-5 min-h-[600px]">
-            {/* Category Sidebar */}
-            <div className="lg:w-52 shrink-0 flex flex-row flex-wrap lg:flex-col gap-2">
+          <div className="flex flex-col lg:flex-row gap-5 min-h-[600px] lg:min-h-0">
+            {/* Category Sidebar — scrollable row on mobile, column on desktop */}
+            <div className="lg:w-52 shrink-0 flex flex-row lg:flex-col gap-2 overflow-x-auto pb-1 lg:pb-0 lg:overflow-x-visible" style={{ scrollbarWidth: 'none' }}>
               {CATEGORIES.map(cat => (
                 <button
                   key={cat.id}
                   onClick={() => setActiveCategory(cat.id)}
-                  className="flex items-center justify-between px-3 py-2 rounded-xl text-sm transition-all text-left"
+                  className="flex items-center justify-between px-3 py-2 rounded-xl text-sm transition-all text-left shrink-0"
                   style={{
                     background: activeCategory === cat.id ? "rgba(108,99,255,.12)" : "#0f1118",
                     border: `1px solid ${activeCategory === cat.id ? "rgba(108,99,255,.35)" : "#1e2130"}`,
                     color: activeCategory === cat.id ? "#a89ffc" : "#6b7094",
-                    minWidth: "fit-content",
                   }}
                 >
-                  <span className="text-xs">{cat.label}</span>
+                  <span className="text-xs whitespace-nowrap">{cat.label}</span>
                   <span className="text-[10px] ml-2 px-1.5 py-0.5 rounded-full" style={{ background: activeCategory === cat.id ? "rgba(108,99,255,.25)" : "#161921", color: activeCategory === cat.id ? "#6c63ff" : "#6b7094" }}>{cat.count}</span>
                 </button>
               ))}
@@ -424,7 +422,7 @@ function ClassicHomePage({ onBuyNow }) {
           </div>
 
           {/* Selection Panel */}
-          <div className="mt-5 rounded-2xl p-6" style={{ background: "#0f1118", border: "1px solid #1e2130" }}>
+          <div className="mt-5 rounded-2xl p-4 sm:p-6" style={{ background: "#0f1118", border: "1px solid #1e2130" }}>
             <div className="flex items-center gap-3 mb-4">
               <span className="font-syne font-bold text-white">Your Selection</span>
               <span className="text-xs font-bold px-2 py-0.5 rounded-full text-white" style={{ background: "#6c63ff" }}>{selected.size}</span>
@@ -461,7 +459,7 @@ function ClassicHomePage({ onBuyNow }) {
 
       {/* ─── HOW IT WORKS ─── */}
       <section style={{ background: "#0f1118", borderTop: "1px solid #1e2130" }}>
-        <div className="max-w-[1160px] mx-auto">
+        <div className="max-w-[1160px] mx-auto w-full">
           <div className="section-label">The Process</div>
           <h2 className="section-title">How It Works</h2>
           <p className="section-desc">From selection to launch in 4 simple steps.</p>
@@ -485,7 +483,7 @@ function ClassicHomePage({ onBuyNow }) {
 
       {/* ─── PRICING ─── */}
       <section id="pricing" style={{ background: "#07080d" }}>
-        <div className="max-w-[1160px] mx-auto">
+        <div className="max-w-[1160px] mx-auto w-full">
           <div className="section-label">Pricing Plans</div>
           <h2 className="section-title">Simple, Transparent Pricing</h2>
           <p className="section-desc">No hidden fees. Choose the plan that fits your needs.</p>
@@ -537,7 +535,7 @@ function ClassicHomePage({ onBuyNow }) {
 
       {/* ─── TESTIMONIALS ─── */}
       <section style={{ background: "#0f1118", borderTop: "1px solid #1e2130" }}>
-        <div className="max-w-[1160px] mx-auto">
+        <div className="max-w-[1160px] mx-auto w-full">
           <div className="section-label">What Clients Say</div>
           <h2 className="section-title">Loved by Businesses</h2>
           <p className="section-desc">Real feedback from business owners who trusted us to build their digital presence.</p>
@@ -569,10 +567,10 @@ function ClassicHomePage({ onBuyNow }) {
 
       {/* ─── CTA BANNER ─── */}
       <section style={{ background: "#07080d" }}>
-        <div className="max-w-[1160px] mx-auto text-center">
-          <div className="rounded-3xl p-12" style={{ background: "linear-gradient(135deg,rgba(108,99,255,.18),rgba(255,101,132,.12))", border: "1px solid rgba(108,99,255,.3)" }}>
+        <div className="max-w-[1160px] mx-auto w-full text-center">
+          <div className="rounded-3xl p-6 sm:p-8 md:p-12" style={{ background: "linear-gradient(135deg,rgba(108,99,255,.18),rgba(255,101,132,.12))", border: "1px solid rgba(108,99,255,.3)" }}>
             <h2 className="section-title" style={{ marginBottom: 12 }}>Ready to Build Something Incredible?</h2>
-            <p className="text-lg mb-8 max-w-xl mx-auto" style={{ color: "#6b7094" }}>
+            <p className="text-base sm:text-lg mb-8 max-w-xl mx-auto" style={{ color: "#6b7094" }}>
               Pick your components, submit a request, and we'll have your dream website ready in days.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">

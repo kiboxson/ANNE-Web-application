@@ -4,11 +4,11 @@ import { Facebook, Twitter, Instagram, Github } from "lucide-react";
 function Footer({ onCommunityClick }) {
   return (
     <footer style={{ background: '#0f1118', borderTop: '1px solid #1e2130', color: '#6b7094' }} className="py-12 mt-0">
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
         
         {/* Brand */}
         <div className="md:col-span-2">
-          <h2 className="text-2xl font-syne font-extrabold text-white mb-3">Kiyu</h2>
+          <h2 className="text-2xl font-syne font-extrabold text-white mb-3">Anne</h2>
           <p className="text-sm leading-relaxed max-w-xs">
             We build fast, beautiful, conversion-focused websites for businesses and creators worldwide. From idea to launch in days.
           </p>
@@ -50,13 +50,13 @@ function Footer({ onCommunityClick }) {
               <button onClick={onCommunityClick} className="hover:text-white transition-colors text-left">Community</button>
             </li>
             <li><a href="mailto:contact@kiyu.dev" className="hover:text-white transition-colors">Contact</a></li>
-            <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
+            <li><a href="mailto:contact@kiyu.dev?subject=Privacy%20Policy%20Request" className="hover:text-white transition-colors">Privacy Policy</a></li>
           </ul>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4" style={{ borderTop: '1px solid #1e2130' }}>
-        <p className="text-sm">© {new Date().getFullYear()} Kiyu. All rights reserved.</p>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4" style={{ borderTop: '1px solid #1e2130' }}>
+        <p className="text-sm">© {new Date().getFullYear()} Anne. All rights reserved.</p>
         <p className="text-sm">Crafted with ❤️ for the web.</p>
       </div>
     </footer>

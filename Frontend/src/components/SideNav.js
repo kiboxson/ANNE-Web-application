@@ -48,7 +48,7 @@ export default function SideNav({ onHomeClick, onCartClick, onFiltersClick, onDe
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#1e2130]">
-              <span className="font-syne font-bold text-[#6c63ff] text-lg">Kiyu Menu</span>
+              <span className="font-syne font-bold text-[#6c63ff] text-lg">Anne Menu</span>
               <button onClick={() => setOpen(false)} className="text-[#6b7094] hover:text-[#e8eaf2]">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

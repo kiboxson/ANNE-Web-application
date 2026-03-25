@@ -48,7 +48,7 @@ export default function QuoteModal({ open, onClose, selectedComponents = [] }) {
           onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
         >
           <motion.div
-            className="relative w-full max-w-lg rounded-2xl overflow-hidden"
+            className="relative w-full max-w-lg rounded-2xl overflow-hidden mx-2 sm:mx-0"
             style={{ background: "#0f1118", border: "1px solid #1e2130", maxHeight: "90vh", overflowY: "auto" }}
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -64,7 +64,7 @@ export default function QuoteModal({ open, onClose, selectedComponents = [] }) {
               <X className="w-4 h-4" />
             </button>
 
-            <div className="p-8">
+            <div className="p-5 sm:p-8">
               {!submitted ? (
                 <>
                   <h2 className="font-syne font-extrabold text-2xl text-white mb-1">Request a Quote</h2>
