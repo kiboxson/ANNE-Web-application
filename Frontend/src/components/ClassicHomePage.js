@@ -306,8 +306,10 @@ function ClassicHomePage({ onBuyNow }) {
         <div className="hero-bg"></div>
         <div className="hero-grid"></div>
         <div className="hero-badge"><span></span> 200+ Animated Components Available</div>
-        <h1>Build Websites That<br /><em>Actually Impress</em></h1>
-        <p className="hero-sub">
+        <h1 style={{ maxWidth: 980, marginLeft: 'auto', marginRight: 'auto', overflowWrap: 'anywhere' }}>
+          Build Websites That<br /><em>Actually Impress</em>
+        </h1>
+        <p className="hero-sub" style={{ maxWidth: 720, marginLeft: 'auto', marginRight: 'auto' }}>
           Choose from our curated library of stunning animated components — heroes, shaders, buttons, navbars, and more. You pick the style, we handle the code.
         </p>
         <div className="hero-btns">

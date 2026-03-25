@@ -46,12 +46,12 @@ body {
 /* ─── HERO SECTION ─── */
 .hero {
   position: relative;
-  min-height: 90vh;
+  min-height: 70vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 120px clamp(16px, 5vw, 48px) 80px;
+  padding: 96px clamp(16px, 5vw, 48px) 56px;
   overflow: hidden;
   text-align: center;
   box-sizing: border-box;
@@ -84,7 +84,7 @@ body {
   background: var(--accent); display: block; animation: badge-pulse 1.5s infinite;
 }
 .hero h1 {
-  font-family: 'Syne', sans-serif; font-size: clamp(2.4rem, 7vw, 5.5rem);
+  font-family: 'Syne', sans-serif; font-size: clamp(2rem, 6vw, 4.2rem);
   font-weight: 800; line-height: 1.05; letter-spacing: -.03em;
   color: #fff; margin-bottom: 24px;
 }
@@ -95,7 +95,7 @@ body {
   background-clip: text;
 }
 .hero-sub {
-  font-size: clamp(1rem, 2.5vw, 1.2rem); color: var(--muted);
+  font-size: clamp(.95rem, 2vw, 1.1rem); color: var(--muted);
   max-width: 600px; line-height: 1.7; margin-bottom: 40px;
 }
 .hero-btns {
@@ -129,10 +129,14 @@ body {
   border-bottom: 1px solid var(--border);
   padding: 14px 0;
   background: var(--surface);
+  max-width: 100%;
 }
 .marquee-track {
-  display: flex; gap: 48px; width: max-content;
+  display: flex; gap: 48px;
+  width: max-content;
+  min-width: 100%;
   animation: marquee 28s linear infinite;
+  will-change: transform;
 }
 .marquee-track span {
   font-family: 'Syne', sans-serif; font-size: .78rem;
@@ -144,7 +148,7 @@ body {
 
 /* ─── SECTIONS ─── */
 section {
-  padding: 80px clamp(16px, 5vw, 48px);
+  padding: 56px clamp(16px, 5vw, 48px);
   box-sizing: border-box;
   width: 100%;
 }
@@ -200,19 +204,19 @@ section {
 
 /* ─── RESPONSIVE FIXES ─── */
 @media (max-width: 1024px) {
-  .hero { padding: 110px clamp(16px, 4vw, 32px) 70px; }
-  section { padding: 70px clamp(16px, 4vw, 32px); }
+  .hero { padding: 88px clamp(16px, 4vw, 32px) 52px; }
+  section { padding: 48px clamp(16px, 4vw, 32px); }
 }
 @media (max-width: 768px) {
-  .hero { padding: 96px 20px 56px; min-height: 80vh; }
-  section { padding: 56px 20px; }
+  .hero { padding: 80px 20px 44px; min-height: 62vh; }
+  section { padding: 40px 20px; }
   .hero-btns { flex-direction: column; width: 100%; }
   .btn-primary, .btn-secondary { width: 100%; text-align: center; }
   .section-desc { font-size: .95rem; }
 }
 @media (max-width: 480px) {
-  .hero { padding: 88px 16px 48px; min-height: 75vh; }
-  section { padding: 48px 16px; }
+  .hero { padding: 72px 16px 40px; min-height: 58vh; }
+  section { padding: 34px 16px; }
   .section-title { font-size: clamp(1.5rem, 7vw, 2.2rem); }
   .hero-badge { font-size: .65rem; padding: 5px 12px; }
 }
