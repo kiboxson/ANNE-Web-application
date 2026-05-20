@@ -147,7 +147,7 @@ function AppContent({ user, isAdmin, setUser }) {
                 onBack={() => setView("home")} 
                 onContactClick={() => {
                   // You can implement contact modal or redirect to contact form
-                  window.location.href = 'mailto:contact@shopease.com';
+                  window.location.href = 'mailto:contact@anne.com';
                 }}
               />
             </div>

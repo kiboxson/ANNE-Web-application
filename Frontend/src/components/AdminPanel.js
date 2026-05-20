@@ -371,23 +371,23 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 pt-20 sm:pt-24 bg-[#07080d] min-h-[calc(100vh-64px)] font-dmsans text-[#e8eaf2]">
       {!isAdmin ? (
-        <div className="bg-white border rounded p-4 sm:p-6">
+        <div className="bg-[#12141e] border border-[#1e2130] rounded-2xl p-6 text-center max-w-md mx-auto shadow-lg">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3 sm:gap-0">
-            <h1 className="text-lg sm:text-xl font-semibold">Not authorized</h1>
-            <button className="px-3 py-1.5 rounded bg-gray-200 hover:bg-gray-300 text-sm sm:text-base" onClick={onBack}>Back</button>
+            <h1 className="text-lg sm:text-xl font-syne font-bold text-[#e8eaf2]">Not authorized</h1>
+            <button className="px-3 py-1.5 rounded-lg bg-[#161921] border border-[#1e2130] text-[#6b7094] hover:text-[#e8eaf2] text-sm transition-colors" onClick={onBack}>Back</button>
           </div>
-          <p className="text-gray-600 text-xs sm:text-sm">You do not have permission to access the admin panel.</p>
+          <p className="text-[#6b7094] text-xs sm:text-sm">You do not have permission to access the admin panel.</p>
         </div>
       ) : (
         <>
           {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 gap-3 sm:gap-0">
-            <h1 className="text-xl sm:text-2xl font-bold">Admin Panel</h1>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 sm:mb-8 gap-3 sm:gap-0">
+            <h1 className="text-2xl sm:text-3xl font-syne font-bold text-[#e8eaf2]">Admin Panel</h1>
             <div className="flex items-center gap-2">
               <button
-                className="px-3 py-1.5 rounded bg-gray-200 hover:bg-gray-300 text-sm sm:text-base"
+                className="px-4 py-2 rounded-lg bg-[#161921] border border-[#1e2130] text-[#6b7094] hover:text-[#e8eaf2] text-sm sm:text-base font-medium transition-colors"
                 onClick={onBack}
               >
                 Back
@@ -396,38 +396,38 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
           </div>
 
           {/* Cloudinary Config */}
-          <form onSubmit={saveCloudinaryConfig} className="bg-yellow-50 border border-yellow-200 rounded p-3 mb-4">
-            <div className="text-sm font-medium mb-2">Cloudinary Configuration</div>
-            <div className="grid md:grid-cols-3 gap-2 items-end">
+          <form onSubmit={saveCloudinaryConfig} className="bg-yellow-500/5 border border-yellow-500/20 text-[#e8eaf2] rounded-2xl p-4 mb-6 shadow-sm">
+            <div className="text-sm font-semibold text-yellow-400 mb-3">Cloudinary Configuration</div>
+            <div className="grid md:grid-cols-3 gap-3 items-end">
               <div className="flex flex-col">
-                <label className="text-xs text-gray-600">Cloud Name</label>
+                <label className="text-xs text-[#6b7094] mb-1 font-semibold uppercase tracking-wider">Cloud Name</label>
                 <input
-                  className="border rounded px-2 py-1"
+                  className="bg-[#0f1118] border border-[#1e2130] text-[#e8eaf2] focus:border-yellow-500/50 outline-none rounded-lg px-3 py-2 text-sm"
                   value={cloudName}
                   onChange={(e) => setCloudName(e.target.value)}
                   placeholder="e.g. dgpocgkx3"
                 />
               </div>
               <div className="flex flex-col">
-                <label className="text-xs text-gray-600">Upload Preset (Unsigned)</label>
+                <label className="text-xs text-[#6b7094] mb-1 font-semibold uppercase tracking-wider">Upload Preset (Unsigned)</label>
                 <input
-                  className="border rounded px-2 py-1"
+                  className="bg-[#0f1118] border border-[#1e2130] text-[#e8eaf2] focus:border-yellow-500/50 outline-none rounded-lg px-3 py-2 text-sm"
                   value={uploadPreset}
                   onChange={(e) => setUploadPreset(e.target.value)}
                   placeholder="your_unsigned_preset"
                 />
               </div>
               <div className="flex items-end">
-                <button type="submit" className="px-3 py-2 rounded bg-black text-white">Save</button>
+                <button type="submit" className="w-full px-4 py-2 rounded-lg bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/30 text-yellow-400 font-medium text-sm transition-colors">Save</button>
               </div>
             </div>
-            <div className="text-xs text-gray-600 mt-2">
-              Status: {cloudName && uploadPreset ? <span className="text-green-700">Configured</span> : <span className="text-red-700">Missing values</span>}
+            <div className="text-xs text-[#6b7094] mt-3">
+              Status: {cloudName && uploadPreset ? <span className="text-green-400 font-bold">Configured</span> : <span className="text-red-400 font-bold">Missing values</span>}
             </div>
           </form>
 
           {/* Tabs */}
-          <div className="flex flex-wrap gap-1 sm:gap-2 mb-4 sm:mb-6">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-6 sm:mb-8 bg-[#12141e] border border-[#1e2130] p-1.5 rounded-xl w-fit">
             {[
               { key: "products", label: "Products" },
               { key: "orders", label: "Orders" },
@@ -442,8 +442,8 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
               <button
                 key={t.key}
                 onClick={() => setTab(t.key)}
-                className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded border text-xs sm:text-sm ${
-                  tab === t.key ? "bg-black text-white border-black" : "bg-white text-black border-gray-300"
+                className={`px-3 py-1.5 rounded-lg border text-xs sm:text-sm font-semibold transition-all ${
+                  tab === t.key ? "bg-[#6c63ff] text-white border-[#6c63ff] shadow-[0_0_12px_rgba(108,99,255,0.25)]" : "bg-[#12141e] text-[#6b7094] border-[#1e2130] hover:text-[#e8eaf2] hover:border-[#6b7094]/30"
                 }`}
               >
                 {t.label}
@@ -466,13 +466,13 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
             {isAdmin ?
             <form
               onSubmit={addProduct}
-              className="grid md:grid-cols-5 gap-2 items-end bg-white p-3 rounded border"
+              className="grid md:grid-cols-5 gap-3 items-end bg-[#12141e] border border-[#1e2130] p-4 rounded-xl shadow-sm"
             >
               
               <div className="flex flex-col">
-                <label className="text-xs text-gray-500">Title</label>
+                <label className="text-xs text-[#6b7094] mb-1 font-semibold uppercase tracking-wider">Title</label>
                 <input
-                  className="border rounded px-2 py-1"
+                  className="bg-[#0f1118] border border-[#1e2130] rounded-lg px-2.5 py-2 text-sm text-[#e8eaf2] focus:border-[#6c63ff] outline-none"
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
                   placeholder="Product title"
@@ -481,10 +481,10 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                 />
               </div>
               <div className="flex flex-col">
-                <label className="text-xs text-gray-500">Price</label>
+                <label className="text-xs text-[#6b7094] mb-1 font-semibold uppercase tracking-wider">Price</label>
                 <input
                   type="number"
-                  className="border rounded px-2 py-1"
+                  className="bg-[#0f1118] border border-[#1e2130] rounded-lg px-2.5 py-2 text-sm text-[#e8eaf2] focus:border-[#6c63ff] outline-none"
                   value={form.price}
                   onChange={(e) => setForm({ ...form, price: e.target.value })}
                   placeholder="0"
@@ -495,10 +495,10 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                 />
               </div>
               <div className="flex flex-col">
-                <label className="text-xs text-gray-500">Stock</label>
+                <label className="text-xs text-[#6b7094] mb-1 font-semibold uppercase tracking-wider">Stock</label>
                 <input
                   type="number"
-                  className="border rounded px-2 py-1"
+                  className="bg-[#0f1118] border border-[#1e2130] rounded-lg px-2.5 py-2 text-sm text-[#e8eaf2] focus:border-[#6c63ff] outline-none"
                   value={form.stock}
                   onChange={(e) => setForm({ ...form, stock: e.target.value })}
                   placeholder="0"
@@ -508,9 +508,9 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                 />
               </div>
               <div className="flex flex-col">
-                <label className="text-xs text-gray-500">Category</label>
+                <label className="text-xs text-[#6b7094] mb-1 font-semibold uppercase tracking-wider">Category</label>
                 <input
-                  className="border rounded px-2 py-1"
+                  className="bg-[#0f1118] border border-[#1e2130] rounded-lg px-2.5 py-2 text-sm text-[#e8eaf2] focus:border-[#6c63ff] outline-none"
                   value={form.category}
                   onChange={(e) => setForm({ ...form, category: e.target.value })}
                   placeholder="Category"
@@ -518,11 +518,11 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                 />
               </div>
               <div className="flex flex-col">
-                <label className="text-xs text-gray-500">Image</label>
+                <label className="text-xs text-[#6b7094] mb-1 font-semibold uppercase tracking-wider">Image</label>
                 <input
                   type="file"
                   accept="image/*"
-                  className="border rounded px-2 py-1"
+                  className="bg-[#0f1118] border border-[#1e2130] rounded-lg px-2.5 py-1.5 text-xs text-[#e8eaf2] focus:border-[#6c63ff] outline-none"
                   onChange={(e) => {
                     const file = e.target.files && e.target.files[0];
                     setImageFile(file || null);
@@ -542,8 +542,8 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`px-3 py-2 rounded text-white ${
-                  isSubmitting ? "bg-gray-500 cursor-not-allowed" : "bg-black hover:bg-gray-800"
+                className={`w-full px-3 py-2 rounded-lg text-white font-semibold text-sm transition-all ${
+                  isSubmitting ? "bg-gray-700 cursor-not-allowed opacity-60" : "bg-[#6c63ff] hover:opacity-90 shadow-[0_0_12px_rgba(108,99,255,0.25)]"
                 }`}
               >
                 {isSubmitting ? "Adding..." : "Add"}
@@ -552,44 +552,44 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
 
             {imagePreview && (
               <div className="mt-2">
-                <div className="text-xs text-gray-500 mb-1">Preview</div>
-                <img src={imagePreview} alt="preview" className="h-24 w-24 object-cover rounded border" />
+                <div className="text-xs text-[#6b7094] mb-1">Preview</div>
+                <img src={imagePreview} alt="preview" className="h-24 w-24 object-cover rounded border border-[#1e2130]" />
               </div>
             )}
 
             {/* Filters */}
             <div className="flex items-center justify-between">
               <input
-                className="border rounded px-3 py-2 w-64"
+                className="bg-[#12141e] border border-[#1e2130] rounded-lg px-3 py-2 w-64 text-[#e8eaf2] focus:border-[#6c63ff] outline-none text-sm"
                 placeholder="Search products..."
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
               />
-              <div className="text-sm text-gray-500">{filteredProducts.length} items</div>
+              <div className="text-sm text-[#6b7094] font-medium">{filteredProducts.length} items</div>
             </div>
 
             {/* Product list */}
-            <div className="overflow-x-auto border rounded">
-              <table className="min-w-full text-sm">
-                <thead className="bg-gray-50">
+            <div className="overflow-x-auto border border-[#1e2130] rounded-xl bg-[#12141e]">
+              <table className="min-w-full text-sm text-[#e8eaf2]">
+                <thead className="bg-[#0f1118] text-[#6b7094] border-b border-[#1e2130] text-xs uppercase tracking-wider font-semibold">
                   <tr>
-                    <th className="text-left px-3 py-2">Title</th>
-                    <th className="text-left px-3 py-2">Category</th>
-                    <th className="text-left px-3 py-2">Price</th>
-                    <th className="text-left px-3 py-2">Stock</th>
-                    <th className="text-right px-3 py-2">Actions</th>
+                    <th className="text-left px-4 py-3">Title</th>
+                    <th className="text-left px-4 py-3">Category</th>
+                    <th className="text-left px-4 py-3">Price</th>
+                    <th className="text-left px-4 py-3">Stock</th>
+                    <th className="text-right px-4 py-3">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredProducts.map((p) => (
-                    <tr key={p.id} className="border-t">
-                      <td className="px-3 py-2">{p.title}</td>
-                      <td className="px-3 py-2">{p.category}</td>
-                      <td className="px-3 py-2">${p.price}</td>
-                      <td className="px-3 py-2">{p.stock}</td>
-                      <td className="px-3 py-2 text-right">
+                    <tr key={p.id} className="border-t border-[#1e2130] hover:bg-[#161921] transition-colors">
+                      <td className="px-4 py-3 font-medium">{p.title}</td>
+                      <td className="px-4 py-3 text-[#6b7094]">{p.category}</td>
+                      <td className="px-4 py-3 text-[#43e97b]">${p.price}</td>
+                      <td className="px-4 py-3">{p.stock}</td>
+                      <td className="px-4 py-3 text-right">
                         <button
-                          className="px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700"
+                          className="px-3 py-1.5 rounded-lg bg-[#ff6584]/10 text-[#ff6584] hover:bg-[#ff6584]/20 border border-[#ff6584]/30 font-semibold text-xs transition-colors"
                           onClick={() => deleteProduct(p.id)}
                         >
                           Delete
@@ -613,13 +613,13 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
             className="space-y-6"
           >
             {/* Flash Sale Control Panel */}
-            <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-lg p-4">
-              <h3 className="text-lg font-semibold text-red-800 mb-4">⚡ Flash Sale Control Panel</h3>
+            <div className="bg-[#12141e] border border-[#1e2130] rounded-2xl p-6 shadow-sm">
+              <h3 className="text-lg font-syne font-bold text-white mb-4">⚡ Flash Sale Control Panel</h3>
               
               <div className="grid md:grid-cols-3 gap-4">
                 {/* Quick Start Flash Sale */}
-                <div className="bg-white p-3 rounded border">
-                  <h4 className="font-medium mb-2">🚀 Quick Start</h4>
+                <div className="bg-[#0f1118] border border-[#1e2130] p-4 rounded-xl">
+                  <h4 className="font-syne font-semibold text-[#e8eaf2] mb-3 text-sm uppercase tracking-wider">🚀 Quick Start</h4>
                   <div className="space-y-2">
                     <button
                       onClick={() => {
@@ -631,7 +631,7 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                           endsAt: end.toISOString().slice(0, 16)
                         });
                       }}
-                      className="w-full px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
+                      className="w-full px-3 py-2 bg-green-500/10 text-green-400 border border-green-500/20 rounded-lg hover:bg-green-500/20 text-xs font-semibold transition-colors"
                     >
                       Start 1 Hour Sale
                     </button>
@@ -645,7 +645,7 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                           endsAt: end.toISOString().slice(0, 16)
                         });
                       }}
-                      className="w-full px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
+                      className="w-full px-3 py-2 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-lg hover:bg-blue-500/20 text-xs font-semibold transition-colors"
                     >
                       Start 24 Hour Sale
                     </button>
@@ -653,8 +653,8 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                 </div>
 
                 {/* Schedule Flash Sale */}
-                <div className="bg-white p-3 rounded border">
-                  <h4 className="font-medium mb-2">📅 Schedule Sale</h4>
+                <div className="bg-[#0f1118] border border-[#1e2130] p-4 rounded-xl">
+                  <h4 className="font-syne font-semibold text-[#e8eaf2] mb-3 text-sm uppercase tracking-wider">📅 Schedule Sale</h4>
                   <div className="space-y-2">
                     <button
                       onClick={() => {
@@ -668,7 +668,7 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                           endsAt: end.toISOString().slice(0, 16)
                         });
                       }}
-                      className="w-full px-3 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 text-sm"
+                      className="w-full px-3 py-2 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-lg hover:bg-purple-500/20 text-xs font-semibold transition-colors"
                     >
                       Tomorrow 9 AM
                     </button>
@@ -684,7 +684,7 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                           endsAt: end.toISOString().slice(0, 16)
                         });
                       }}
-                      className="w-full px-3 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 text-sm"
+                      className="w-full px-3 py-2 bg-orange-500/10 text-orange-400 border border-orange-500/20 rounded-lg hover:bg-orange-500/20 text-xs font-semibold transition-colors"
                     >
                       Weekend Sale
                     </button>
@@ -692,8 +692,8 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                 </div>
 
                 {/* Emergency Controls */}
-                <div className="bg-white p-3 rounded border">
-                  <h4 className="font-medium mb-2">🚨 Emergency Controls</h4>
+                <div className="bg-[#0f1118] border border-[#1e2130] p-4 rounded-xl">
+                  <h4 className="font-syne font-semibold text-[#e8eaf2] mb-3 text-sm uppercase tracking-wider">🚨 Emergency Controls</h4>
                   <div className="space-y-2">
                     <button
                       onClick={() => {
@@ -707,7 +707,7 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                           window.alert('All flash sales will be stopped when you add/update items');
                         }
                       }}
-                      className="w-full px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
+                      className="w-full px-3 py-2 bg-[#ff6584]/15 text-[#ff6584] border border-[#ff6584]/35 rounded-lg hover:bg-[#ff6584]/25 text-xs font-bold transition-colors"
                     >
                       🛑 Stop All Sales
                     </button>
@@ -720,7 +720,7 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                           discount: ""
                         });
                       }}
-                      className="w-full px-3 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 text-sm"
+                      className="w-full px-3 py-2 bg-[#161921] border border-[#1e2130] text-[#6b7094] hover:text-[#e8eaf2] rounded-lg text-xs font-semibold transition-colors"
                     >
                       Clear Timing
                     </button>
@@ -730,29 +730,29 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
 
               {/* Current Flash Sale Status */}
               {(flashForm.startsAt || flashForm.endsAt) && (
-                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded">
-                  <h4 className="font-medium text-blue-800 mb-2">📊 Current Flash Sale Settings</h4>
+                <div className="mt-4 p-4 bg-[#6c63ff]/5 border border-[#6c63ff]/20 rounded-xl">
+                  <h4 className="font-semibold text-white mb-2 text-sm">📊 Current Flash Sale Settings</h4>
                   <div className="grid md:grid-cols-2 gap-4 text-sm">
                     {flashForm.startsAt && (
                       <div>
-                        <span className="font-medium">Start:</span> {new Date(flashForm.startsAt).toLocaleString()}
+                        <span className="text-[#6b7094] font-medium mr-1.5">Start:</span> <span className="text-[#e8eaf2]">{new Date(flashForm.startsAt).toLocaleString()}</span>
                       </div>
                     )}
                     {flashForm.endsAt && (
                       <div>
-                        <span className="font-medium">End:</span> {new Date(flashForm.endsAt).toLocaleString()}
+                        <span className="text-[#6b7094] font-medium mr-1.5">End:</span> <span className="text-[#e8eaf2]">{new Date(flashForm.endsAt).toLocaleString()}</span>
                       </div>
                     )}
                     {flashForm.discount && (
                       <div>
-                        <span className="font-medium">Discount:</span> {flashForm.discount}%
+                        <span className="text-[#6b7094] font-medium mr-1.5">Discount:</span> <span className="text-[#e8eaf2]">{flashForm.discount}%</span>
                       </div>
                     )}
                     {flashForm.startsAt && flashForm.endsAt && (
                       <div>
-                        <span className="font-medium">Duration:</span> {
+                        <span className="text-[#6b7094] font-medium mr-1.5">Duration:</span> <span className="text-[#e8eaf2]">{
                           Math.round((new Date(flashForm.endsAt) - new Date(flashForm.startsAt)) / (1000 * 60 * 60))
-                        } hours
+                        } hours</span>
                       </div>
                     )}
                   </div>
@@ -810,39 +810,39 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                   setIsFlashSubmitting(false);
                 }
               }}
-              className="grid md:grid-cols-6 gap-2 items-end bg-white p-3 rounded border"
+              className="grid md:grid-cols-6 gap-3 items-end bg-[#12141e] border border-[#1e2130] p-4 rounded-xl shadow-sm"
             >
               <div className="flex flex-col">
-                <label className="text-xs text-gray-500">Title</label>
-                <input className="border rounded px-2 py-1" value={flashForm.title} onChange={(e)=>setFlashForm({...flashForm, title:e.target.value})} required disabled={isFlashSubmitting} />
+                <label className="text-xs text-[#6b7094] mb-1 font-semibold uppercase tracking-wider">Title</label>
+                <input className="bg-[#0f1118] border border-[#1e2130] rounded-lg px-2.5 py-2 text-sm text-[#e8eaf2] focus:border-[#6c63ff] outline-none" value={flashForm.title} onChange={(e)=>setFlashForm({...flashForm, title:e.target.value})} required disabled={isFlashSubmitting} />
               </div>
               <div className="flex flex-col">
-                <label className="text-xs text-gray-500">Price</label>
-                <input type="number" className="border rounded px-2 py-1" value={flashForm.price} onChange={(e)=>setFlashForm({...flashForm, price:e.target.value})} min="0" step="0.01" required disabled={isFlashSubmitting} />
+                <label className="text-xs text-[#6b7094] mb-1 font-semibold uppercase tracking-wider">Price</label>
+                <input type="number" className="bg-[#0f1118] border border-[#1e2130] rounded-lg px-2.5 py-2 text-sm text-[#e8eaf2] focus:border-[#6c63ff] outline-none" value={flashForm.price} onChange={(e)=>setFlashForm({...flashForm, price:e.target.value})} min="0" step="0.01" required disabled={isFlashSubmitting} />
               </div>
               <div className="flex flex-col">
-                <label className="text-xs text-gray-500">Stock</label>
-                <input type="number" className="border rounded px-2 py-1" value={flashForm.stock} onChange={(e)=>setFlashForm({...flashForm, stock:e.target.value})} min="0" required disabled={isFlashSubmitting} />
+                <label className="text-xs text-[#6b7094] mb-1 font-semibold uppercase tracking-wider">Stock</label>
+                <input type="number" className="bg-[#0f1118] border border-[#1e2130] rounded-lg px-2.5 py-2 text-sm text-[#e8eaf2] focus:border-[#6c63ff] outline-none" value={flashForm.stock} onChange={(e)=>setFlashForm({...flashForm, stock:e.target.value})} min="0" required disabled={isFlashSubmitting} />
               </div>
               <div className="flex flex-col">
-                <label className="text-xs text-gray-500">Discount (%)</label>
-                <input type="number" className="border rounded px-2 py-1" value={flashForm.discount} onChange={(e)=>setFlashForm({...flashForm, discount:e.target.value})} min="0" max="100" disabled={isFlashSubmitting} />
+                <label className="text-xs text-[#6b7094] mb-1 font-semibold uppercase tracking-wider">Discount (%)</label>
+                <input type="number" className="bg-[#0f1118] border border-[#1e2130] rounded-lg px-2.5 py-2 text-sm text-[#e8eaf2] focus:border-[#6c63ff] outline-none" value={flashForm.discount} onChange={(e)=>setFlashForm({...flashForm, discount:e.target.value})} min="0" max="100" disabled={isFlashSubmitting} />
               </div>
               <div className="flex flex-col">
-                <label className="text-xs text-gray-500">Starts At</label>
-                <input type="datetime-local" className="border rounded px-2 py-1" value={flashForm.startsAt} onChange={(e)=>setFlashForm({...flashForm, startsAt:e.target.value})} disabled={isFlashSubmitting} />
+                <label className="text-xs text-[#6b7094] mb-1 font-semibold uppercase tracking-wider">Starts At</label>
+                <input type="datetime-local" className="bg-[#0f1118] border border-[#1e2130] rounded-lg px-2.5 py-2 text-sm text-[#e8eaf2] focus:border-[#6c63ff] outline-none" value={flashForm.startsAt} onChange={(e)=>setFlashForm({...flashForm, startsAt:e.target.value})} disabled={isFlashSubmitting} />
               </div>
               <div className="flex flex-col">
-                <label className="text-xs text-gray-500">Ends At</label>
-                <input type="datetime-local" className="border rounded px-2 py-1" value={flashForm.endsAt} onChange={(e)=>setFlashForm({...flashForm, endsAt:e.target.value})} disabled={isFlashSubmitting} />
+                <label className="text-xs text-[#6b7094] mb-1 font-semibold uppercase tracking-wider">Ends At</label>
+                <input type="datetime-local" className="bg-[#0f1118] border border-[#1e2130] rounded-lg px-2.5 py-2 text-sm text-[#e8eaf2] focus:border-[#6c63ff] outline-none" value={flashForm.endsAt} onChange={(e)=>setFlashForm({...flashForm, endsAt:e.target.value})} disabled={isFlashSubmitting} />
               </div>
               <div className="flex flex-col md:col-span-2">
-                <label className="text-xs text-gray-500">Category</label>
-                <input className="border rounded px-2 py-1" value={flashForm.category} onChange={(e)=>setFlashForm({...flashForm, category:e.target.value})} disabled={isFlashSubmitting} />
+                <label className="text-xs text-[#6b7094] mb-1 font-semibold uppercase tracking-wider">Category</label>
+                <input className="bg-[#0f1118] border border-[#1e2130] rounded-lg px-2.5 py-2 text-sm text-[#e8eaf2] focus:border-[#6c63ff] outline-none" value={flashForm.category} onChange={(e)=>setFlashForm({...flashForm, category:e.target.value})} disabled={isFlashSubmitting} />
               </div>
               <div className="flex flex-col md:col-span-2">
-                <label className="text-xs text-gray-500">Image</label>
-                <input type="file" accept="image/*" className="border rounded px-2 py-1" disabled={isFlashSubmitting}
+                <label className="text-xs text-[#6b7094] mb-1 font-semibold uppercase tracking-wider">Image</label>
+                <input type="file" accept="image/*" className="bg-[#0f1118] border border-[#1e2130] rounded-lg px-2.5 py-1.5 text-xs text-[#e8eaf2] focus:border-[#6c63ff] outline-none" disabled={isFlashSubmitting}
                   onChange={(e)=>{
                     const file = e.target.files && e.target.files[0];
                     setFlashImageFile(file||null);
@@ -851,41 +851,41 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                   }}
                 />
               </div>
-              <button type="submit" disabled={isFlashSubmitting} className={`px-3 py-2 rounded text-white ${isFlashSubmitting? 'bg-gray-500 cursor-not-allowed':'bg-black hover:bg-gray-800'}`}>{isFlashSubmitting? 'Adding...':'Add Flash Item'}</button>
+              <button type="submit" disabled={isFlashSubmitting} className={`w-full px-3 py-2 rounded-lg text-white font-semibold text-sm transition-all ${isFlashSubmitting? 'bg-gray-700 cursor-not-allowed opacity-60':'bg-[#6c63ff] hover:opacity-90 shadow-[0_0_12px_rgba(108,99,255,0.25)]'}`}>{isFlashSubmitting? 'Adding...':'Add Flash Item'}</button>
             </form>
 
             {flashImagePreview && (
               <div className="mt-2">
-                <div className="text-xs text-gray-500 mb-1">Preview</div>
-                <img src={flashImagePreview} alt="preview" className="h-24 w-24 object-cover rounded border" />
+                <div className="text-xs text-[#6b7094] mb-1">Preview</div>
+                <img src={flashImagePreview} alt="preview" className="h-24 w-24 object-cover rounded border border-[#1e2130]" />
               </div>
             )}
 
             {/* Flash list */}
-            <div className="overflow-x-auto border rounded">
-              <table className="min-w-full text-sm">
-                <thead className="bg-gray-50">
+            <div className="overflow-x-auto border border-[#1e2130] rounded-xl bg-[#12141e]">
+              <table className="min-w-full text-sm text-[#e8eaf2]">
+                <thead className="bg-[#0f1118] text-[#6b7094] border-b border-[#1e2130] text-xs uppercase tracking-wider font-semibold font-syne">
                   <tr>
-                    <th className="text-left px-3 py-2">Title</th>
-                    <th className="text-left px-3 py-2">Category</th>
-                    <th className="text-left px-3 py-2">Price</th>
-                    <th className="text-left px-3 py-2">Stock</th>
-                    <th className="text-left px-3 py-2">Discount</th>
-                    <th className="text-left px-3 py-2">Window</th>
-                    <th className="text-right px-3 py-2">Actions</th>
+                    <th className="text-left px-4 py-3">Title</th>
+                    <th className="text-left px-4 py-3">Category</th>
+                    <th className="text-left px-4 py-3">Price</th>
+                    <th className="text-left px-4 py-3">Stock</th>
+                    <th className="text-left px-4 py-3">Discount</th>
+                    <th className="text-left px-4 py-3">Window</th>
+                    <th className="text-right px-4 py-3">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {flashProducts.map((p) => (
-                    <tr key={p.id} className="border-t">
-                      <td className="px-3 py-2">{p.title}</td>
-                      <td className="px-3 py-2">{p.category}</td>
-                      <td className="px-3 py-2">${p.price}</td>
-                      <td className="px-3 py-2">{p.stock}</td>
-                      <td className="px-3 py-2">{p.discount ?? '-'}%</td>
-                      <td className="px-3 py-2">{p.startsAt || '-'} → {p.endsAt || '-'}</td>
-                      <td className="px-3 py-2 text-right">
-                        <button className="px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700"
+                    <tr key={p.id} className="border-t border-[#1e2130] hover:bg-[#161921] transition-colors">
+                      <td className="px-4 py-3 font-medium">{p.title}</td>
+                      <td className="px-4 py-3 text-[#6b7094]">{p.category}</td>
+                      <td className="px-4 py-3 text-[#43e97b]">${p.price}</td>
+                      <td className="px-4 py-3">{p.stock}</td>
+                      <td className="px-4 py-3 font-semibold text-orange-400">{p.discount ?? '-'}%</td>
+                      <td className="px-4 py-3 text-xs text-[#6b7094]">{p.startsAt || '-'} → {p.endsAt || '-'}</td>
+                      <td className="px-4 py-3 text-right">
+                        <button className="px-3 py-1.5 rounded-lg bg-[#ff6584]/10 text-[#ff6584] hover:bg-[#ff6584]/20 border border-[#ff6584]/30 font-semibold text-xs transition-colors"
                           onClick={async ()=>{
                             try{
                               await ctxRemoveFlashProduct(p.id);
@@ -1106,38 +1106,38 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
               </div>
             </div>
 
-            {/* Feedback Stats */}
+             {/* Feedback Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-              <div className="bg-white border rounded-lg p-4">
-                <div className="text-2xl font-bold text-gray-900">{feedbacks.length}</div>
-                <div className="text-sm text-gray-600">Total Feedback</div>
+              <div className="bg-[#12141e] border border-[#1e2130] rounded-xl p-4">
+                <div className="text-2xl font-syne font-bold text-[#e8eaf2]">{feedbacks.length}</div>
+                <div className="text-sm text-[#6b7094] font-medium">Total Feedback</div>
               </div>
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <div className="text-2xl font-bold text-green-700">
+              <div className="bg-green-500/5 border border-green-500/20 rounded-xl p-4">
+                <div className="text-2xl font-syne font-bold text-green-400">
                   {feedbacks.filter(f => f.status === 'published').length}
                 </div>
-                <div className="text-sm text-green-600">Published</div>
+                <div className="text-sm text-green-400/80 font-medium">Published</div>
               </div>
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <div className="text-2xl font-bold text-yellow-700">
+              <div className="bg-yellow-500/5 border border-yellow-500/20 rounded-xl p-4">
+                <div className="text-2xl font-syne font-bold text-yellow-400">
                   {feedbacks.filter(f => f.status === 'pending').length}
                 </div>
-                <div className="text-sm text-yellow-600">Pending Review</div>
+                <div className="text-sm text-yellow-400/80 font-medium">Pending Review</div>
               </div>
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <div className="text-2xl font-bold text-blue-700">
+              <div className="bg-[#6c63ff]/5 border border-[#6c63ff]/20 rounded-xl p-4">
+                <div className="text-2xl font-syne font-bold text-[#6c63ff]">
                   {feedbacks.length > 0 ? (feedbacks.reduce((sum, f) => sum + f.rating, 0) / feedbacks.length).toFixed(1) : '0.0'}
                 </div>
-                <div className="text-sm text-blue-600">Avg Rating</div>
+                <div className="text-sm text-[#6c63ff]/80 font-medium">Avg Rating</div>
               </div>
             </div>
 
             {/* Feedback List */}
             {filteredFeedbacks.length === 0 ? (
-              <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+              <div className="text-center py-12 bg-[#12141e] border border-[#1e2130] rounded-xl">
                 <div className="text-4xl mb-3">📝</div>
-                <div className="text-gray-600">No feedback found</div>
-                <div className="text-sm text-gray-500 mt-1">
+                <div className="text-[#e8eaf2] font-semibold">No feedback found</div>
+                <div className="text-sm text-[#6b7094] mt-1">
                   {feedbackFilter !== 'all' ? 'Try changing the filter' : 'Customer feedback will appear here'}
                 </div>
               </div>
@@ -1146,12 +1146,12 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                 {filteredFeedbacks.map((feedback) => (
                   <div
                     key={feedback._id}
-                    className="bg-white border rounded-lg p-4 hover:shadow-md transition-shadow"
+                    className="bg-[#12141e] border border-[#1e2130] rounded-xl p-4 hover:border-[#6c63ff] transition-all shadow-sm"
                   >
                     <div className="flex flex-col sm:flex-row gap-4">
                       {/* Avatar */}
                       <div className="flex-shrink-0">
-                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white text-2xl font-bold">
+                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#6c63ff] to-[#c850c0] flex items-center justify-center text-white text-2xl font-bold">
                           {feedback.name.charAt(0).toUpperCase()}
                         </div>
                       </div>
@@ -1160,32 +1160,32 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                       <div className="flex-1">
                         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-2">
                           <div>
-                            <h4 className="font-semibold text-gray-900">{feedback.name}</h4>
-                            <p className="text-sm text-gray-600">{feedback.email}</p>
+                            <h4 className="font-semibold text-[#e8eaf2]">{feedback.name}</h4>
+                            <p className="text-sm text-[#6b7094]">{feedback.email}</p>
                           </div>
                           <div className="flex items-center gap-1">
                             {[...Array(5)].map((_, i) => (
-                              <span key={i} className={`text-lg ${i < feedback.rating ? 'text-yellow-400' : 'text-gray-300'}`}>
+                              <span key={i} className={`text-lg ${i < feedback.rating ? 'text-yellow-400' : 'text-gray-600'}`}>
                                 ⭐
                               </span>
                             ))}
-                            <span className="ml-2 text-sm font-medium text-gray-700">
+                            <span className="ml-2 text-xs font-semibold text-[#6b7094]">
                               {feedback.rating}/5
                             </span>
                           </div>
                         </div>
 
-                        <p className="text-gray-700 mb-3 italic">"{feedback.feedback}"</p>
+                        <p className="text-[#e8eaf2] mb-3 italic">"{feedback.feedback}"</p>
 
-                        <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500">
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-[#6b7094]">
                           <span>📅 {new Date(feedback.submittedAt).toLocaleDateString()}</span>
                           <span>•</span>
                           <span>🕐 {new Date(feedback.submittedAt).toLocaleTimeString()}</span>
                           <span>•</span>
-                          <span className={`px-2 py-1 rounded font-medium ${
-                            feedback.status === 'published' ? 'bg-green-100 text-green-800' :
-                            feedback.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-blue-100 text-blue-800'
+                          <span className={`px-2 py-0.5 rounded font-semibold text-[10px] ${
+                            feedback.status === 'published' ? 'bg-green-500/10 text-green-400 border border-green-500/20' :
+                            feedback.status === 'pending' ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20' :
+                            'bg-[#6c63ff]/10 text-[#6c63ff] border border-[#6c63ff]/20'
                           }`}>
                             {feedback.status.toUpperCase()}
                           </span>
@@ -1193,11 +1193,11 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                       </div>
 
                       {/* Actions */}
-                      <div className="flex sm:flex-col gap-2">
+                      <div className="flex sm:flex-col gap-2 justify-center">
                         {feedback.status !== 'published' && (
                           <button
                             onClick={() => updateFeedbackStatus(feedback._id, 'published')}
-                            className="px-3 py-2 rounded bg-green-600 text-white hover:bg-green-700 text-sm font-medium whitespace-nowrap"
+                            className="px-3 py-1.5 rounded-lg bg-green-500/10 text-green-400 border border-green-500/30 hover:bg-green-500/20 text-xs font-semibold whitespace-nowrap transition-colors"
                             title="Publish to home page"
                           >
                             ✓ Publish
@@ -1206,7 +1206,7 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                         {feedback.status === 'published' && (
                           <button
                             onClick={() => updateFeedbackStatus(feedback._id, 'pending')}
-                            className="px-3 py-2 rounded bg-yellow-600 text-white hover:bg-yellow-700 text-sm font-medium whitespace-nowrap"
+                            className="px-3 py-1.5 rounded-lg bg-yellow-500/10 text-yellow-400 border border-yellow-500/30 hover:bg-yellow-500/20 text-xs font-semibold whitespace-nowrap transition-colors"
                             title="Unpublish from home page"
                           >
                             ⏸ Unpublish
@@ -1214,7 +1214,7 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                         )}
                         <button
                           onClick={() => deleteFeedback(feedback._id)}
-                          className="px-3 py-2 rounded bg-red-600 text-white hover:bg-red-700 text-sm font-medium whitespace-nowrap"
+                          className="px-3 py-1.5 rounded-lg bg-[#ff6584]/10 text-[#ff6584] border border-[#ff6584]/30 hover:bg-[#ff6584]/20 text-xs font-semibold whitespace-nowrap transition-colors"
                           title="Delete feedback"
                         >
                           🗑 Delete
@@ -1227,9 +1227,9 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
             )}
 
             {/* Help Text */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h4 className="font-medium text-blue-900 mb-2">ℹ️ How it works</h4>
-              <ul className="text-sm text-blue-800 space-y-1">
+            <div className="bg-[#6c63ff]/5 border border-[#6c63ff]/20 rounded-xl p-4">
+              <h4 className="font-semibold text-white mb-2 text-sm">ℹ️ How it works</h4>
+              <ul className="text-sm text-[#6b7094] space-y-1 font-medium">
                 <li>• <strong>Published</strong> feedback appears in the "Voices of Satisfaction" section on the home page</li>
                 <li>• <strong>Pending</strong> feedback is hidden from public view</li>
                 <li>• Click "Publish" to make feedback visible to customers</li>
@@ -1250,14 +1250,14 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
             className="space-y-6"
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-6">
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">👥 Community Page Management</h3>
-              <p className="text-gray-600">Edit all sections of the Community page from here</p>
+            <div className="bg-[#12141e] border border-[#1e2130] rounded-xl p-6 shadow-sm">
+              <h3 className="text-2xl font-syne font-bold text-[#e8eaf2] mb-2">👥 Community Page Management</h3>
+              <p className="text-sm text-[#6b7094] font-medium">Edit all sections of the Community page from here</p>
             </div>
 
             {/* Section Selector */}
-            <div className="bg-white border rounded-lg p-4">
-              <label className="block text-sm font-semibold text-gray-700 mb-3">Select Section to Edit:</label>
+            <div className="bg-[#12141e] border border-[#1e2130] rounded-xl p-4">
+              <label className="block text-sm font-semibold text-[#e8eaf2] mb-3">Select Section to Edit:</label>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                 {[
                   { key: 'stats', label: '📊 Stats', icon: '📊' },
@@ -1272,10 +1272,10 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                       setCommunitySection(section.key);
                       setEditingCommunity(communityContent[section.key]?.content || null);
                     }}
-                    className={`px-4 py-3 rounded-lg border-2 font-medium transition-all ${
+                    className={`px-4 py-3 rounded-lg border-2 font-semibold transition-all ${
                       communitySection === section.key
-                        ? 'bg-blue-600 text-white border-blue-600'
-                        : 'bg-white text-gray-700 border-gray-300 hover:border-blue-400'
+                        ? 'bg-[#6c63ff] text-white border-[#6c63ff] shadow-[0_0_12px_rgba(108,99,255,0.25)]'
+                        : 'bg-[#161921] text-[#6b7094] border-[#1e2130] hover:border-[#6b7094] hover:text-[#e8eaf2]'
                     }`}
                   >
                     <div className="text-2xl mb-1">{section.icon}</div>
@@ -1286,9 +1286,9 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
             </div>
 
             {/* Content Editor */}
-            <div className="bg-white border rounded-lg p-6">
+            <div className="bg-[#12141e] border border-[#1e2130] rounded-xl p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">
-                <h4 className="text-xl font-semibold text-gray-900">
+                <h4 className="text-xl font-syne font-bold text-[#e8eaf2]">
                   {communitySection === 'stats' && '📊 Statistics Section'}
                   {communitySection === 'about' && '📖 About Us Section'}
                   {communitySection === 'team' && '👨‍💼 Team Members Section'}
@@ -1296,7 +1296,7 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                   {communitySection === 'contact' && '📞 Contact Information'}
                 </h4>
                 {communityContent[communitySection] && (
-                  <span className="text-sm text-gray-500">
+                  <span className="text-xs text-[#6b7094]">
                     Last updated: {new Date(communityContent[communitySection].updatedAt).toLocaleString()}
                   </span>
                 )}
@@ -1305,11 +1305,11 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
               {/* JSON Editor */}
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-[#6b7094] mb-2 uppercase tracking-wider text-xs">
                     Content (JSON Format)
                   </label>
                   <textarea
-                    value={editingCommunity ? JSON.stringify(editingCommunity, null, 2) : JSON.stringify(communityContent[communitySection]?.content || {}, null, 2)}
+                    value={editingCommunity ? (typeof editingCommunity === 'string' ? editingCommunity : JSON.stringify(editingCommunity, null, 2)) : (communityContent[communitySection]?.content ? JSON.stringify(communityContent[communitySection].content, null, 2) : '{}')}
                     onChange={(e) => {
                       try {
                         const parsed = JSON.parse(e.target.value);
@@ -1320,7 +1320,7 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                       }
                     }}
                     rows={20}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+                    className="w-full px-4 py-3 bg-[#0f1118] border border-[#1e2130] rounded-lg font-mono text-sm text-[#e8eaf2] focus:border-[#6c63ff] outline-none"
                     placeholder="Enter JSON content..."
                   />
                 </div>
@@ -1339,7 +1339,7 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                         updateCommunitySection(communitySection, editingCommunity);
                       }
                     }}
-                    className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                    className="px-6 py-3 bg-[#6c63ff] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity shadow-[0_0_12px_rgba(108,99,255,0.25)]"
                   >
                     💾 Save Changes
                   </button>
@@ -1347,7 +1347,7 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                     onClick={() => {
                       setEditingCommunity(communityContent[communitySection]?.content || null);
                     }}
-                    className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+                    className="px-6 py-3 bg-[#161921] text-[#6b7094] border border-[#1e2130] rounded-lg font-semibold hover:text-[#e8eaf2] transition-colors"
                   >
                     ↺ Reset
                   </button>
@@ -1355,13 +1355,13 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
               </div>
 
               {/* Help Text */}
-              <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <h5 className="font-semibold text-yellow-900 mb-2">💡 Section Guidelines:</h5>
-                <div className="text-sm text-yellow-800 space-y-2">
+              <div className="mt-6 bg-[#6c63ff]/5 border border-[#6c63ff]/20 rounded-xl p-4">
+                <h5 className="font-semibold text-white mb-2">💡 Section Guidelines:</h5>
+                <div className="text-sm text-[#6b7094] space-y-2">
                   {communitySection === 'stats' && (
                     <div>
                       <p className="font-medium mb-1">Stats format (array of 4 items):</p>
-                      <pre className="bg-yellow-100 p-2 rounded text-xs overflow-x-auto">
+                      <pre className="bg-[#0f1118] border border-[#1e2130] p-2.5 rounded-lg text-xs text-[#e8eaf2] overflow-x-auto">
 {`[
   { "label": "Happy Customers", "value": "50K+" },
   { "label": "Years of Excellence", "value": "8+" },
@@ -1374,7 +1374,7 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                   {communitySection === 'about' && (
                     <div>
                       <p className="font-medium mb-1">About section format:</p>
-                      <pre className="bg-yellow-100 p-2 rounded text-xs overflow-x-auto">
+                      <pre className="bg-[#0f1118] border border-[#1e2130] p-2.5 rounded-lg text-xs text-[#e8eaf2] overflow-x-auto">
 {`{
   "title": "Who We Are",
   "paragraphs": ["First paragraph...", "Second paragraph..."],
@@ -1387,7 +1387,7 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                   {communitySection === 'team' && (
                     <div>
                       <p className="font-medium mb-1">Team members format (array):</p>
-                      <pre className="bg-yellow-100 p-2 rounded text-xs overflow-x-auto">
+                      <pre className="bg-[#0f1118] border border-[#1e2130] p-2.5 rounded-lg text-xs text-[#e8eaf2] overflow-x-auto">
 {`[
   {
     "id": 1,
@@ -1404,7 +1404,7 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                   {communitySection === 'testimonials' && (
                     <div>
                       <p className="font-medium mb-1">Testimonials format (array):</p>
-                      <pre className="bg-yellow-100 p-2 rounded text-xs overflow-x-auto">
+                      <pre className="bg-[#0f1118] border border-[#1e2130] p-2.5 rounded-lg text-xs text-[#e8eaf2] overflow-x-auto">
 {`[
   {
     "id": 1,
@@ -1421,7 +1421,7 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                   {communitySection === 'contact' && (
                     <div>
                       <p className="font-medium mb-1">Contact info format:</p>
-                      <pre className="bg-yellow-100 p-2 rounded text-xs overflow-x-auto">
+                      <pre className="bg-[#0f1118] border border-[#1e2130] p-2.5 rounded-lg text-xs text-[#e8eaf2] overflow-x-auto">
 {`{
   "address": "123 Main St, City, Country",
   "phone": "+1234567890",
@@ -1445,15 +1445,15 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
             exit={{ opacity: 0, y: -10 }}
             className="space-y-4"
           >
-            <div className="grid md:grid-cols-3 gap-4 h-96">
+            <div className="grid md:grid-cols-3 gap-4 h-[480px]">
               {/* Chat Sessions List */}
-              <div className="border rounded-lg overflow-hidden">
-                <div className="bg-gray-50 px-4 py-2 border-b">
-                  <h3 className="font-semibold text-sm">Active Chats ({chatSessions.length})</h3>
+              <div className="border border-[#1e2130] rounded-xl overflow-hidden bg-[#12141e] flex flex-col">
+                <div className="bg-[#0f1118] px-4 py-3 border-b border-[#1e2130]">
+                  <h3 className="font-syne font-semibold text-sm text-[#e8eaf2]">Active Chats ({chatSessions.length})</h3>
                 </div>
-                <div className="overflow-y-auto h-80">
+                <div className="overflow-y-auto flex-1 divide-y divide-[#1e2130]">
                   {chatSessions.length === 0 ? (
-                    <div className="p-4 text-center text-gray-500 text-sm">
+                    <div className="p-8 text-center text-[#6b7094] text-sm font-medium">
                       No active chats
                     </div>
                   ) : (
@@ -1461,36 +1461,36 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                       <div
                         key={session._id}
                         onClick={() => setSelectedSession(session._id)}
-                        className={`p-3 border-b cursor-pointer hover:bg-gray-50 ${
-                          selectedSession === session._id ? 'bg-blue-50 border-blue-200' : ''
+                        className={`p-4 cursor-pointer transition-colors ${
+                          selectedSession === session._id ? 'bg-[#6c63ff]/10 text-white' : 'hover:bg-[#161921] text-[#e8eaf2]'
                         }`}
                       >
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
-                              <div className="font-medium text-sm">
+                              <div className="font-semibold text-sm">
                                 {session.senderName || 'Anonymous'}
                               </div>
                               {session.userId && (
-                                <span className="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">
+                                <span className="bg-green-500/10 text-green-400 text-[10px] px-2 py-0.5 rounded font-semibold border border-green-500/20">
                                   Registered
                                 </span>
                               )}
                             </div>
                             {session.userId && (
-                              <div className="text-xs text-blue-600 font-mono mb-1">
+                              <div className="text-[10px] text-[#6b7094] font-mono mb-1">
                                 ID: {session.userId.slice(0, 8)}...
                               </div>
                             )}
-                            <div className="text-xs text-gray-600 truncate">
+                            <div className="text-xs text-[#6b7094] truncate">
                               {session.lastMessage}
                             </div>
-                            <div className="text-xs text-gray-400 mt-1">
+                            <div className="text-[10px] text-[#6b7094]/80 mt-1">
                               {new Date(session.lastTimestamp).toLocaleString()}
                             </div>
                           </div>
                           {session.unreadCount > 0 && (
-                            <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                            <span className="bg-[#ff6584] text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold ml-2">
                               {session.unreadCount}
                             </span>
                           )}
@@ -1502,28 +1502,28 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
               </div>
 
               {/* Chat Messages */}
-              <div className="md:col-span-2 border rounded-lg overflow-hidden">
+              <div className="md:col-span-2 border border-[#1e2130] rounded-xl overflow-hidden bg-[#12141e] flex flex-col">
                 {selectedSession ? (
                   <>
-                    <div className="bg-gray-50 px-4 py-2 border-b">
-                      <h3 className="font-semibold text-sm">Chat Session: {selectedSession.slice(-8)}</h3>
+                    <div className="bg-[#0f1118] px-4 py-3 border-b border-[#1e2130]">
+                      <h3 className="font-syne font-semibold text-sm text-[#e8eaf2]">Chat Session: {selectedSession.slice(-8)}</h3>
                     </div>
-                    <div className="h-64 overflow-y-auto p-3 space-y-2">
+                    <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#0c0d14] min-h-[250px]">
                       {chatMessages.length === 0 ? (
-                        <div className="text-center text-gray-500 text-sm">
+                        <div className="text-center text-[#6b7094] text-sm my-auto">
                           No messages yet
                         </div>
                       ) : (
                         chatMessages.map((msg, i) => (
                           <div key={i} className={`flex ${msg.sender === 'admin' ? 'justify-end' : 'justify-start'}`}>
-                            <div className={`max-w-[80%] px-3 py-2 rounded-lg text-sm ${
+                            <div className={`max-w-[80%] px-3.5 py-2.5 rounded-lg text-sm ${
                               msg.sender === 'admin' 
-                                ? 'bg-blue-500 text-white rounded-br-none' 
-                                : 'bg-gray-100 text-gray-800 rounded-bl-none'
+                                ? 'bg-[#6c63ff] text-white rounded-br-none' 
+                                : 'bg-[#161921] text-[#e8eaf2] border border-[#1e2130] rounded-bl-none'
                             }`}>
-                              <div className="text-xs opacity-70 mb-1">{msg.senderName}</div>
-                              {msg.message}
-                              <div className="text-xs opacity-50 mt-1">
+                              <div className="text-[10px] opacity-80 mb-0.5 font-semibold">{msg.senderName}</div>
+                              <div>{msg.message}</div>
+                              <div className="text-[10px] opacity-60 mt-1 text-right">
                                 {new Date(msg.timestamp).toLocaleTimeString()}
                               </div>
                             </div>
@@ -1531,7 +1531,7 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                         ))
                       )}
                     </div>
-                    <div className="border-t p-3">
+                    <div className="border-t border-[#1e2130] p-4 bg-[#12141e]">
                       <div className="flex gap-2">
                         <input
                           type="text"
@@ -1541,12 +1541,12 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                           onKeyDown={(e) => {
                             if (e.key === "Enter") sendAdminMessage();
                           }}
-                          className="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+                          className="flex-1 bg-[#0f1118] border border-[#1e2130] rounded-lg px-4 py-2.5 text-sm text-[#e8eaf2] focus:border-[#6c63ff] outline-none"
                         />
                         <button
                           onClick={sendAdminMessage}
                           disabled={!adminMessage.trim()}
-                          className="px-4 py-2 rounded-lg bg-blue-500 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-600"
+                          className="px-5 py-2.5 rounded-lg bg-[#6c63ff] text-white font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 shadow-[0_0_12px_rgba(108,99,255,0.25)]"
                         >
                           Send
                         </button>
@@ -1554,7 +1554,7 @@ export default function AdminPanel({ onBack, isAdmin = false }) {
                     </div>
                   </>
                 ) : (
-                  <div className="h-full flex items-center justify-center text-gray-500">
+                  <div className="h-full flex items-center justify-center text-[#6b7094] font-medium bg-[#12141e] p-8">
                     Select a chat session to view messages
                   </div>
                 )}

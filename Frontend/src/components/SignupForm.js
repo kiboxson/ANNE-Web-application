@@ -30,21 +30,21 @@ function SignupForm({ onSuccess }) {
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
       {error ? (
-        <div className="text-red-600 text-sm" role="alert">{error}</div>
+        <div className="text-[#ff6584] text-sm font-semibold bg-[#ff6584]/10 border border-[#ff6584]/20 px-3 py-2 rounded-lg" role="alert">{error}</div>
       ) : null}
       <input
         type="text"
         placeholder="Username"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
-        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
+        className="w-full px-4 py-2.5 bg-[#0f1118] border border-[#1e2130] rounded-lg text-[#e8eaf2] placeholder-[#6b7094] focus:border-[#6c63ff] outline-none transition-colors"
       />
       <input
         type="email"
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
+        className="w-full px-4 py-2.5 bg-[#0f1118] border border-[#1e2130] rounded-lg text-[#e8eaf2] placeholder-[#6b7094] focus:border-[#6c63ff] outline-none transition-colors"
       />
       <div className="relative">
         <input
@@ -52,13 +52,13 @@ function SignupForm({ onSuccess }) {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none pr-10"
+          className="w-full px-4 py-2.5 bg-[#0f1118] border border-[#1e2130] rounded-lg text-[#e8eaf2] placeholder-[#6b7094] focus:border-[#6c63ff] outline-none pr-10 transition-colors"
         />
         <button
           type="button"
           aria-label={showPassword ? "Hide password" : "Show password"}
           onClick={() => setShowPassword((s) => !s)}
-          className="absolute inset-y-0 right-2 flex items-center text-gray-500 hover:text-gray-700"
+          className="absolute inset-y-0 right-3 flex items-center text-[#6b7094] hover:text-[#e8eaf2] transition-colors"
         >
           {showPassword ? (
             // Eye-off icon
@@ -77,7 +77,7 @@ function SignupForm({ onSuccess }) {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 disabled:opacity-60"
+        className="w-full bg-[#6c63ff] text-white py-2.5 rounded-lg hover:opacity-90 transition-all font-semibold font-syne disabled:opacity-60 shadow-[0_0_12px_rgba(108,99,255,0.25)]"
       >
         {loading ? "Signing up..." : "Signup"}
       </button>

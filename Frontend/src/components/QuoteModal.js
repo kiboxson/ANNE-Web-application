@@ -114,14 +114,14 @@ export default function QuoteModal({ open, onClose, selectedComponents = [] }) {
                       onFocus={(e) => (e.target.style.borderColor = "#6c63ff")}
                       onBlur={(e) => (e.target.style.borderColor = "#1e2130")}
                     >
-                      <option value="">Select website type...</option>
-                      <option>Landing Page</option>
-                      <option>E-Commerce Store</option>
-                      <option>Portfolio / Agency</option>
-                      <option>Business Website</option>
-                      <option>SaaS Dashboard</option>
-                      <option>Blog / Content Site</option>
-                      <option>Other</option>
+                      <option value="" className="bg-[#0f1118] text-[#e8eaf2]">Select website type...</option>
+                      <option className="bg-[#0f1118] text-[#e8eaf2]">Landing Page</option>
+                      <option className="bg-[#0f1118] text-[#e8eaf2]">E-Commerce Store</option>
+                      <option className="bg-[#0f1118] text-[#e8eaf2]">Portfolio / Agency</option>
+                      <option className="bg-[#0f1118] text-[#e8eaf2]">Business Website</option>
+                      <option className="bg-[#0f1118] text-[#e8eaf2]">SaaS Dashboard</option>
+                      <option className="bg-[#0f1118] text-[#e8eaf2]">Blog / Content Site</option>
+                      <option className="bg-[#0f1118] text-[#e8eaf2]">Other</option>
                     </select>
                   </div>
 
@@ -134,12 +134,12 @@ export default function QuoteModal({ open, onClose, selectedComponents = [] }) {
                       onFocus={(e) => (e.target.style.borderColor = "#6c63ff")}
                       onBlur={(e) => (e.target.style.borderColor = "#1e2130")}
                     >
-                      <option value="">Select budget...</option>
-                      <option>$149 – $299 (Starter)</option>
-                      <option>$299 – $699 (Professional)</option>
-                      <option>$699 – $1500 (Advanced)</option>
-                      <option>$1500+ (Enterprise)</option>
-                      <option>Let's discuss</option>
+                      <option value="" className="bg-[#0f1118] text-[#e8eaf2]">Select budget...</option>
+                      <option className="bg-[#0f1118] text-[#e8eaf2]">$149 – $299 (Starter)</option>
+                      <option className="bg-[#0f1118] text-[#e8eaf2]">$299 – $699 (Professional)</option>
+                      <option className="bg-[#0f1118] text-[#e8eaf2]">$699 – $1500 (Advanced)</option>
+                      <option className="bg-[#0f1118] text-[#e8eaf2]">$1500+ (Enterprise)</option>
+                      <option className="bg-[#0f1118] text-[#e8eaf2]">Let's discuss</option>
                     </select>
                   </div>
 

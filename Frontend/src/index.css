@@ -32,16 +32,17 @@
 /* Reusable card utility */
 @layer components {
   .card {
-    @apply bg-white rounded-xl shadow-sm ring-1 ring-gray-100 dark:bg-gray-900 dark:ring-gray-800;
+    @apply bg-[#12141e] border border-[#1e2130] rounded-xl;
   }
   .btn {
     @apply inline-flex items-center justify-center gap-2 rounded-lg px-3 py-2 font-medium transition;
   }
   .btn-primary {
-    @apply btn bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600;
+    @apply btn bg-[#6c63ff] text-white hover:opacity-90;
+    box-shadow: 0 0 24px rgba(108,99,255,0.35);
   }
   .btn-secondary {
-    @apply btn bg-white text-gray-800 ring-1 ring-gray-200 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-100 dark:ring-gray-700 dark:hover:bg-gray-700;
+    @apply btn bg-transparent text-[#e8eaf2] border border-[#1e2130] hover:border-[#6c63ff] hover:text-white;
   }
 }
 

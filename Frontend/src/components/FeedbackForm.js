@@ -74,7 +74,7 @@ function FeedbackForm({ onClose, onSuccess }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-[#07080d]/80 backdrop-blur-md flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
       <motion.div
@@ -82,7 +82,7 @@ function FeedbackForm({ onClose, onSuccess }) {
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         transition={{ type: "spring", duration: 0.5 }}
-        className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-[#12141e] border border-[#1e2130] rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto text-[#e8eaf2] scrollbar-thin scrollbar-thumb-[#1e2130] scrollbar-track-transparent"
         onClick={(e) => e.stopPropagation()}
       >
         {!submitted ? (
@@ -90,12 +90,12 @@ function FeedbackForm({ onClose, onSuccess }) {
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-3xl font-serif font-bold text-gray-900">Share Your Experience</h2>
-                <p className="text-gray-600 mt-2">We value your feedback and would love to hear from you</p>
+                <h2 className="text-3xl font-bold font-syne bg-gradient-to-r from-[#6c63ff] to-[#00f2fe] bg-clip-text text-transparent">Share Your Experience</h2>
+                <p className="text-[#8a8fbb] mt-2 font-medium">We value your feedback and would love to hear from you</p>
               </div>
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-[#6b7094] hover:text-[#e8eaf2] transition-colors p-2 hover:bg-[#1e2130] rounded-full"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -106,7 +106,7 @@ function FeedbackForm({ onClose, onSuccess }) {
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700"
+                className="mb-6 p-4 bg-[#ff6584]/10 border border-[#ff6584]/20 rounded-lg text-[#ff6584] font-semibold text-sm"
               >
                 {error}
               </motion.div>
@@ -116,7 +116,7 @@ function FeedbackForm({ onClose, onSuccess }) {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Name Input */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-[#8a8fbb] mb-2">
                   Your Name *
                 </label>
                 <input
@@ -125,14 +125,14 @@ function FeedbackForm({ onClose, onSuccess }) {
                   value={formData.name}
                   onChange={handleChange}
                   placeholder="John Doe"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 bg-[#0f1118] border border-[#1e2130] rounded-lg text-[#e8eaf2] placeholder-[#6b7094] focus:border-[#6c63ff] outline-none transition-all duration-200"
                   required
                 />
               </div>
 
               {/* Email Input */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-[#8a8fbb] mb-2">
                   Email Address *
                 </label>
                 <input
@@ -141,14 +141,14 @@ function FeedbackForm({ onClose, onSuccess }) {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="john@example.com"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 bg-[#0f1118] border border-[#1e2130] rounded-lg text-[#e8eaf2] placeholder-[#6b7094] focus:border-[#6c63ff] outline-none transition-all duration-200"
                   required
                 />
               </div>
 
               {/* Rating */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                <label className="block text-sm font-semibold text-[#8a8fbb] mb-3">
                   Your Rating *
                 </label>
                 <div className="flex items-center gap-2">
@@ -167,12 +167,12 @@ function FeedbackForm({ onClose, onSuccess }) {
                         className={`w-8 h-8 transition-colors ${
                           star <= (hoveredRating || formData.rating)
                             ? "text-yellow-400 fill-current"
-                            : "text-gray-300"
+                            : "text-[#1e2130] stroke-[#2e324d]"
                         }`}
                       />
                     </motion.button>
                   ))}
-                  <span className="ml-3 text-gray-600 font-medium">
+                  <span className="ml-3 text-[#8a8fbb] font-semibold">
                     {formData.rating} {formData.rating === 1 ? "star" : "stars"}
                   </span>
                 </div>
@@ -180,7 +180,7 @@ function FeedbackForm({ onClose, onSuccess }) {
 
               {/* Feedback Textarea */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-[#8a8fbb] mb-2">
                   Your Feedback *
                 </label>
                 <textarea
@@ -189,10 +189,10 @@ function FeedbackForm({ onClose, onSuccess }) {
                   onChange={handleChange}
                   placeholder="Tell us about your experience..."
                   rows={5}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-transparent transition-all resize-none"
+                  className="w-full px-4 py-3 bg-[#0f1118] border border-[#1e2130] rounded-lg text-[#e8eaf2] placeholder-[#6b7094] focus:border-[#6c63ff] outline-none transition-all duration-200 resize-none"
                   required
                 />
-                <p className="text-sm text-gray-500 mt-2">
+                <p className="text-sm text-[#6b7094] mt-2 font-medium">
                   {formData.feedback.length} characters
                 </p>
               </div>
@@ -201,13 +201,9 @@ function FeedbackForm({ onClose, onSuccess }) {
               <motion.button
                 type="submit"
                 disabled={isSubmitting}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className={`w-full py-4 rounded-lg font-semibold text-white flex items-center justify-center gap-2 transition-all ${
-                  isSubmitting
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-gradient-to-r from-gray-700 to-gray-900 hover:from-gray-800 hover:to-black"
-                }`}
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+                className="w-full py-4 rounded-lg font-bold font-syne text-white flex items-center justify-center gap-2 transition-all bg-[#6c63ff] hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_15px_rgba(108,99,255,0.3)]"
               >
                 {isSubmitting ? (
                   <>
@@ -231,15 +227,15 @@ function FeedbackForm({ onClose, onSuccess }) {
               animate={{ scale: 1 }}
               transition={{ type: "spring", duration: 0.6 }}
             >
-              <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-6" />
+              <CheckCircle className="w-20 h-20 text-[#00f2fe] mx-auto mb-6" />
             </motion.div>
-            <h3 className="text-3xl font-serif font-bold text-gray-900 mb-4">
+            <h3 className="text-3xl font-bold font-syne bg-gradient-to-r from-[#6c63ff] to-[#00f2fe] bg-clip-text text-transparent mb-4">
               Thank You!
             </h3>
-            <p className="text-lg text-gray-600 mb-2">
+            <p className="text-lg text-[#e8eaf2] mb-2 font-medium">
               Your feedback has been submitted successfully.
             </p>
-            <p className="text-gray-500">
+            <p className="text-[#8a8fbb]">
               We appreciate you taking the time to share your experience with us.
             </p>
           </div>
